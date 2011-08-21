@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"	
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:background="@color/task_edit_detials_background">
+   	<include layout="@layout/actionbar" />
+	<TableLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+		android:layout_marginLeft="@dimen/task_edit_detials_padding"
+		android:layout_marginRight="@dimen/task_edit_detials_padding" 
+		android:layout_marginBottom="@dimen/task_edit_detials_padding" 
+    	android:background="@color/task_edit_detials_paper"
+	    android:shrinkColumns="1"
+	    android:stretchColumns="0">   
+	    <TableRow>
+			<EditText
+			 	android:layout_width="fill_parent"
+				android:layout_height="wrap_content" 
+				android:id="@+id/taskEdit_titleField"
+				android:layout_span="2"
+				android:background="@drawable/edit_text_holo_light"
+				android:hint="@string/task_title_hint" 
+				android:layout_marginTop="@dimen/padding"
+	        	android:singleLine="true"
+				android:textColor="@color/task_textfield_color" />
+	    </TableRow>
+	    <TableRow android:id="@+id/taskEdit_dateRow">
+			<EditText
+			 	android:layout_width="fill_parent"
+				android:layout_height="wrap_content" 
+				android:id="@+id/taskEdit_dateField"
+				android:inputType="datetime"
+				android:background="@drawable/edit_text_holo_light"
+				android:hint="Due Date:" 
+				android:layout_marginTop="@dimen/padding"
+				android:textColor="@color/task_textfield_color" 
+				android:singleLine="true"
+				android:textSize="@dimen/text_size_medium"
+				android:onClick="pickDate_OnClick"
+				/>
+			<Button 
+				android:layout_width="32dp"
+				android:layout_height="32dp"
+				android:id="@+id/taskEdit_dateClear"
+				android:background="@drawable/ic_menu_close_clear_cancel"
+				android:onClick="clearDate_OnClick"/>
+	    </TableRow>
+		<EditText 
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent" 
+			android:layout_span="2"
+			android:id="@+id/taskEdit_detialsField" 
+			android:textColor="@color/task_textfield_color"
+			android:hint="Compose 7ask" 
+			android:background="@drawable/edit_multiline_text_holo_light"
+			android:inputType="textMultiLine"
+			android:gravity="top" />
+	</TableLayout>		
+</LinearLayout>

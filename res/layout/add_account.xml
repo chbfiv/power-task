@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#000000">
+
+    <TextView
+        android:id="@+id/addAccount_title"
+        android:layout_width="fill_parent"
+        android:layout_height="60dip"
+        android:background="@drawable/gradient"
+        android:paddingLeft="10dip"
+        android:gravity="center_vertical"
+        android:textColor="#ffffff"
+        android:text="Add a Google Account"
+        android:textSize="26dip" 
+        android:layout_alignParentTop="true"/>
+
+    <TextView
+        android:id="@+id/addAccount_descriptionTitle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/addAccount_title"
+        android:padding="6dip"
+        android:background="#000000"
+        android:textColor="#ffffff"
+        android:text="Adding an account"
+        android:textSize="20dip"/>
+
+    <TextView
+        android:id="@+id/addAccount_description"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dip"
+        android:layout_below="@+id/addAccount_descriptionTitle"
+        android:text="@string/addAccount_description"
+        android:textSize="16dip"
+        android:textColor="#ffffff"
+        android:layout_margin="5dip"/>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/addAccount_description"
+        android:background="#808080" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/addAccount_footer"
+        android:padding="10dip"
+        android:gravity="center_vertical"
+        android:background="#000000"
+        android:textColor="#ffffff"
+        android:text="@string/addAccount_descriptionFooter"
+        android:textSize="16dip"/>
+
+    <LinearLayout
+        android:id="@+id/addAccount_footer"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="50dip"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/gradient">
+
+        <Button
+            android:id="@+id/addAccount_next"
+            android:text="Next"
+            android:layout_marginTop="5px"
+            android:layout_weight="1"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/addAccount_cancel"
+            android:text="Cancel"
+            android:layout_marginTop="5px"
+            android:layout_weight="1"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</RelativeLayout>

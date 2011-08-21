@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:shrinkColumns="1"
+    android:stretchColumns="1"
+   	android:background="@android:color/black" >    
+    <TableRow
+	    android:layout_marginLeft="16dip"
+	    android:layout_marginRight="16dip"
+    	android:minHeight="64dip">
+	    <CheckBox  
+		    android:layout_width="match_parent" 
+		    android:layout_height="match_parent" 
+	    	android:id="@+id/tagItem_checkBox" 
+	        android:button="@drawable/btn_check_holo_light"/>
+	     <TextView 
+	         android:layout_width="match_parent"
+	         android:layout_height="match_parent"
+	         android:id="@+id/tagItem_name"
+	         android:textSize="@dimen/text_size_large"
+	         android:singleLine="true"
+	         android:layout_weight="1"
+	         android:text="Example Tag asdasd asd asd asd asd asd" 
+	         android:ellipsize="end"
+	         android:gravity="center_vertical"
+	    	 android:layout_marginLeft="8dip"
+	    	 android:textColor="@android:color/white" />
+	    <ImageButton
+	    	android:id="@+id/tagItem_colorPicker"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:gravity="center_vertical"
+	        android:background="@android:color/transparent"
+	        android:src="@drawable/color_picker" /> 
+    </TableRow>
+	<ImageView 
+	    android:layout_width="match_parent"
+	    android:layout_height="1dip"
+	    android:scaleType="fitXY"
+	    android:gravity="fill_horizontal"
+	    android:layout_marginLeft="16dip"
+	    android:layout_marginRight="16dip"
+	    android:src="@drawable/divider_horizontal_holo_light" />
+</TableLayout>

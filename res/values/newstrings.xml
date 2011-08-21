@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="description_logo">7ask 7ags</string>
+    <string name="description_add">Add Tasks</string>
+
+    <string name="task_title">Title:</string>
+    <string name="task_title_hint">Title:</string>
+    <string name="task_date">Task Date</string>
+    <string name="dateButton">...</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="app_name_setup">Cloud Task Setup</string>
+</resources>

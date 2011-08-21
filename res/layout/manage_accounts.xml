@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#000000">
+    <TextView
+        android:id="@+id/manageAccounts_header"
+        android:layout_width="fill_parent"
+        android:layout_height="60dip"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/gradient"
+        android:paddingLeft="10dip"
+        android:gravity="center_vertical"
+        android:textColor="#ffffff"
+        android:text="Manage Accounts"
+        android:textSize="26dip"/>
+
+    <TextView
+        android:id="@+id/manageAccounts_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/manageAccounts_header"
+        android:padding="6dip"
+        android:background="#000000"
+        android:textColor="#ffffff"
+        android:text="Autherize the accounts you want to sync."
+        android:textSize="16dip"/>
+
+    <View
+        android:id="@+id/manageAccounts_divider"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@+id/manageAccounts_title"
+        android:background="#808080" />
+
+    <ListView
+        android:id="@+id/manageAccounts_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/manageAccounts_divider"
+        android:layout_margin="10dip"
+        android:divider="#FFFFFF"
+        android:textSize="16dip"
+        android:background="@android:color/transparent"
+        android:cacheColorHint="@android:color/transparent">
+    </ListView>   
+</RelativeLayout>

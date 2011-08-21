@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:padding="3dip"
+    android:stretchColumns="0"
+    android:shrinkColumns="0">    
+    <TableRow>
+	    <TextView
+			android:id="@+id/taskListItem_title"
+	        android:layout_width="match_parent"
+	        android:layout_height="fill_parent" 
+	        android:layout_marginLeft="6dip"
+			android:textSize="@dimen/text_size_large"
+	        android:singleLine="true"
+	        android:text="Example List" 
+	        android:ellipsize="end"
+	        android:gravity="center_vertical"/>	    
+        <TextView
+			android:id="@+id/taskListItem_count"
+	        android:layout_width="match_parent"
+	        android:layout_height="fill_parent" 
+			android:textSize="@dimen/text_size_medium"
+	        android:singleLine="true"
+	        android:text="104" 
+	        android:gravity="center_vertical"
+	        android:layout_marginLeft="2dip"
+	        android:layout_marginRight="6dip"/>
+	    <ImageView
+        	android:id="@+id/taskItem_icon"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:src="@drawable/ic_go_search_api_holo_light"
+	        android:scaleType="center"
+	        android:layout_marginLeft="2dip"
+	        android:layout_marginRight="2dip"/> 
+    </TableRow>
+     <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+		android:layout_span="3"
+        android:background="#c2c2c2" />
+</TableLayout>

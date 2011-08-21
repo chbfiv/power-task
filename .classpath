@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="lib" path="lib/requestfactory-client.jar"/>
+	<classpathentry kind="lib" path="lib/c2dm.jar"/>
+	<classpathentry kind="lib" path="lib/validation-api-1.0.0.GA.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="src" path="shared"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="lib" path="/home/chbfiv/dev/google-api-java-client/google-api-services-tasks-v1-1.0.0-beta.jar"/>
+	<classpathentry kind="lib" path="/home/chbfiv/dev/google-api-java-client/google-api-client-1.4.1-beta.jar"/>
+	<classpathentry kind="lib" path="/home/chbfiv/dev/google-api-java-client/google-api-client-googleapis-1.4.1-beta.jar"/>
+	<classpathentry kind="lib" path="/home/chbfiv/dev/google-api-java-client/dependencies/guava-r09.jar"/>
+	<classpathentry kind="lib" path="/home/chbfiv/dev/google-api-java-client/dependencies/jackson-core-asl-1.6.7.jar"/>
+	<classpathentry kind="lib" path="/home/chbfiv/dev/google-api-java-client/google-api-client-extensions-android2-1.4.1-beta.jar"/>
+	<classpathentry kind="lib" path="/home/chbfiv/dev/google-api-java-client/google-api-client-googleapis-extensions-android2-1.4.1-beta.jar"/>
+	<classpathentry kind="lib" path="lib/CWAC-Parcel.jar"/>
+	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

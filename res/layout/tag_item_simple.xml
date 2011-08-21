@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:shrinkColumns="1"
+    android:stretchColumns="1">    
+    <TableRow>
+	     <TextView 
+	         android:layout_width="match_parent"
+	         android:layout_height="wrap_content"
+	         android:id="@+id/tagItem_name"
+	         android:textSize="@dimen/text_size_large"
+	         android:paddingLeft="16dip"
+	         android:paddingRight="16dip" 
+	         android:paddingTop="8dip"
+	         android:paddingBottom="8dip" 
+	         android:text="Example Tag" 
+	    	 android:textColor="@android:color/white" />
+    </TableRow>
+	<ImageView 
+	    android:layout_width="match_parent"
+	    android:layout_height="1dip"
+	    android:scaleType="fitXY"
+	    android:gravity="fill_horizontal"
+	    android:paddingLeft="16dip"
+	    android:paddingRight="16dip"
+	    android:src="@drawable/divider_horizontal_holo_light" />
+</TableLayout>

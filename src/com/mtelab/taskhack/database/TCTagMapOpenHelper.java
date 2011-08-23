@@ -41,7 +41,12 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
                 "FOREIGN KEY(" + KEY_tagId + ") " + 
                 "REFERENCES " + TCTagsOpenHelper.TABLE_NAME + "("+ TCTagsOpenHelper.KEY_id + ") ON DELETE CASCADE ON UPDATE CASCADE," +
 			    "FOREIGN KEY(" + KEY_taskId + ") " + 
-			    "REFERENCES " + GooTaskListOpenHelper.TABLE_NAME + "("+ GooTaskListOpenHelper.KEY_id + ") ON DELETE CASCADE ON UPDATE CASCADE);"; 
+			    "REFERENCES " + GooTasksOpenHelper.TABLE_NAME + "("+ GooTasksOpenHelper.KEY_id + ") ON DELETE CASCADE ON UPDATE CASCADE);"; 
+    
+    @Override
+    public String getTableCreate() {
+    	return TABLE_CREATE;
+    }
     
     public TCTagMapOpenHelper(Context context) {
         super(context); 
@@ -73,21 +78,6 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 		super.onOpen(db);
 	}
 	
-	@Override
-	public boolean initialize() {
-		boolean ret = false;
-    	try
-    	{
-    		getWritableDatabase().execSQL(TABLE_CREATE);
-    		ret = true;
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		return ret;
-	}
-	
 	public List<TCTag> query(long taskId) {
 		List<TCTag> tagList = new ArrayList<TCTag>();
 		Cursor c = null;
@@ -100,7 +90,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 			
 			String[] args = new String[] { String.valueOf(taskId) };
 			
-			c = getReadableDatabase().rawQuery(sql, args);
+			c = getDbReadOnly().rawQuery(sql, args);
 
 			if(c != null && c.moveToFirst())
 			{
@@ -137,7 +127,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 			
 			String[] args = new String[] { String.valueOf(taskId) };
 			
-			c = getReadableDatabase().rawQuery(sql, args);
+			c = getDbReadOnly().rawQuery(sql, args);
 
 			if(c != null && c.moveToFirst())
 			{
@@ -200,7 +190,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 			 ContentValues values = new ContentValues();
 			 values.put(KEY_tagId, tagId);
 			 values.put(KEY_taskId, taskId);
-			 ret = getWritableDatabase().insert(TABLE_NAME, null, values);	
+			 ret = getDbReadWrite().insert(TABLE_NAME, null, values);	
 		} 
 		catch(SQLException sqle)
 		{
@@ -217,7 +207,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 			 ContentValues values = new ContentValues();
 			 values.put(KEY_tagId, tagId);
 			 values.put(KEY_taskId, taskId);
-			 ret = getWritableDatabase().replace(TABLE_NAME, null, values);	
+			 ret = getDbReadWrite().replace(TABLE_NAME, null, values);	
 		} 
 		catch(SQLException sqle)
 		{
@@ -256,7 +246,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 		boolean ret = false;
 		 try
 		 {
-			 ret = getWritableDatabase().delete(TABLE_NAME, KEY_tagId + " = " + tagId + " AND " + KEY_taskId + " = " + taskId , null) > 0;				
+			 ret = getDbReadWrite().delete(TABLE_NAME, KEY_tagId + " = " + tagId + " AND " + KEY_taskId + " = " + taskId , null) > 0;				
 		 }
 		 catch(SQLException sqle)
 		 {

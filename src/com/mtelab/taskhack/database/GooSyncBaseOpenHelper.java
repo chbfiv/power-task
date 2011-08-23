@@ -1,15 +1,12 @@
 package com.mtelab.taskhack.database;
 
-import com.mtelab.taskhack.helpers.SharedPrefUtil;
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 
-public class GooSyncBaseOpenHelper extends GooBaseOpenHelper {
+public abstract class GooSyncBaseOpenHelper extends GooBaseOpenHelper {
 	
     @SuppressWarnings("unused")
-	private static final String TAG = SharedPrefUtil.class.getName();
+	private static final String TAG = GooSyncBaseOpenHelper.class.getName();
 
     protected static final String KEY_syncState = "syncState";   
     protected static final String KEY_eTag = "eTag";   

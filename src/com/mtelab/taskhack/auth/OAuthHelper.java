@@ -12,7 +12,7 @@ import com.mtelab.taskhack.R;
 import com.mtelab.taskhack.database.GooAccountsOpenHelper;
 import com.mtelab.taskhack.helpers.SharedPrefUtil;
 import com.mtelab.taskhack.models.GooAccount;
-import com.mtelab.taskhack.views.ManageAccountsActivity;
+import com.mtelab.taskhack.views.GooAccountsActivity;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -101,7 +101,7 @@ public class OAuthHelper {
 	      return;
 	    }
 	    //otherwise take them to the accounts page
-		final Intent intent = new Intent(mActivity, ManageAccountsActivity.class);
+		final Intent intent = new Intent(mActivity, GooAccountsActivity.class);
 		mActivity.startActivity(intent);
 		mActivity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
 	}

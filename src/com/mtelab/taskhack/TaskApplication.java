@@ -7,14 +7,10 @@ import com.google.api.client.extensions.android2.AndroidHttp;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.services.tasks.v1.Tasks;
-import com.mtelab.taskhack.adapters.GooAccountsAdapter;
 import com.mtelab.taskhack.adapters.GooTaskListAdapter;
-import com.mtelab.taskhack.adapters.GooTaskListCollectionAdapter;
 import com.mtelab.taskhack.adapters.TCTagListAdapter;
 import com.mtelab.taskhack.auth.OAuthHelper;
-import com.mtelab.taskhack.models.GooAccount;
 import com.mtelab.taskhack.models.GooTask;
-import com.mtelab.taskhack.models.GooTaskList;
 import com.mtelab.taskhack.models.TCTagItem;
 import com.mtelab.taskhack.shared.TaskChange;
 
@@ -37,10 +33,8 @@ public class TaskApplication extends Application {
     private TaskListener listener;
     
     private GooTaskListAdapter mTaskListAdapter;
-    private GooTaskListCollectionAdapter mTaskListCollectionAdapter;
-    private GooAccountsAdapter mAccountAdapter;
     private TCTagListAdapter mTagListAdapter;
-    
+    	
     private OAuthHelper mOAuthHelper;
     
     @Override
@@ -48,7 +42,7 @@ public class TaskApplication extends Application {
     	super.onCreate();
         service.accessKey = OAuthHelper.GOOGLE_API_KEY;  	
     }
-    
+        
     public void setTaskListener(TaskListener listener) {
         this.listener = listener;
     }
@@ -83,28 +77,6 @@ public class TaskApplication extends Application {
         	mTaskListAdapter = new GooTaskListAdapter(context,  R.layout.task_item, new ArrayList<GooTask>());
         }
         return mTaskListAdapter;
-    }
-    
-    public GooTaskListCollectionAdapter getTaskListCollectionAdapter() {
-        return mTaskListCollectionAdapter;
-    }
-    
-    public GooTaskListCollectionAdapter getTaskListCollectionAdapter(Context context) {
-        if (mTaskListCollectionAdapter == null) {
-        	mTaskListCollectionAdapter = new GooTaskListCollectionAdapter(context,  R.layout.task_list_item, new ArrayList<GooTaskList>());
-        }
-        return mTaskListCollectionAdapter;
-    }
-    
-    public GooAccountsAdapter getAccountsAdapter() {
-        return mAccountAdapter;
-    } 
-    
-    public GooAccountsAdapter getAccountsAdapter(Context context) {
-        if (mAccountAdapter == null) {
-        	mAccountAdapter = new GooAccountsAdapter(context, R.layout.account, new ArrayList<GooAccount>());
-        }
-        return mAccountAdapter;
     }
     
     public void notifyListener(Intent intent) {

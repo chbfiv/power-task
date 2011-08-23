@@ -5,7 +5,7 @@ import java.util.List;
 import com.mtelab.taskhack.R;
 import com.mtelab.taskhack.drawables.ColorPicker;
 import com.mtelab.taskhack.models.TCTagItem;
-import com.mtelab.taskhack.views.GooTaskListActivity;
+import com.mtelab.taskhack.views.GooTasksActivity;
 import com.mtelab.taskhack.views.TCTagListActivity;
 
 import android.content.Context;

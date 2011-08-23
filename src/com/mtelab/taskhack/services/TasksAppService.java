@@ -9,18 +9,19 @@ import com.google.api.services.tasks.v1.model.TaskLists;
 import com.google.api.services.tasks.v1.model.Task;
 import com.google.api.services.tasks.v1.model.Tasks;
 import com.mtelab.taskhack.TaskApplication;
-import com.mtelab.taskhack.auth.OAuthHelper;
-import com.mtelab.taskhack.database.GooTaskListCollectionOpenHelper;
-import com.mtelab.taskhack.database.GooTaskListOpenHelper;
+import com.mtelab.taskhack.database.GooAccountsOpenHelper;
+import com.mtelab.taskhack.database.GooTaskListsOpenHelper;
+import com.mtelab.taskhack.database.GooTasksOpenHelper;
 import com.mtelab.taskhack.database.TCTagMapOpenHelper;
 import com.mtelab.taskhack.database.TCTagsOpenHelper;
 import com.mtelab.taskhack.helpers.SharedPrefUtil;
+import com.mtelab.taskhack.models.GooAccount;
 import com.mtelab.taskhack.models.GooBase;
 import com.mtelab.taskhack.models.GooTask;
 import com.mtelab.taskhack.models.GooTaskList;
-import com.mtelab.taskhack.shared.TaskChange;
-import com.mtelab.taskhack.views.GooTaskListActivity;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -36,16 +37,17 @@ public class TasksAppService extends IntentService {
 
 	private static final String TAG = TasksAppService.class.getName();
 
-	//com.google.android.iosched.extra.STATUS_RECEIVER
 	public static final String REQUEST_RECEIVER_EXTRA = TasksAppService.class + ".extra";
 	
 	public static final String EXTRA_TASK_LIST_ID = "task_list_id";
 	public static final String EXTRA_TASK_ID = "task_id";
+	public static final String EXTRA_ACCOUNT_ID = "account_id";
 	
 	public static final int RESULT_RECEIVER_ = 20000;
     
 	public static final int REQUEST_SYNC_TASK_LISTS = 30000;
 	public static final int REQUEST_SYNC_TASKS = 30001;
+	public static final int REQUEST_SYNC_ACCOUNTS = 30002;
 	
 	public static final int CREATE_TASK = 30002;
 	public static final int READ_TASK = 30003;
@@ -54,6 +56,7 @@ public class TasksAppService extends IntentService {
     
 	public static final int RESULT_SYNC_TASK_LISTS_SUCCESS = 40000;
 	public static final int RESULT_SYNC_TASKS_SUCCESS = 40001;
+	public static final int RESULT_SYNC_ACCOUNTS_SUCCESS = 40002;
 	
 	public static final int RESULT_CREATE_TASK_SUCCESS = 40002;
 	public static final int RESULT_READ_TASK_SUCCESS = 40003;
@@ -66,13 +69,13 @@ public class TasksAppService extends IntentService {
     public static final int RESULT_FAILED_UNAUTHORIZED = 49996;
     
     public static final String RESULT_TASK_LISTS = "result_task_lists";
-    public static final String EXTRA_ACCOUNT_ID = "accountId";
-    
-    private GooTaskListCollectionOpenHelper dbTLCHelper;
-    private GooTaskListOpenHelper dbTLHelper;
-    private TCTagsOpenHelper dbTagsHelper;
-    private TCTagMapOpenHelper dbTagMapHelper;
-    
+
+    private final GooAccountsOpenHelper dbACCHelper = new GooAccountsOpenHelper(this);
+    private final GooTaskListsOpenHelper dbTLCHelper = new GooTaskListsOpenHelper(this);
+    private final GooTasksOpenHelper dbTLHelper = new GooTasksOpenHelper(this);
+    private final TCTagsOpenHelper dbTagsHelper = new TCTagsOpenHelper(this);
+    private final TCTagMapOpenHelper dbTagMapHelper = new TCTagMapOpenHelper(this);
+	
     private com.google.api.services.tasks.v1.Tasks taskService;
     
     public TasksAppService()
@@ -84,8 +87,15 @@ public class TasksAppService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		//TLog(TAG + " service onHandleIntent - started; action:" + intent.getAction());
 
-	    SharedPreferences prefs = SharedPrefUtil.getSharedPref(this);	    
-	    final long accountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, GooBase.INVALID_ID);
+		intent.getLongExtra(EXTRA_TASK_LIST_ID, GooBase.INVALID_ID);
+
+	    long accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, GooBase.INVALID_ID);
+	    if(accountId == GooBase.INVALID_ID)
+	    {
+		    SharedPreferences prefs = SharedPrefUtil.getSharedPref(this);	    
+		    accountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, GooBase.INVALID_ID);
+	    }
+	    
 	    final long taskListId = intent.getLongExtra(EXTRA_TASK_LIST_ID, GooBase.INVALID_ID);
 	    final long taskId = intent.getLongExtra(EXTRA_TASK_ID, GooBase.INVALID_ID);
 	    
@@ -106,6 +116,11 @@ public class TasksAppService extends IntentService {
 			    {
 			    	processTasksRequest(taskListId, receiver);
 			    	break;
+			    }	 
+			    case REQUEST_SYNC_ACCOUNTS:
+			    {
+			    	processAccountsRequest(receiver);
+			    	break;
 			    }	    
 			    case UPDATE_TASK:
 			    {
@@ -120,6 +135,37 @@ public class TasksAppService extends IntentService {
 	    	if(receiver != null) receiver.send(RESULT_FAILED, Bundle.EMPTY);	    	
 	    }
 	    if(receiver != null) receiver.send(RESULT_LOADING_COMPLETE, Bundle.EMPTY);
+	}
+	
+	private void processAccountsRequest(ResultReceiver receiver)
+	{
+		Bundle bundle = new Bundle(); 
+    	try
+    	{   		
+            Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
+            
+            for (Account account : accounts) {
+            	GooAccount gooAccount = dbACCHelper.findAccountByName(account.name);
+            	if(gooAccount != null)
+            	{
+            		//Required to know which google accounts have been removed to allow
+            		//for removal from local cache.
+            		gooAccount.localAccountFound = Boolean.TRUE;
+            	}
+            	else
+            	{
+            		//create a new local cache account (currently unauthorized to sync)
+                	gooAccount = new GooAccount(account.name, account.type, false);  
+                	dbACCHelper.create(gooAccount);
+            	}
+            }  
+    		
+	    	if(receiver != null) receiver.send(RESULT_SYNC_ACCOUNTS_SUCCESS, bundle);
+    	} 
+    	catch(Exception e)
+    	{
+    		handleException(e, receiver);
+    	}
 	}
 	
 	private void processTaskListRequest(long accountId, ResultReceiver receiver)
@@ -220,12 +266,7 @@ public class TasksAppService extends IntentService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
-		dbTLCHelper = new GooTaskListCollectionOpenHelper(this);
-		dbTLHelper = new GooTaskListOpenHelper(this);	
-		dbTagsHelper = new TCTagsOpenHelper(this);
-		dbTagMapHelper = new TCTagMapOpenHelper(this);		
-
+		
 		TaskApplication app = (TaskApplication)getApplication();
 		taskService = app.getTasksService();
 	}

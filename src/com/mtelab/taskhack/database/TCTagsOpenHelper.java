@@ -37,6 +37,11 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
                 KEY_name + " TEXT, " +
     			KEY_color + " INTEGER);"; 
     
+    @Override
+    public String getTableCreate() {
+    	return TABLE_CREATE;
+    }
+    
     public TCTagsOpenHelper(Context context) {
         super(context);
     }
@@ -66,28 +71,13 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
 		super.onOpen(db);
 	}
 	
-	@Override
-	public boolean initialize() {
-		boolean ret = false;
-    	try
-    	{
-    		getWritableDatabase().execSQL(TABLE_CREATE);
-    		ret = true;
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		return ret;
-	}
-	
 	public TCTag read(String name) {
 		TCTag tag = null;
 		Cursor c = null;
 		try
 		{ 
 			name = formatTagName(name);
-			c = getReadableDatabase().query(
+			c = getDbReadOnly().query(
 						TABLE_NAME,            // The database to query
 						PROJECTION,    // The columns to return from the query
 						KEY_name + " = ? ",     // The columns for the where clause
@@ -118,7 +108,7 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
 		Cursor c = null;
 		try
 		{
-			c = getReadableDatabase().query(
+			c = getDbReadOnly().query(
 						TABLE_NAME,            // The database to query
 						PROJECTION,    // The columns to return from the query
 						KEY_id + " = " + id,     // The columns for the where clause
@@ -164,7 +154,7 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
 				 ContentValues values = new ContentValues();
 				 values.put(KEY_name, name);
 				 values.put(KEY_color, color);
-				 ret = getWritableDatabase().insert(TABLE_NAME, null, values);
+				 ret = getDbReadWrite().insert(TABLE_NAME, null, values);
 			 }
 			 else
 			 {
@@ -187,7 +177,7 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
 			 ContentValues values = new ContentValues();
 			 values.put(KEY_name, name);
 			 values.put(KEY_color, tag.getColor());
-			 ret = getWritableDatabase().update(TABLE_NAME, values, KEY_id + " = " + tag.getId(), null) > 0;				
+			 ret = getDbReadWrite().update(TABLE_NAME, values, KEY_id + " = " + tag.getId(), null) > 0;				
 		}
 		catch(SQLException sqle)
 		{
@@ -200,7 +190,7 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
 		boolean ret = false;
 		 try
 		 {
-			 ret = getWritableDatabase().delete(TABLE_NAME, KEY_id + " = " + rowId, null) > 0;				
+			 ret = getDbReadWrite().delete(TABLE_NAME, KEY_id + " = " + rowId, null) > 0;				
 		 }
 		 catch(SQLException sqle)
 		 {

@@ -3,7 +3,7 @@ package com.mtelab.taskhack.views;
 import com.mtelab.taskhack.R;
 import com.mtelab.taskhack.base.ActivityHelper;
 import com.mtelab.taskhack.base.BaseActivity;
-import com.mtelab.taskhack.database.GooTaskListOpenHelper;
+import com.mtelab.taskhack.database.GooTasksOpenHelper;
 import com.mtelab.taskhack.models.GooBase;
 import com.mtelab.taskhack.models.GooTask;
 
@@ -21,7 +21,7 @@ public class GooTaskViewActivity extends BaseActivity {
 
 	private static final String TAG = GooTaskViewActivity.class.getName();
 	
-	private final GooTaskListOpenHelper dbTLHelper = new GooTaskListOpenHelper(this);
+	private final GooTasksOpenHelper dbTLHelper = new GooTasksOpenHelper(this);
 	
     private TextView mTitle;
     private TextView mNotes;
@@ -42,6 +42,12 @@ public class GooTaskViewActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+    	if(!dbTLHelper.initialize())
+    	{
+    		Log.e(TAG, "onCreate - db failed to initialize.");
+    		return;    		
+    	}
+    	
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			Log.e(TAG, "onCreate - failed to get intent bundle.");
@@ -76,6 +82,13 @@ public class GooTaskViewActivity extends BaseActivity {
     	refreshTask();    	
     }
     
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		
+		if (dbTLHelper != null) dbTLHelper.close(); 
+	}
+	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.edit_mode_menu_item, menu);

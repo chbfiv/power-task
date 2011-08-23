@@ -8,99 +8,85 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.view.View.OnLongClickListener;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.mtelab.taskhack.R;
 import com.mtelab.taskhack.TaskApplication;
-import com.mtelab.taskhack.adapters.GooTaskListCollectionAdapter;
+import com.mtelab.taskhack.adapters.GooTaskListsCursorAdapter;
 import com.mtelab.taskhack.auth.OAuthHelper;
 import com.mtelab.taskhack.auth.OAuthReceiver;
 import com.mtelab.taskhack.base.ActivityHelper;
 import com.mtelab.taskhack.base.BaseActivity;
 import com.mtelab.taskhack.database.GooAccountsOpenHelper;
-import com.mtelab.taskhack.database.GooTaskListCollectionOpenHelper;
-import com.mtelab.taskhack.database.GooTaskListOpenHelper;
-import com.mtelab.taskhack.database.TCTagMapOpenHelper;
-import com.mtelab.taskhack.database.TCTagsOpenHelper;
-import com.mtelab.taskhack.dialogs.TaskActionsDialog;
+import com.mtelab.taskhack.database.GooTaskListsOpenHelper;
 import com.mtelab.taskhack.dialogs.TaskListActionsDialog;
 import com.mtelab.taskhack.helpers.SharedPrefUtil;
 import com.mtelab.taskhack.models.GooAccount;
 import com.mtelab.taskhack.models.GooBase;
 import com.mtelab.taskhack.models.GooSyncBase;
-import com.mtelab.taskhack.models.GooTask;
 import com.mtelab.taskhack.models.GooTaskList;
 import com.mtelab.taskhack.services.TasksAppService;
 
-public class GooTaskListCollectionActivity extends BaseActivity implements
+public class GooTaskListsActivity extends BaseActivity implements
 	OnClickListener, OnLongClickListener {
 	
-	private static final String TAG = GooTaskListCollectionActivity.class.getName();
+	private static final String TAG = GooTaskListsActivity.class.getName();
 	
 	private final GooAccountsOpenHelper dbACCHelper = new GooAccountsOpenHelper(this);
-	private final GooTaskListCollectionOpenHelper dbTLCHelper = new GooTaskListCollectionOpenHelper(this);
-	private final GooTaskListOpenHelper dbTLHelper = new GooTaskListOpenHelper(this);
-	private final TCTagMapOpenHelper dbTagMapHelper = new TCTagMapOpenHelper(this);
-	private final TCTagsOpenHelper dbTagsHelper = new TCTagsOpenHelper(this);
+	private final GooTaskListsOpenHelper dbTLCHelper = new GooTaskListsOpenHelper(this);
 	
-	private final static int REQUEST_COMPOSE_LIST = 0;
 	private ListView listView;
-	private GooTaskListCollectionAdapter mAdapter;
+	private GooTaskListsCursorAdapter mAdapter;
 	
 	private TaskListActionsDialog mTaskListActionsDialog;
 	private long mActiveAccountId = GooBase.INVALID_ID;
+
+	public static final String EXTRA_ACTIVE_ACCOUNT_ID = "active_account_id";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		getOAuthHelper().onCreate(savedInstanceState);
     	
-    	if(!dbACCHelper.initialize() ||
-			!dbTLCHelper.initialize() ||
-			!dbTLHelper.initialize() ||
-			!dbTagMapHelper.initialize() ||
-			!dbTagsHelper.initialize())
-    	{
-    		Log.e(TAG, "onCreate - db failed to initialize.");
-    		return;    		
-    	}
-    	
-	    SharedPreferences prefs = getSharedPrefUtil().getSharedPref();
-	    mActiveAccountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, GooBase.INVALID_ID);
-	    
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			mActiveAccountId = extras.getLong(EXTRA_ACTIVE_ACCOUNT_ID, GooBase.INVALID_ID);	
+		}
+		else
+		{
+		    SharedPreferences prefs = getSharedPrefUtil().getSharedPref();
+		    mActiveAccountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, GooBase.INVALID_ID);		    
+		}
+
     	if(mActiveAccountId == GooBase.INVALID_ID)
     	{
     		Log.e(TAG, "onCreate - invalid account id.");
-    		goAccounts();
+    		GooAccountsActivity.go(this);
     		return;
-    	}
+    	}    	
+
+	    SharedPreferences.Editor editor = getSharedPrefUtil().getEditor();
+	    editor.putLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, mActiveAccountId);
+	    editor.commit();		
     	
     	GooAccount account = dbACCHelper.read(mActiveAccountId);
     	if(account == null)
     	{
     		Log.e(TAG, "onCreate - account is null");
-    		goAccounts();
+    		GooAccountsActivity.go(this);
     		return;
     	}
     	
@@ -117,20 +103,19 @@ public class GooTaskListCollectionActivity extends BaseActivity implements
 		listView = (ListView) findViewById(R.id.task_list_collection);
 		
 		listView.addHeaderView(headerContainer);
-		
-		// get the task application to store the adapter which will act as the
-		// task storage
-		// for this demo.
-		TaskApplication app = (TaskApplication) getApplication();
-		mAdapter = app.getTaskListCollectionAdapter(this);
-		
-		listView.setAdapter(mAdapter);	    	
 	}	
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		getOAuthHelper().onResume();
+
+		listView.setAdapter(null);	 
+		Cursor c = dbTLCHelper.queryCursor(mActiveAccountId, GooSyncBase.SYNC_DELETE);
+		mAdapter = new GooTaskListsCursorAdapter(this, c, true);		
+		listView.setAdapter(mAdapter);	  
+		
+		mAdapter.requery();			
 		
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(OAuthHelper.INTENT_ON_AUTH);
@@ -140,9 +125,10 @@ public class GooTaskListCollectionActivity extends BaseActivity implements
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (dbTLCHelper != null) {
-			dbTLCHelper.close();
-	    }
+
+		if(mAdapter != null) mAdapter.getCursor().close();
+		if (dbACCHelper != null) dbACCHelper.close(); 
+		if (dbTLCHelper != null) dbTLCHelper.close(); 
 	}
 	
 	@Override
@@ -163,7 +149,7 @@ public class GooTaskListCollectionActivity extends BaseActivity implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.menu_sync: {
-				syncTaskListCollection();
+				sync();
 				return true;
 			}
 			case R.id.menu_edit_mode: {
@@ -191,32 +177,46 @@ public class GooTaskListCollectionActivity extends BaseActivity implements
 	    return dialog;
 	}
 	
+    public static void go(Activity activity, long accountId)
+    {
+    	go(activity, true, accountId);
+    }
+    
+	public static void go(Activity activity, boolean finishActivity, long accountId) {
+		final Intent intent = new Intent(activity, GooTaskListsActivity.class);
+		intent.putExtra(EXTRA_ACTIVE_ACCOUNT_ID, accountId);
+		activity.startActivity(intent);
+		activity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
+		if(finishActivity) activity.finish();
+	}
+	
 	@Override
 	public void onClick(View v) {
-		int position = (Integer)v.getTag();
-		if(position != ListView.INVALID_POSITION)
+		long taskListId = (Long)v.getTag();
+		if(taskListId != GooBase.INVALID_ID)
 		{
-			GooTaskList taskList = mAdapter.getItem(position);
-			viewTaskList(taskList.getId());
+			GooTasksActivity.go(this, false, taskListId);
 		}
 	}
 	
 	@Override
 	public boolean onLongClick(View v) {
-		int position = (Integer)v.getTag();
-		if(position != ListView.INVALID_POSITION)
+		long taskListId = (Long)v.getTag();
+		if(taskListId != GooBase.INVALID_ID)
 		{
-			GooTaskList taskList = mAdapter.getItem(position);
-			showTaskListActionsDialog(taskList.getId());
-		}	
+			showTaskListActionsDialog(taskListId);
+		}
 		return false;
 	}
 	
-	public void viewTaskList(long taskListId)
-	{
-		Intent intent = new Intent(this, GooTaskListActivity.class);
-		intent.putExtra(GooTaskListActivity.EXTRA_ACTIVE_TASK_LIST_ID, taskListId);
-		startActivity(intent);
+	@Override
+	public void sync(boolean withRefresh) {
+		if(withRefresh) mAdapter.requery();
+		
+		Intent intent = new Intent(this, TasksAppService.class);
+		intent.setFlags(TasksAppService.REQUEST_SYNC_TASK_LISTS);
+		intent.putExtra(TasksAppService.REQUEST_RECEIVER_EXTRA, mLoadTaskListReceiver);
+		startService(intent);
 	}
 	
 	public void showTaskListActionsDialog(long taskListId)
@@ -354,7 +354,6 @@ public class GooTaskListCollectionActivity extends BaseActivity implements
 		    		 taskList.title = param.title;
 		    		 taskList.flagSyncState(GooSyncBase.SYNC_UPDATE);	
 	        		 dbTLCHelper.update(taskList);
-		    		 mAdapter.set(dbTLCHelper.query(mActiveAccountId, GooSyncBase.SYNC_DELETE));
 		    	 }
 	    	 }
 	    	 catch(Exception ex)
@@ -365,7 +364,7 @@ public class GooTaskListCollectionActivity extends BaseActivity implements
 	     }
 	
 	     protected void onPostExecute(Boolean result) {
-    		 mAdapter.notifyDataSetChanged();			
+    		 mAdapter.requery();			
 	     }
 	}
 
@@ -378,10 +377,7 @@ public class GooTaskListCollectionActivity extends BaseActivity implements
 		    	 {
 		    		 GooTaskList taskList = new GooTaskList(mActiveAccountId, title);
 		    		 taskList.flagSyncState(GooSyncBase.SYNC_CREATE);
-		    		 long taskListId = dbTLCHelper.create(taskList);
-		    		 
-		    		 taskList = dbTLCHelper.read(taskListId);
-		    		 mAdapter.create(taskList);
+		    		 dbTLCHelper.create(taskList);
 		    	 }
 	    	 }
 	    	 catch(Exception ex)
@@ -392,7 +388,7 @@ public class GooTaskListCollectionActivity extends BaseActivity implements
 	     }
 	
 	     protected void onPostExecute(Boolean result) {
-	         mAdapter.notifyDataSetChanged();
+	         mAdapter.requery();
 	     }
 	}
 	
@@ -404,10 +400,9 @@ public class GooTaskListCollectionActivity extends BaseActivity implements
 		    	 for (Long id : ids)
 		    	 {
 		    		 GooTaskList taskList = dbTLCHelper.read(id);
-		    		 taskList.flagSyncState(GooSyncBase.SYNC_DELETE);
+		    		 taskList.setSyncState(GooSyncBase.SYNC_DELETE);
 		    		 dbTLCHelper.update(taskList);
-		    	 }
-	    		 mAdapter.set(dbTLCHelper.query(mActiveAccountId, GooSyncBase.SYNC_DELETE));
+		    	 }   		 
 	    	 }
 	    	 catch(Exception ex)
 	    	 {
@@ -417,110 +412,43 @@ public class GooTaskListCollectionActivity extends BaseActivity implements
 	     }
 	
 	     protected void onPostExecute(Boolean result) {
-	         mAdapter.notifyDataSetChanged();
+	         mAdapter.requery();
 	     }
 	}
-	public void goAccounts() {
-//		final Intent intent = new Intent(this, AccountsActivity.class);
-//		startActivity(intent);
-//		overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
-		final Intent intent = new Intent(this, ManageAccountsActivity.class);
-		startActivity(intent);
-		overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
-		finish();
-	}
 
-	public void syncTaskListCollection() {
-	    SharedPreferences prefs = getSharedPrefUtil().getSharedPref();
-	    final long accountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, GooBase.INVALID_ID);
-	    
-    	if(accountId == GooBase.INVALID_ID)
-    	{
-    		Log.e(TAG, "OAuthReceiver - invalid account id.");
-    		return;
-    	}
-    	
-		mAdapter.set(dbTLCHelper.query(accountId, GooSyncBase.SYNC_DELETE));
-		Intent intent = new Intent(this, TasksAppService.class);
-		intent.setFlags(TasksAppService.REQUEST_SYNC_TASK_LISTS);
-		intent.putExtra(TasksAppService.REQUEST_RECEIVER_EXTRA, mLoadTaskListReceiver);
-		startService(intent);
-	}
-
-	public void composeTaskList() {
-		
-	}
-
-	// Manage UI Screens
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch (requestCode) {
-		case REQUEST_COMPOSE_LIST:
-			if (resultCode == Activity.RESULT_OK) {
-				
-			}
-			break;
-		}
-	}
-
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {			    
-		Intent intent = new Intent(this, GooTaskListActivity.class);
-		intent.putExtra(GooTaskListActivity.EXTRA_ACTIVE_TASK_LIST_ID, id);
-		startActivity(intent);
-	}
-
-//	@Override
-//	public void onFocusChange(View v, boolean hasFocus) {
-////		if(hasFocus)
-////		{
-////			mAddTaskListEdit.setText(null);       
-////			mAddTaskListLayout.setVisibility(View.VISIBLE);
-////			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-////	        imm.showSoftInput(mAddTaskListEdit, 0);
-////		}
-////		else
-////		{
-////			mAddTaskListLayout.setVisibility(View.GONE);
-////		}
-//	}
-	
 	private OAuthReceiver mOAuthReceiver = new OAuthReceiver() {	
 	    
 	    @Override
 	    public void onAuthToken(Context context, String authToken) {	
-
 		    TaskApplication app = (TaskApplication)getApplication();
-	    	app.setAccessToken(authToken);  
-	    	
-	    	syncTaskListCollection();
+	    	app.setAccessToken(authToken);  	    	
+	    	sync();
 	    }
 	};
 	
 	private ResultReceiver mLoadTaskListReceiver = new ResultReceiver(null) {
+		
 	    @Override
 	    protected void onReceiveResult(final int resultCode, final Bundle resultData) {			    	
-				runOnUiThread(new Runnable() {
-					public void run() {		
-					    SharedPreferences prefs = getSharedPrefUtil().getSharedPref();
-					    final long accountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, GooBase.INVALID_ID);			
-						if (resultCode == TasksAppService.RESULT_SYNC_TASK_LISTS_SUCCESS) {
-							getOAuthHelper().resetAuthAttempts();
-							mAdapter.set(dbTLCHelper.query(accountId, GooSyncBase.SYNC_DELETE));
-				        }
-						else if (resultCode == TasksAppService.RESULT_FAILED_UNAUTHORIZED) {
-							getOAuthHelper().updateTokenExpiration(true);
-						}
-						else if (resultCode == TasksAppService.RESULT_LOADING)
-						{
-							getActivityHelper().setSyncing(true);
-						}
-						else if (resultCode == TasksAppService.RESULT_LOADING_COMPLETE)
-						{
-							getActivityHelper().setSyncing(false);
-						}
-					}							
-				});
+			runOnUiThread(new Runnable() {
+				public void run() {			
+					if (resultCode == TasksAppService.RESULT_SYNC_TASK_LISTS_SUCCESS) {
+						getOAuthHelper().resetAuthAttempts();   		 
+		        		mAdapter.requery();
+			        }
+					else if (resultCode == TasksAppService.RESULT_FAILED_UNAUTHORIZED) {
+						getOAuthHelper().updateTokenExpiration(true);
+					}
+					else if (resultCode == TasksAppService.RESULT_LOADING)
+					{
+						getActivityHelper().setSyncing(true);
+					}
+					else if (resultCode == TasksAppService.RESULT_LOADING_COMPLETE)
+					{
+						getActivityHelper().setSyncing(false);
+					}
+				}							
+			});
 	    }
 	};
 

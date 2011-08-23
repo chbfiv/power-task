@@ -8,7 +8,7 @@ import com.mtelab.taskhack.R.layout;
 import com.mtelab.taskhack.R.menu;
 import com.mtelab.taskhack.base.ActivityHelper;
 import com.mtelab.taskhack.base.BaseActivity;
-import com.mtelab.taskhack.database.GooTaskListOpenHelper;
+import com.mtelab.taskhack.database.GooTasksOpenHelper;
 import com.mtelab.taskhack.models.GooBase;
 import com.mtelab.taskhack.models.GooTask;
 
@@ -33,7 +33,7 @@ public class GooTaskComposeActivity extends BaseActivity {
 
 	private static final String TAG = GooTaskComposeActivity.class.getName();
 	
-	private final GooTaskListOpenHelper dbTLHelper = new GooTaskListOpenHelper(this);
+	private final GooTasksOpenHelper dbTLHelper = new GooTasksOpenHelper(this);
 	
     private EditText mTitle;
     private EditText mNotes;
@@ -54,6 +54,12 @@ public class GooTaskComposeActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+    	if(!dbTLHelper.initialize())
+    	{
+    		Log.e(TAG, "onCreate - db failed to initialize.");
+    		return;    		
+    	}
+    	
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			Log.e(TAG, "onCreate - failed to get intent bundle.");
@@ -78,7 +84,14 @@ public class GooTaskComposeActivity extends BaseActivity {
     	
     	refreshTask();
     }
-
+    
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		
+		if (dbTLHelper != null) dbTLHelper.close(); 
+	}
+	
     private void refreshTask()
     {
     	if(mActiveTaskId == GooBase.INVALID_ID)

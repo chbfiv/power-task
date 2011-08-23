@@ -16,10 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
@@ -32,10 +28,9 @@ import com.mtelab.taskhack.auth.OAuthHelper;
 import com.mtelab.taskhack.auth.OAuthReceiver;
 import com.mtelab.taskhack.base.ActivityHelper;
 import com.mtelab.taskhack.base.BaseActivity;
-import com.mtelab.taskhack.database.GooTaskListCollectionOpenHelper;
-import com.mtelab.taskhack.database.GooTaskListOpenHelper;
+import com.mtelab.taskhack.database.GooTaskListsOpenHelper;
+import com.mtelab.taskhack.database.GooTasksOpenHelper;
 import com.mtelab.taskhack.database.TCTagMapOpenHelper;
-import com.mtelab.taskhack.database.TCTagsOpenHelper;
 import com.mtelab.taskhack.dialogs.TaskActionsDialog;
 import com.mtelab.taskhack.models.GooBase;
 import com.mtelab.taskhack.models.GooTask;
@@ -43,12 +38,13 @@ import com.mtelab.taskhack.models.GooTaskList;
 import com.mtelab.taskhack.models.TCTag;
 import com.mtelab.taskhack.services.TasksAppService;
 
-public class GooTaskListActivity extends BaseActivity implements
+public class GooTasksActivity extends BaseActivity implements
 		OnClickListener, OnCheckedChangeListener, OnLongClickListener {
 	
-	private static final String TAG = GooTaskListActivity.class.getName();
-	private final GooTaskListOpenHelper dbTLHelper = new GooTaskListOpenHelper(this);
-	private final GooTaskListCollectionOpenHelper dbTLCHelper = new GooTaskListCollectionOpenHelper(this);
+	private static final String TAG = GooTasksActivity.class.getName();
+	
+	private final GooTasksOpenHelper dbTLHelper = new GooTasksOpenHelper(this);
+	private final GooTaskListsOpenHelper dbTLCHelper = new GooTaskListsOpenHelper(this);
 	private final TCTagMapOpenHelper dbTagMapHelper = new TCTagMapOpenHelper(this);
 
 	public static final String EXTRA_ACTIVE_TASK_LIST_ID = "active_task_list_id";
@@ -65,6 +61,12 @@ public class GooTaskListActivity extends BaseActivity implements
 		super.onCreate(savedInstanceState);
 		getOAuthHelper().onCreate(savedInstanceState);
 		
+    	if(!dbTLHelper.initialize() || !dbTLCHelper.initialize() || !dbTagMapHelper.initialize())
+    	{
+    		Log.e(TAG, "onCreate - db failed to initialize.");
+    		return;    		
+    	}
+    	
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			Log.e(TAG, "onCreate - failed to get intent bundle.");
@@ -114,9 +116,10 @@ public class GooTaskListActivity extends BaseActivity implements
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (dbTLHelper != null) {
-			dbTLHelper.close();
-	    }
+		
+		if (dbTLHelper != null) dbTLHelper.close(); 
+		if (dbTLCHelper != null) dbTLCHelper.close(); 
+		if (dbTagMapHelper != null) dbTagMapHelper.close(); 
 	}
 	
 	@Override
@@ -165,15 +168,16 @@ public class GooTaskListActivity extends BaseActivity implements
 	    return dialog;
 	}	
 	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch (requestCode) {
-		case TCTagListActivity.REQUEST_TAGS:
-			if (resultCode == Activity.RESULT_OK) {
-				
-			}
-			break;
-		}
+    public static void go(Activity activity, long taskListId) 
+    {
+    	go(activity, true, taskListId);
+    }
+    
+	public static void go(Activity activity, boolean finishActivity, long taskListId) {		
+		final Intent intent = new Intent(activity, GooTasksActivity.class);
+		intent.putExtra(EXTRA_ACTIVE_TASK_LIST_ID, taskListId);
+		activity.startActivity(intent);
+		if(finishActivity) activity.finish();
 	}
 	
 	public void commitAddTaskList(View view)

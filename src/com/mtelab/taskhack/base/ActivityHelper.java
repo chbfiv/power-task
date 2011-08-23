@@ -26,9 +26,9 @@ import com.mtelab.taskhack.R.menu;
 import com.mtelab.taskhack.R.string;
 import com.mtelab.taskhack.helpers.FontHelper;
 import com.mtelab.taskhack.helpers.SimpleMenu;
-import com.mtelab.taskhack.views.GooTaskListActivity;
-import com.mtelab.taskhack.views.GooTaskListCollectionActivity;
-import com.mtelab.taskhack.views.ManageAccountsActivity;
+import com.mtelab.taskhack.views.GooTasksActivity;
+import com.mtelab.taskhack.views.GooTaskListsActivity;
+import com.mtelab.taskhack.views.GooAccountsActivity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -103,14 +103,14 @@ public class ActivityHelper {
     }
     
 	public void goAccounts() {
-		final Intent intent = new Intent(mActivity, ManageAccountsActivity.class);
+		final Intent intent = new Intent(mActivity, GooAccountsActivity.class);
 		mActivity.startActivity(intent);
 		mActivity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
 		mActivity.finish();
 	}
 	
     public void goTaskListCollection() {
-		Intent intent = new Intent(mActivity, GooTaskListCollectionActivity.class);
+		Intent intent = new Intent(mActivity, GooTaskListsActivity.class);
 		mActivity.startActivity(intent);
 		mActivity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
 		mActivity.finish();

@@ -22,7 +22,7 @@ import android.widget.ListView;
 import com.mtelab.taskhack.R;
 import com.mtelab.taskhack.TaskApplication;
 import com.mtelab.taskhack.adapters.TCTagListAdapter;
-import com.mtelab.taskhack.database.GooTaskListOpenHelper;
+import com.mtelab.taskhack.database.GooTasksOpenHelper;
 import com.mtelab.taskhack.database.TCTagMapOpenHelper;
 import com.mtelab.taskhack.database.TCTagsOpenHelper;
 import com.mtelab.taskhack.models.GooBase;
@@ -34,7 +34,7 @@ public class TCTagListActivity extends Activity implements
 	
 	private static final String TAG = TCTagListActivity.class.getName();
 	
-	private final GooTaskListOpenHelper dbTLHelper = new GooTaskListOpenHelper(this);
+	private final GooTasksOpenHelper dbTLHelper = new GooTasksOpenHelper(this);
 	private final TCTagMapOpenHelper dbTagMapHelper = new TCTagMapOpenHelper(this);
 	private final TCTagsOpenHelper dbTagsHelper = new TCTagsOpenHelper(this);
 
@@ -52,6 +52,12 @@ public class TCTagListActivity extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+    	if(!dbTLHelper.initialize() || !dbTagMapHelper.initialize() || !dbTagsHelper.initialize())
+    	{
+    		Log.e(TAG, "onCreate - db failed to initialize.");
+    		return;    		
+    	}
+    	
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			Log.e(TAG, "onCreate - failed to get intent bundle.");
@@ -100,16 +106,15 @@ public class TCTagListActivity extends Activity implements
 		
 		adapter.set(dbTagMapHelper.queryItems(mTaskId));
 	}
-	
+
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (dbTagMapHelper != null) {
-			dbTagMapHelper.close();
-	    }
-		if (dbTagsHelper != null) {
-			dbTagsHelper.close();
-	    }
+		
+		if (dbTLHelper != null) dbTLHelper.close(); 
+		if (dbTagMapHelper != null) dbTagMapHelper.close(); 
+		if (dbTagsHelper != null) dbTagsHelper.close(); 
 	}
 	
 	@Override

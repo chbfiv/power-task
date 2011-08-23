@@ -17,9 +17,9 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
+public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	
-    private static final String TAG = GooTaskListCollectionOpenHelper.class.getName();
+    private static final String TAG = GooTaskListsOpenHelper.class.getName();
 
     protected static final String TABLE_NAME = "goo_tasklists";
     protected static final String KEY_accountId = "accountId";
@@ -60,7 +60,12 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
     			KEY_title + " TEXT, " +
     			KEY_selfLink + " TEXT);"; 
     
-    public GooTaskListCollectionOpenHelper(Context context) {
+    @Override
+    public String getTableCreate() {
+    	return TABLE_CREATE;
+    }
+    
+    public GooTaskListsOpenHelper(Context context) {
         super(context);
     }
 
@@ -68,6 +73,7 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
     public void onCreate(SQLiteDatabase db) {
     	super.onCreate(db);
     }    
+    
     
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {		
@@ -89,35 +95,13 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 		super.onOpen(db);
 	}
 	
-	@Override
-	public boolean initialize() {
-		boolean ret = false;
-    	try
-    	{
-    		getWritableDatabase().execSQL(TABLE_CREATE);
-    		ret = true;
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		return ret;
-	}
-	
 	public List<GooTaskList> query(long accountId, int syncStateFilter) {
+		initialize();
 		List<GooTaskList> list = new ArrayList<GooTaskList>();
 		Cursor c = null;
 		try
 		{
-			c = getReadableDatabase().query(
-						TABLE_NAME,            // The database to query
-						PROJECTION,    // The columns to return from the query
-						KEY_accountId + " = ? AND (" + KEY_syncState + " & " + syncStateFilter + ") != " + syncStateFilter,     // The columns for the where clause
-			           new String[] { String.valueOf(accountId) }, // The values for the where clause
-			           null,          // don't group the rows
-			           null,          // don't filter by row groups
-			           null        // The sort order
-			       );
+			c = queryCursor(accountId, syncStateFilter);
 			if(c != null && c.moveToFirst())
 			{
 				do
@@ -143,19 +127,12 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public List<GooTaskList> query(long accountId) {
+		initialize();
 		List<GooTaskList> list = new ArrayList<GooTaskList>();
 		Cursor c = null;
 		try
 		{
-			c = getReadableDatabase().query(
-						TABLE_NAME,            // The database to query
-						PROJECTION,    // The columns to return from the query
-						KEY_accountId + " = ? ",     // The columns for the where clause
-			           new String[] { String.valueOf(accountId) }, // The values for the where clause
-			           null,          // don't group the rows
-			           null,          // don't filter by row groups
-			           null        // The sort order
-			       );
+			c = queryCursor(accountId);
 			if(c != null && c.moveToFirst())
 			{
 				do
@@ -180,12 +157,76 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 		return list;
 	}
 	
+	public Cursor queryCursor(long accountId, int syncStateFilter)  {
+		initialize();
+		Cursor c = null;
+		try
+		{
+			c = getDbReadOnly().query(
+					TABLE_NAME,            // The database to query
+					PROJECTION,    // The columns to return from the query
+					KEY_accountId + " = ? AND (" + KEY_syncState + " & " + syncStateFilter + ") != " + syncStateFilter,     // The columns for the where clause
+		           new String[] { String.valueOf(accountId) }, // The values for the where clause
+		           null,          // don't group the rows
+		           null,          // don't filter by row groups
+		           null        // The sort order
+		       );
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}
+		return c;
+	}
+	
+	public Cursor queryCursor(long accountId) {
+		initialize();
+		Cursor c = null;
+		try
+		{
+			c = getDbReadOnly().query(
+						TABLE_NAME,            // The database to query
+						PROJECTION,    // The columns to return from the query
+						KEY_accountId + " = ? ",     // The columns for the where clause
+			           new String[] { String.valueOf(accountId) }, // The values for the where clause
+			           null,          // don't group the rows
+			           null,          // don't filter by row groups
+			           null        // The sort order
+			       );
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}
+		return c;
+	}
+	
+	public static GooTaskList read(Cursor c) {
+		GooTaskList tl = null;
+		try
+		{
+			if(c != null)
+			{
+				tl = new GooTaskList(c.getLong(INDEX_accountId), c.getString(INDEX_remoteId),
+						c.getString(INDEX_kind), c.getString(INDEX_title), c.getString(INDEX_selfLink));
+				tl.setBase(c.getLong(INDEX_id), c.getLong(INDEX_created), c.getLong(INDEX_modified));
+				tl.setSync(c.getInt(INDEX_syncState), c.getString(INDEX_eTag));
+			}
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}
+		return tl;
+	}
+	
 	public GooTaskList read(long id) {
+		initialize();
 		GooTaskList tl = null;
 		Cursor c = null;
 		try
 		{
-			c = getReadableDatabase().query(
+			c = getDbReadOnly().query(
 						TABLE_NAME,            // The database to query
 						PROJECTION,    // The columns to return from the query
 						KEY_id + " = " + id,     // The columns for the where clause
@@ -214,11 +255,12 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public GooTaskList read(String remoteId) {
+		initialize();
 		GooTaskList tl = null;
 		Cursor c = null;
 		try
 		{
-			c = getReadableDatabase().query(
+			c = getDbReadOnly().query(
 						TABLE_NAME,            // The database to query
 						PROJECTION,    // The columns to return from the query
 						KEY_remoteId + " = ? ",     // The columns for the where clause
@@ -270,6 +312,7 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public boolean sync(TasksAppService service, long accountId, TaskLists remoteLists, String eTag) 
 	{
+		initialize();
 		boolean ret = false;
 		try
 		{
@@ -343,6 +386,7 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public long create(GooTaskList item) 
 	{
+		initialize();
 		long ret = -1;
 		try
 		{
@@ -354,7 +398,7 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 			 values.put(KEY_kind, item.kind);
 			 values.put(KEY_title, item.title);
 			 values.put(KEY_selfLink, item.selfLink);
-			 ret = getWritableDatabase().insert(TABLE_NAME, null, values);	
+			 ret = getDbReadWrite().insert(TABLE_NAME, null, values);	
 		}
 		catch(SQLException sqle)
 		{
@@ -398,6 +442,7 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public boolean update(GooTaskList item) 
 	{
+		initialize();
 		boolean ret = false;
 		try
 		{
@@ -408,7 +453,7 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 			 values.put(KEY_kind, item.kind);
 			 values.put(KEY_title, item.title);
 			 values.put(KEY_selfLink, item.selfLink);
-			 ret = getWritableDatabase().update(TABLE_NAME, values, KEY_id + " = " + item.getId(), null) > 0;				
+			 ret = getDbReadWrite().update(TABLE_NAME, values, KEY_id + " = " + item.getId(), null) > 0;				
 		}
 		catch(SQLException sqle)
 		{
@@ -418,10 +463,11 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	 public boolean delete(long rowId) {
+		initialize();
 		boolean ret = false;
 		 try
 		 {
-			 ret = getWritableDatabase().delete(TABLE_NAME, KEY_id + " = " + rowId, null) > 0;				
+			 ret = getDbReadWrite().delete(TABLE_NAME, KEY_id + " = " + rowId, null) > 0;				
 		 }
 		 catch(SQLException sqle)
 		 {
@@ -438,7 +484,7 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 			 String sql = "UPDATE " + TABLE_NAME + " SET " + KEY_syncState 
 			 	+ " = (" + KEY_syncState + " | " + state + ")"
 			 	+ " WHERE " + KEY_accountId + " = " + accountId; 
-			 getWritableDatabase().execSQL(sql);
+			 getDbReadWrite().execSQL(sql);
 			 ret = true;							
 		}
 		catch(SQLException sqle)
@@ -456,7 +502,7 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 			 String sql = "UPDATE " + TABLE_NAME + " SET " + KEY_syncState 
 			 	+ " = (" + KEY_syncState + " & " + ~state + ")"
 			 	+ " WHERE " + KEY_accountId + " = " + accountId; 
-			 getWritableDatabase().execSQL(sql);
+			 getDbReadWrite().execSQL(sql);
 			 ret = true;							
 		}
 		catch(SQLException sqle)
@@ -474,7 +520,7 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 			 String sql = "DELETE FROM " + TABLE_NAME + " WHERE " 
 			 	+ state + " = (" + KEY_syncState + " & " + state + ")"
 			 	+ " AND " + KEY_accountId + " = " + accountId; 
-			 getWritableDatabase().execSQL(sql);
+			 getDbReadWrite().execSQL(sql);
 			 ret = true;							
 		}
 		catch(SQLException sqle)
@@ -486,6 +532,7 @@ public class GooTaskListCollectionOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public String getTaskListRemoteId(long taskListId)
 	{
+		initialize();
 		String ret = "";
 		GooTaskList list;
 		try

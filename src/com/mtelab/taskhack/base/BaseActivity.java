@@ -15,16 +15,12 @@
  */
 package com.mtelab.taskhack.base;
 
-import java.util.EventListener;
-
 import com.mtelab.taskhack.auth.OAuthHelper;
-import com.mtelab.taskhack.database.GooTaskListCollectionOpenHelper;
 import com.mtelab.taskhack.helpers.FontHelper;
 import com.mtelab.taskhack.helpers.SharedPrefUtil;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -73,4 +69,13 @@ public abstract class BaseActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         return mActivityHelper.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
+    
+	public void sync()
+	{
+		sync(true);
+	}
+	
+	public void sync(boolean withRefresh) {
+	
+	}
 }

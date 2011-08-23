@@ -9,8 +9,8 @@ import com.mtelab.taskhack.models.GooTask;
 import com.mtelab.taskhack.models.GooTaskList;
 import com.mtelab.taskhack.models.TCTag;
 import com.mtelab.taskhack.views.ColorStripItem;
-import com.mtelab.taskhack.views.GooTaskListActivity;
-import com.mtelab.taskhack.views.ManageAccountsActivity;
+import com.mtelab.taskhack.views.GooTasksActivity;
+import com.mtelab.taskhack.views.GooAccountsActivity;
 import com.mtelab.taskhack.views.TCTagListActivity;
 
 import android.accounts.Account;
@@ -37,13 +37,13 @@ public class GooTaskListAdapter extends ArrayAdapter<GooTask> {
     	LinearLayout colorStrip;
     }
 
-	private final GooTaskListActivity mActivity;
+	private final GooTasksActivity mActivity;
     private final LayoutInflater inflater;
     private static float mScale;
     
     public GooTaskListAdapter(Context context, int textViewResourceId, List<GooTask> task) {
 		super(context, textViewResourceId, task);
-		mActivity = (GooTaskListActivity)context;
+		mActivity = (GooTasksActivity)context;
 		mScale = mActivity.getResources().getDisplayMetrics().density; 
 		inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}    

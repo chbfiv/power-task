@@ -30,17 +30,17 @@
 <!--             android:theme="@style/Theme.IOSched.Home" -->
 <!--         	android:label="@string/app_name" -->
         <activity 
-        	android:name=".views.GooTaskListCollectionActivity"
+        	android:name=".views.GooTaskListsActivity"
             android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>         
         </activity>        
-        <activity android:name=".views.GooTaskListActivity" />
+        <activity android:name=".views.GooTasksActivity" />
         <activity android:name=".views.GooTaskComposeActivity" />
         <activity android:name=".views.GooTaskViewActivity" />
-        <activity android:name=".views.ManageAccountsActivity" />    
+        <activity android:name=".views.GooAccountsActivity" />    
         <activity android:name=".views.TCTagListActivity" />    
     </application>
 </manifest>

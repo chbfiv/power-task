@@ -106,10 +106,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 			{
 				do
 				{
-					GooTaskList tl = new GooTaskList(c.getLong(INDEX_accountId), c.getString(INDEX_remoteId),
-							c.getString(INDEX_kind), c.getString(INDEX_title), c.getString(INDEX_selfLink));
-					tl.setBase(c.getLong(INDEX_id), c.getLong(INDEX_created), c.getLong(INDEX_modified));
-					tl.setSync(c.getInt(INDEX_syncState), c.getString(INDEX_eTag));
+					GooTaskList tl = read(c);
 					list.add(tl);
 				}
 				while(c.moveToNext());
@@ -137,10 +134,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 			{
 				do
 				{
-					GooTaskList tl = new GooTaskList(c.getLong(INDEX_accountId), c.getString(INDEX_remoteId),
-							c.getString(INDEX_kind), c.getString(INDEX_title), c.getString(INDEX_selfLink));
-					tl.setBase(c.getLong(INDEX_id), c.getLong(INDEX_created), c.getLong(INDEX_modified));
-					tl.setSync(c.getInt(INDEX_syncState), c.getString(INDEX_eTag));
+					GooTaskList tl = read(c);
 					list.add(tl);
 				}
 				while(c.moveToNext());
@@ -237,10 +231,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 			       );
 			if(c != null && c.moveToFirst())
 			{
-				tl = new GooTaskList(c.getLong(INDEX_accountId), c.getString(INDEX_remoteId),
-						c.getString(INDEX_kind), c.getString(INDEX_title), c.getString(INDEX_selfLink));
-				tl.setBase(c.getLong(INDEX_id), c.getLong(INDEX_created), c.getLong(INDEX_modified));
-				tl.setSync(c.getInt(INDEX_syncState), c.getString(INDEX_eTag));
+				tl = read(c);
 			}
 		}
 		catch(SQLException sqle)
@@ -271,10 +262,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 			       );
 			if(c != null && c.moveToFirst())
 			{
-				tl = new GooTaskList(c.getLong(INDEX_accountId), c.getString(INDEX_remoteId),
-						c.getString(INDEX_kind), c.getString(INDEX_title), c.getString(INDEX_selfLink));
-				tl.setBase(c.getLong(INDEX_id), c.getLong(INDEX_created), c.getLong(INDEX_modified));
-				tl.setSync(c.getInt(INDEX_syncState), c.getString(INDEX_eTag));
+				tl = read(c);
 			}
 		}
 		catch(SQLException sqle)
@@ -288,27 +276,81 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 		return tl;
 	}
 	
-	/*public boolean createOrUpdateRange(long accountId, TaskLists list) 
+	public long create(GooTaskList item) 
 	{
-		boolean ret = false;
+		initialize();
+		long ret = -1;
 		try
 		{
-			if(list != null)
-			{
-				ret = true;
-				addSyncStateByAccount(accountId, SYNC_REMOTE_RECORD_MISSING);
-				for (TaskList item : list.items) {
-					createOrUpdate(accountId, item);
-				}		
-				deleteBySyncState(accountId, SYNC_REMOTE_RECORD_MISSING);
-			}
+			 ContentValues values = new ContentValues();
+			 values.put(KEY_accountId, item.accountId);
+			 values.put(KEY_syncState, item.getSyncState());
+			 values.put(KEY_eTag, item.getETag());
+			 values.put(KEY_remoteId, item.remoteId);
+			 values.put(KEY_kind, item.kind);
+			 values.put(KEY_title, item.title);
+			 values.put(KEY_selfLink, item.selfLink);
+			 ret = getDbReadWrite().insert(TABLE_NAME, null, values);	
 		}
 		catch(SQLException sqle)
 		{
 	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
 		}
 		return ret;
-	}*/
+	}
+		
+	public boolean update(GooTaskList item) 
+	{
+		initialize();
+		boolean ret = false;
+		try
+		{
+			 ContentValues values = new ContentValues();
+			 values.put(KEY_syncState, item.getSyncState());
+			 values.put(KEY_eTag, item.getETag());
+			 values.put(KEY_remoteId, item.remoteId);
+			 values.put(KEY_kind, item.kind);
+			 values.put(KEY_title, item.title);
+			 values.put(KEY_selfLink, item.selfLink);
+			 ret = getDbReadWrite().update(TABLE_NAME, values, KEY_id + " = " + item.getId(), null) > 0;				
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}
+		return ret;
+	}
+	
+	 public boolean delete(long rowId) {
+		initialize();
+		boolean ret = false;
+		 try
+		 {
+			 ret = getDbReadWrite().delete(TABLE_NAME, KEY_id + " = " + rowId, null) > 0;				
+		 }
+		 catch(SQLException sqle)
+		 {
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());	   			
+		 }
+		 return ret;
+     }
+	 
+	public String getTaskListRemoteId(long taskListId)
+	{
+		initialize();
+		String ret = "";
+		GooTaskList list;
+		try
+		{
+			list = read(taskListId);
+			ret = list.remoteId;
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}
+		return ret;
+	}	
 	
 	public boolean sync(TasksAppService service, long accountId, TaskLists remoteLists, String eTag) 
 	{
@@ -383,167 +425,4 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 		}
 		return ret;
 	}
-	
-	public long create(GooTaskList item) 
-	{
-		initialize();
-		long ret = -1;
-		try
-		{
-			 ContentValues values = new ContentValues();
-			 values.put(KEY_accountId, item.accountId);
-			 values.put(KEY_syncState, item.getSyncState());
-			 values.put(KEY_eTag, item.getETag());
-			 values.put(KEY_remoteId, item.remoteId);
-			 values.put(KEY_kind, item.kind);
-			 values.put(KEY_title, item.title);
-			 values.put(KEY_selfLink, item.selfLink);
-			 ret = getDbReadWrite().insert(TABLE_NAME, null, values);	
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		return ret;
-	}
-	
-	/*public long createOrUpdate(long accountId, TaskList item) 
-	{
-		GooTaskList list = new GooTaskList(accountId, item.id, item.kind, item.title, item.selfLink);
-		list.setETag(item.etag);
-		return createOrUpdate(list);
-	}
-	
-	public long createOrUpdate(GooTaskList item) 
-	{
-		long ret = -1;
-		try
-		{
-			GooTaskList tl = read(item.remoteId);	
-			item.setSyncState(item.getSyncState() & ~SYNC_REMOTE_RECORD_MISSING);
-			if(tl == null)
-			{
-				ret = create(item);
-			}
-			else
-			{
-				long localId = tl.getId();
-				item.setId(localId);
-				update(item);
-				ret = localId;
-			}
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		return ret;
-	}*/
-	
-	public boolean update(GooTaskList item) 
-	{
-		initialize();
-		boolean ret = false;
-		try
-		{
-			 ContentValues values = new ContentValues();
-			 values.put(KEY_syncState, item.getSyncState());
-			 values.put(KEY_eTag, item.getETag());
-			 values.put(KEY_remoteId, item.remoteId);
-			 values.put(KEY_kind, item.kind);
-			 values.put(KEY_title, item.title);
-			 values.put(KEY_selfLink, item.selfLink);
-			 ret = getDbReadWrite().update(TABLE_NAME, values, KEY_id + " = " + item.getId(), null) > 0;				
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		return ret;
-	}
-	
-	 public boolean delete(long rowId) {
-		initialize();
-		boolean ret = false;
-		 try
-		 {
-			 ret = getDbReadWrite().delete(TABLE_NAME, KEY_id + " = " + rowId, null) > 0;				
-		 }
-		 catch(SQLException sqle)
-		 {
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());	   			
-		 }
-		 return ret;
-     }
-	 
-	/*public boolean addSyncStateByAccount(long accountId, int state) 
-	{
-		boolean ret = false;
-		try
-		{
-			 String sql = "UPDATE " + TABLE_NAME + " SET " + KEY_syncState 
-			 	+ " = (" + KEY_syncState + " | " + state + ")"
-			 	+ " WHERE " + KEY_accountId + " = " + accountId; 
-			 getDbReadWrite().execSQL(sql);
-			 ret = true;							
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		return ret;
-	}
-	
-	public boolean removeSyncStateByAccount(long accountId, int state) 
-	{
-		boolean ret = false;
-		try
-		{
-			 String sql = "UPDATE " + TABLE_NAME + " SET " + KEY_syncState 
-			 	+ " = (" + KEY_syncState + " & " + ~state + ")"
-			 	+ " WHERE " + KEY_accountId + " = " + accountId; 
-			 getDbReadWrite().execSQL(sql);
-			 ret = true;							
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		return ret;
-	}
-	
-	public boolean deleteBySyncState(long accountId, int state) 
-	{
-		boolean ret = false;
-		try
-		{
-			 String sql = "DELETE FROM " + TABLE_NAME + " WHERE " 
-			 	+ state + " = (" + KEY_syncState + " & " + state + ")"
-			 	+ " AND " + KEY_accountId + " = " + accountId; 
-			 getDbReadWrite().execSQL(sql);
-			 ret = true;							
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		return ret;
-	}*/
-	
-	public String getTaskListRemoteId(long taskListId)
-	{
-		initialize();
-		String ret = "";
-		GooTaskList list;
-		try
-		{
-			list = read(taskListId);
-			ret = list.remoteId;
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		return ret;
-	}	
 }

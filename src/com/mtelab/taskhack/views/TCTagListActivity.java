@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -153,6 +154,13 @@ public class TCTagListActivity extends Activity implements
 	        break;
 	    }
 	    return dialog;
+	}	
+
+	public static void go(Activity activity, long taskId) {		
+		final Intent intent = new Intent(activity, TCTagListActivity.class);
+		intent.putExtra(EXTRA_TASK_ID, taskId);
+		activity.startActivityForResult(intent, REQUEST_TAGS);  
+		activity.overridePendingTransition(R.anim.fade, R.anim.hold);
 	}
 	
 	// List Actions

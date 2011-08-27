@@ -1,24 +1,15 @@
 package com.mtelab.taskhack;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
-
 import com.google.api.client.extensions.android2.AndroidHttp;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.services.tasks.v1.Tasks;
-import com.mtelab.taskhack.adapters.GooTaskListAdapter;
 import com.mtelab.taskhack.adapters.TCTagListAdapter;
 import com.mtelab.taskhack.auth.OAuthHelper;
-import com.mtelab.taskhack.models.GooTask;
 import com.mtelab.taskhack.models.TCTagItem;
-import com.mtelab.taskhack.shared.TaskChange;
-
-
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 
 public class TaskApplication extends Application {
 
@@ -32,7 +23,6 @@ public class TaskApplication extends Application {
     
     private TaskListener listener;
     
-    private GooTaskListAdapter mTaskListAdapter;
     private TCTagListAdapter mTagListAdapter;
     	
     private OAuthHelper mOAuthHelper;
@@ -67,26 +57,4 @@ public class TaskApplication extends Application {
         }
         return mTagListAdapter;
     }  
-    
-    public GooTaskListAdapter getTaskListAdapter() {
-        return mTaskListAdapter;
-    }
-    
-    public GooTaskListAdapter getTaskListAdapter(Context context) {
-        if (mTaskListAdapter == null) {
-        	mTaskListAdapter = new GooTaskListAdapter(context,  R.layout.task_item, new ArrayList<GooTask>());
-        }
-        return mTaskListAdapter;
-    }
-    
-    public void notifyListener(Intent intent) {
-        if (listener != null) {
-            Bundle extras = intent.getExtras();
-            if (extras != null) {
-                String message = (String) extras.get("message");
-                String[] messages = message.split(Pattern.quote(TaskChange.SEPARATOR));
-                listener.onTaskUpdated(messages[0], Long.parseLong(messages[1]));
-            }
-        }
-    }
 }

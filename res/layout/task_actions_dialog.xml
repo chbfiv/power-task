@@ -108,7 +108,7 @@
 			        android:singleLine="true"
 			        android:ellipsize="end"
 			        android:gravity="center_vertical"
-	                android:text="Delete / Archive" 
+	                android:text="Delete" 
 	                android:onClick="deleteAction" 
 	                android:clickable="true"  />
 		        <ImageView 

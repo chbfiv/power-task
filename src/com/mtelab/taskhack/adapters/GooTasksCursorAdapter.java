@@ -1,34 +1,34 @@
 package com.mtelab.taskhack.adapters;
 
-import java.util.List;
-
 import com.mtelab.taskhack.R;
-import com.mtelab.taskhack.drawables.ColorStrip;
+import com.mtelab.taskhack.database.GooTaskListsOpenHelper;
+import com.mtelab.taskhack.database.GooTasksOpenHelper;
 import com.mtelab.taskhack.helpers.DateTimeHelper;
 import com.mtelab.taskhack.models.GooTask;
 import com.mtelab.taskhack.models.GooTaskList;
 import com.mtelab.taskhack.models.TCTag;
 import com.mtelab.taskhack.views.ColorStripItem;
+import com.mtelab.taskhack.views.GooTaskListsActivity;
 import com.mtelab.taskhack.views.GooTasksActivity;
-import com.mtelab.taskhack.views.GooAccountsActivity;
-import com.mtelab.taskhack.views.TCTagListActivity;
 
-import android.accounts.Account;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.ImageView;
+import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-public class GooTaskListAdapter extends ArrayAdapter<GooTask> {
+public class GooTasksCursorAdapter extends CursorAdapter {
 
-    private final static class ViewHolder {
+    private static final String TAG = GooTasksCursorAdapter.class.getName();
+    
+	private final static class ViewHolder {
     	TextView title;
     	TextView notes;
     	TextView dueDate;
@@ -41,57 +41,46 @@ public class GooTaskListAdapter extends ArrayAdapter<GooTask> {
     private final LayoutInflater inflater;
     private static float mScale;
     
-    public GooTaskListAdapter(Context context, int textViewResourceId, List<GooTask> task) {
-		super(context, textViewResourceId, task);
+    public GooTasksCursorAdapter(Context context, Cursor c, boolean autoRequery) {
+		super(context, c, autoRequery);
 		mActivity = (GooTasksActivity)context;
-		mScale = mActivity.getResources().getDisplayMetrics().density; 
-		inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);	
+		mScale = mActivity.getResources().getDisplayMetrics().density; 	
 	}    
-    
-    public void set(List<GooTask> tasks) {
-        clear();
-        for (GooTask task : tasks) {
-     	   add(task);
-        }
-        notifyDataSetChanged();
-     }
 
-    public long getItemId(int position) {
-    	GooTask task = getItem(position);
-        return task.getId();
+    public boolean requery()
+    {
+    	boolean ret = false;
+    	Cursor c = getCursor();
+    	if(c != null)
+    	{
+    		ret = c.requery();    		
+    	}
+    	else
+    	{
+    	    Log.e(TAG, "requery null");	
+    		throw new NullPointerException();
+    	}
+    	return ret;
     }
+    
+	@Override
+	public void bindView(View view, Context context, Cursor cursor) {
+    	ViewHolder holder = (ViewHolder)view.getTag();
+        holder.statusCheckBox.setOnCheckedChangeListener(null);
+        holder.title.setOnClickListener(null);
+        holder.title.setOnLongClickListener(null);
+        holder.starCheckBox.setOnCheckedChangeListener(null);
 
-    public View getView(int position, View convertView, ViewGroup view) {
-    	ViewHolder holder;
-    	GooTask task = getItem(position);
-    	
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.task_item, null);
+    	GooTask task = GooTasksOpenHelper.read(cursor);
 
-            holder = new ViewHolder();
-            holder.title = (TextView) convertView.findViewById(R.id.taskItem_title);
-            holder.notes = (TextView) convertView.findViewById(R.id.taskItem_notes);
-            holder.dueDate = (TextView) convertView.findViewById(R.id.taskItem_dueDate);
-            holder.statusCheckBox = (CheckBox) convertView.findViewById(R.id.taskItem_statusCheckBox);
-            holder.starCheckBox = (CheckBox) convertView.findViewById(R.id.taskItem_starCheckBox);
-            holder.colorStrip = (LinearLayout) convertView.findViewById(R.id.taskItem_colorStrip);
-            
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder)convertView.getTag();
-            holder.statusCheckBox.setOnCheckedChangeListener(null);
-            holder.title.setOnClickListener(null);
-            holder.title.setOnLongClickListener(null);
-            holder.starCheckBox.setOnCheckedChangeListener(null);
-        }
-
-        holder.statusCheckBox.setTag(position);
-        holder.title.setTag(position);
-        holder.colorStrip.setTag(position);
-        holder.starCheckBox.setTag(position);
-        holder.notes.setTag(position);
-        holder.dueDate.setTag(position);
-
+        holder.statusCheckBox.setTag(task.getId());
+        holder.title.setTag(task.getId());
+        holder.colorStrip.setTag(task.getId());
+        holder.starCheckBox.setTag(task.getId());
+        holder.notes.setTag(task.getId());
+        holder.dueDate.setTag(task.getId());
+        
         holder.starCheckBox.setChecked(hasBlueStarTag(task));   
         holder.starCheckBox.setOnCheckedChangeListener(mActivity);
         
@@ -139,10 +128,21 @@ public class GooTaskListAdapter extends ArrayAdapter<GooTask> {
         {
         	holder.dueDate.setVisibility(View.GONE);
         }   
-        
-        
-        return convertView;
-    }
+	}
+
+	@Override
+	public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        View newView = inflater.inflate(R.layout.task_item, null);
+       	ViewHolder holder = new ViewHolder();
+        holder.title = (TextView) newView.findViewById(R.id.taskItem_title);
+        holder.notes = (TextView) newView.findViewById(R.id.taskItem_notes);
+        holder.dueDate = (TextView) newView.findViewById(R.id.taskItem_dueDate);
+        holder.statusCheckBox = (CheckBox) newView.findViewById(R.id.taskItem_statusCheckBox);
+        holder.starCheckBox = (CheckBox) newView.findViewById(R.id.taskItem_starCheckBox);
+        holder.colorStrip = (LinearLayout) newView.findViewById(R.id.taskItem_colorStrip);
+        newView.setTag(holder);
+		return newView;
+	}
     
     private boolean hasBlueStarTag(GooTask task)
     {
@@ -152,5 +152,5 @@ public class GooTaskListAdapter extends ArrayAdapter<GooTask> {
     			return true;
     	}
     	return ret;
-    }    
+    }  
 }

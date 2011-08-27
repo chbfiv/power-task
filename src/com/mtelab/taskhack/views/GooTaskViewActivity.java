@@ -7,6 +7,7 @@ import com.mtelab.taskhack.database.GooTasksOpenHelper;
 import com.mtelab.taskhack.models.GooBase;
 import com.mtelab.taskhack.models.GooTask;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -106,7 +107,19 @@ public class GooTaskViewActivity extends BaseActivity {
     	}
         return super.onOptionsItemSelected(item);
     }
-
+    
+    public static void go(Activity activity, long taskId) 
+    {
+    	go(activity, true, taskId);
+    }
+    
+	public static void go(Activity activity, boolean finishActivity, long taskId) {		
+		final Intent intent = new Intent(activity, GooTaskViewActivity.class);
+		intent.putExtra(EXTRA_ACTIVE_TASK_ID, taskId);
+		activity.startActivity(intent);
+		if(finishActivity) activity.finish();
+	}
+	
     private void refreshTask()
     {
     	if(mActiveTaskId == GooBase.INVALID_ID)

@@ -123,7 +123,7 @@ public class GooAccountsActivity extends BaseActivity
 		
 		Intent intent = new Intent(this, TasksAppService.class);
 		intent.setFlags(TasksAppService.REQUEST_SYNC_ACCOUNTS);
-		intent.putExtra(TasksAppService.REQUEST_RECEIVER_EXTRA, mAccountsReceiver);
+		intent.putExtra(TasksAppService.REQUEST_RECEIVER_EXTRA, mSyncReceiver);
 		startService(intent);
     }
 
@@ -145,7 +145,7 @@ public class GooAccountsActivity extends BaseActivity
 		}
 	} 	
 
-	private ResultReceiver mAccountsReceiver = new ResultReceiver(null) {
+	private ResultReceiver mSyncReceiver = new ResultReceiver(null) {
 		
 	    @Override
 	    protected void onReceiveResult(final int resultCode, final Bundle resultData) {			    	

@@ -79,6 +79,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 	}
 	
 	public List<TCTag> query(long taskId) {
+		initialize();
 		List<TCTag> tagList = new ArrayList<TCTag>();
 		Cursor c = null;
 		try
@@ -115,6 +116,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 	}	
 	
 	public List<TCTagItem> queryItems(long taskId) {
+		initialize();
 		List<TCTagItem> tagItemList = new ArrayList<TCTagItem>();
 		Cursor c = null;
 		try
@@ -153,6 +155,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 	
 	public long replace(String tag, long taskId) 
 	{		
+		initialize();
 		long ret = -1;
 		long tagId = -1;
 		try
@@ -184,6 +187,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 	
 	public long create(long tagId, long taskId)
 	{
+		initialize();
 		long ret = -1;
 		try
 		{
@@ -201,6 +205,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 	
 	public long replace(long tagId, long taskId)
 	{
+		initialize();
 		long ret = -1;
 		try
 		{
@@ -218,6 +223,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 	
 	public boolean delete(String tag, long taskId) 
 	{		
+		initialize();
 		boolean ret = false;
 		long tagId = -1;
 		try
@@ -243,6 +249,7 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 	}
 	
 	public boolean delete(long tagId, long taskId) {
+		initialize();
 		boolean ret = false;
 		 try
 		 {

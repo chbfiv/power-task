@@ -121,12 +121,7 @@ public class TasksAppService extends IntentService {
 			    {
 			    	processAccountsRequest(receiver);
 			    	break;
-			    }	    
-			    case UPDATE_TASK:
-			    {
-			    	processUpdateTask(taskId, receiver);
-			    	break;
-			    }	
+			    }	  
 		    }	      
 	    }
 	    catch (Exception e)
@@ -192,30 +187,8 @@ public class TasksAppService extends IntentService {
     		if(gooList != null)
     		{
 				Tasks list = taskService.tasks.list(gooList.remoteId).execute();
-				dbTLHelper.createOrUpdateRange(taskListId, list);
+				dbTLHelper.sync(this, taskListId, list, list.etag);
 		    	if(receiver != null) receiver.send(RESULT_SYNC_TASKS_SUCCESS, bundle);
-    		}
-    	} 
-    	catch(Exception e)
-    	{
-    		handleException(e, receiver);
-    	}
-	}
-	
-	private void processUpdateTask(long taskId, ResultReceiver receiver) 
-	{
-		Bundle bundle = new Bundle(); 
-    	try
-    	{    		
-    		GooTask gooTask = dbTLHelper.read(taskId);
-    		if(gooTask != null)
-    		{
-    			String taskListRemoteId = dbTLCHelper.getTaskListRemoteId(gooTask.taskListId);
-    			
-	    		Task task = taskService.tasks.get(taskListRemoteId, gooTask.remoteId).execute();
-	    		task = gooTask.Sync(task);
-    			Task result = taskService.tasks.update(taskListRemoteId, task.id, task).execute();
-		    	if(receiver != null) receiver.send(RESULT_UPDATE_TASK_SUCCESS, bundle);
     		}
     	} 
     	catch(Exception e)
@@ -328,55 +301,63 @@ public class TasksAppService extends IntentService {
         Log.i(TAG, msg);	
 	}	
 	
-	public static void updateTask(Context context, long taskId, ResultReceiver receiver)
+	public static void syncTaskLists(Context context, ResultReceiver receiver)
 	{
 		Intent intent = new Intent(context, TasksAppService.class);
-		intent.setFlags(UPDATE_TASK);
-		intent.putExtra(EXTRA_TASK_ID, taskId);		
+		intent.setFlags(REQUEST_SYNC_TASK_LISTS);
 		intent.putExtra(REQUEST_RECEIVER_EXTRA, receiver);
 		context.startService(intent);		
 	}	
 	
-	public TaskList createRemoteTaskList(GooTaskList localList)
+	public static void syncTasks(Context context, long taskListId, ResultReceiver receiver)
 	{
-		TaskList remoteList = new TaskList();
-		TaskList resultList = null;
+		Intent intent = new Intent(context, TasksAppService.class);
+		intent.setFlags(REQUEST_SYNC_TASKS);
+		intent.putExtra(EXTRA_TASK_LIST_ID, taskListId);		
+		intent.putExtra(REQUEST_RECEIVER_EXTRA, receiver);
+		context.startService(intent);		
+	}	
+	
+	
+	public TaskList createRemoteTaskList(GooTaskList local)
+	{
+		TaskList remote = new TaskList();
+		TaskList result = null;
     	try
     	{   		
-    		remoteList.title = localList.title;
-    		resultList = taskService.tasklists.insert(remoteList).execute();			
+    		remote.title = local.title;
+    		result = taskService.tasklists.insert(remote).execute();			
     	} 
     	catch(Exception e)
     	{
     		handleException(e);    		
     	}
-    	return resultList;
+    	return result;
 	}
 	
-	public TaskList updateRemoteTaskList(GooTaskList localList)
+	public TaskList updateRemoteTaskList(GooTaskList local)
 	{
-		TaskList remoteList = null;
-		TaskList resultList = null;
+		TaskList remote = null;
+		TaskList result = null;
     	try
     	{   		
-    		remoteList = taskService.tasklists.get(localList.remoteId).execute();
-    		remoteList.title = localList.title;
-
-    		resultList = taskService.tasklists.update(remoteList.id, remoteList).execute();
+    		remote = taskService.tasklists.get(local.remoteId).execute();
+    		remote.title = local.title;
+    		result = taskService.tasklists.update(remote.id, remote).execute();
     	} 
     	catch(Exception e)
     	{
     		handleException(e);    		
     	}
-    	return resultList;
+    	return result;
 	}
 	
-	public boolean deleteRemoteTaskList(GooTaskList localList)
+	public boolean deleteRemoteTaskList(GooTaskList local)
 	{
 		boolean ret = false;
     	try
     	{   		
-    		taskService.tasklists.delete(localList.remoteId).execute();
+    		taskService.tasklists.delete(local.remoteId).execute();
     		ret = true;
     	} 
     	catch(Exception e)
@@ -385,4 +366,82 @@ public class TasksAppService extends IntentService {
     	}
     	return ret;
 	}	
+	
+	public Task createRemoteTask(GooTask local)
+	{
+		Task remote = new Task();
+		Task result = null;
+    	try
+    	{
+			String taskListRemoteId = dbTLCHelper.getTaskListRemoteId(local.taskListId);
+
+			if(taskListRemoteId ==  "") return result;
+			
+    		remote.title = local.title;
+    		remote.notes = local.notes;
+    		remote.status = local.status;
+    		remote.due = local.due;
+    		remote.completed = local.completed;
+    		
+			result = taskService.tasks.insert(taskListRemoteId, remote).execute();	
+    	} 
+    	catch(Exception e)
+    	{
+    		handleException(e);    		
+    	}
+    	return result;
+	}
+	
+	public Task updateRemoteTask(GooTask local)
+	{
+		Task remote = null;
+		Task result = null;
+    	try
+    	{   
+			String taskListRemoteId = dbTLCHelper.getTaskListRemoteId(local.taskListId);
+			String taskRemoteId = local.remoteId;
+
+			if(isNullOrEmpty(taskListRemoteId) || isNullOrEmpty(taskRemoteId)) return result;
+			
+    		remote = taskService.tasks.get(taskListRemoteId, taskRemoteId).execute();
+
+    		remote.title = local.title;
+    		remote.notes = local.notes;
+    		remote.status = local.status;
+    		remote.due = local.due;
+    		remote.completed = local.completed;
+
+    		result = taskService.tasks.update(taskListRemoteId, taskRemoteId, remote).execute();
+    	} 
+    	catch(Exception e)
+    	{
+    		handleException(e);    		
+    	}
+    	return result;
+	}
+	
+	public boolean deleteRemoteTask(GooTask local)
+	{
+		boolean ret = false;
+    	try
+    	{   		
+			String taskListRemoteId = dbTLCHelper.getTaskListRemoteId(local.taskListId);
+			String taskRemoteId = local.remoteId;
+
+			if(isNullOrEmpty(taskListRemoteId) || isNullOrEmpty(taskRemoteId)) return ret;
+			
+    		taskService.tasks.delete(taskListRemoteId, taskRemoteId).execute();
+    		ret = true;
+    	} 
+    	catch(Exception e)
+    	{
+    		handleException(e);
+    	}
+    	return ret;
+	}	
+	
+	public static boolean isNullOrEmpty(String val)
+	{
+		return val == null || val.equals("");
+	}
 }

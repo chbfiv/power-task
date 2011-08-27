@@ -92,6 +92,19 @@ public class GooTaskComposeActivity extends BaseActivity {
 		if (dbTLHelper != null) dbTLHelper.close(); 
 	}
 	
+    public static void go(Activity activity, long taskId) 
+    {
+    	go(activity, true, taskId);
+    }
+    
+	public static void go(Activity activity, boolean finishActivity, long taskId) {		
+		final Intent intent = new Intent(activity, GooTaskComposeActivity.class);
+		intent.putExtra(EXTRA_ACTIVE_TASK_ID, taskId);
+		activity.startActivity(intent);
+		activity.overridePendingTransition(R.anim.fade, R.anim.hold);
+		if(finishActivity) activity.finish();
+	}
+	
     private void refreshTask()
     {
     	if(mActiveTaskId == GooBase.INVALID_ID)

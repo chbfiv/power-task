@@ -72,6 +72,7 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
 	}
 	
 	public TCTag read(String name) {
+		initialize();
 		TCTag tag = null;
 		Cursor c = null;
 		try
@@ -104,6 +105,7 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
 	}
 	
 	public TCTag read(long id) {
+		initialize();
 		TCTag tag = null;
 		Cursor c = null;
 		try
@@ -141,6 +143,7 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
 	
 	public long create(String name) 
 	{
+		initialize();
 		long ret = -1;
 		try
 		{
@@ -170,6 +173,7 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
 
 	public boolean update(TCTag tag) 
 	{
+		initialize();
 		boolean ret = false;
 		try
 		{
@@ -187,6 +191,7 @@ public class TCTagsOpenHelper extends GooBaseOpenHelper {
 	}
 	
 	public boolean delete(long rowId) {
+		initialize();
 		boolean ret = false;
 		 try
 		 {

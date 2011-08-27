@@ -212,11 +212,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 	@Override
 	public void sync(boolean withRefresh) {
 		if(withRefresh) mAdapter.requery();
-		
-		Intent intent = new Intent(this, TasksAppService.class);
-		intent.setFlags(TasksAppService.REQUEST_SYNC_TASK_LISTS);
-		intent.putExtra(TasksAppService.REQUEST_RECEIVER_EXTRA, mLoadTaskListReceiver);
-		startService(intent);
+		TasksAppService.syncTaskLists(this, mSyncReceiver);
 	}
 	
 	public void showTaskListActionsDialog(long taskListId)
@@ -426,7 +422,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 	    }
 	};
 	
-	private ResultReceiver mLoadTaskListReceiver = new ResultReceiver(null) {
+	private ResultReceiver mSyncReceiver = new ResultReceiver(null) {
 		
 	    @Override
 	    protected void onReceiveResult(final int resultCode, final Bundle resultData) {			    	

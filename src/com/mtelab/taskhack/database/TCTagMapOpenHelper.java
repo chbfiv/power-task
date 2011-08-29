@@ -84,10 +84,10 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 		Cursor c = null;
 		try
 		{
-			String sql = " SELECT t.id AS id, t.created AS created, t.modified AS modified, t.name as tagName, t.color AS tagColor " +
+			String sql = " SELECT t._id AS id, t.created AS created, t.modified AS modified, t.name as tagName, t.color AS tagColor " +
 				" FROM tc_tagmap AS tm, tc_tags AS t " +
-				" WHERE t.id = tm.tagId AND tm.taskId = ? " +
-				" GROUP BY t.id ";
+				" WHERE t._id = tm.tagId AND tm.taskId = ? " +
+				" GROUP BY t._id ";
 			
 			String[] args = new String[] { String.valueOf(taskId) };
 			
@@ -121,11 +121,11 @@ public class TCTagMapOpenHelper extends GooBaseOpenHelper {
 		Cursor c = null;
 		try
 		{
-			String sql = " SELECT t.id AS id, t.created AS created, t.modified AS modified, t.name as tagName, t.color AS tagColor, SUM(CAST(tm.taskId = ? AS INTEGER)) AS checked " +
+			String sql = " SELECT t._id AS id, t.created AS created, t.modified AS modified, t.name as tagName, t.color AS tagColor, SUM(CAST(tm.taskId = ? AS INTEGER)) AS checked " +
 				" FROM tc_tags AS t " + 
 				" LEFT OUTER JOIN tc_tagmap AS tm " +
-				" ON t.id = tm.tagId " +
-				" GROUP BY t.id ";
+				" ON t._id = tm.tagId " +
+				" GROUP BY t._id ";
 			
 			String[] args = new String[] { String.valueOf(taskId) };
 			

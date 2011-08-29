@@ -102,20 +102,6 @@ public class ActivityHelper {
         return false;
     }
     
-	public void goAccounts() {
-		final Intent intent = new Intent(mActivity, GooAccountsActivity.class);
-		mActivity.startActivity(intent);
-		mActivity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
-		mActivity.finish();
-	}
-	
-    public void goTaskListCollection() {
-		Intent intent = new Intent(mActivity, GooTaskListsActivity.class);
-		mActivity.startActivity(intent);
-		mActivity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
-		mActivity.finish();
-    }
-    
     public void goTaskList() {
 		mActivity.finish();
     }
@@ -132,13 +118,13 @@ public class ActivityHelper {
         
         View.OnClickListener accountsClickListener = new View.OnClickListener() {
             public void onClick(View view) {
-            	goAccounts();
+            	GooAccountsActivity.go(mActivity, true);
             }
         };
         
         View.OnClickListener taskListCollectionClickListener = new View.OnClickListener() {
             public void onClick(View view) {
-                goTaskListCollection();
+                GooTaskListsActivity.go(mActivity, true);
             }
         };
         

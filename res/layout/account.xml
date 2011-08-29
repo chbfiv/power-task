@@ -17,22 +17,12 @@
 			android:textSize="@dimen/text_size_large"
 	        android:singleLine="true"
 	        android:gravity="center_vertical"
-	        android:text="example" />
+	        android:text="example"
+	        android:textColor="@android:color/white" />
 	    <CheckBox  
 	    	android:id="@+id/accountItem"
 		    android:layout_width="wrap_content" 
 		    android:layout_height="fill_parent"  />
-    </TableRow>
-    <TableRow>
-	    <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-			android:id="@+id/accountInfo"
-			android:layout_span="3"
-	        android:singleLine="true"
-	        android:paddingLeft="30dip"
-			android:textSize="@dimen/text_size_small"
-	        android:text="detials example" />
     </TableRow>
 </TableLayout>
 

@@ -77,6 +77,11 @@
 	<!--  -->
 	<string name="addAccount_description">You can use more than one Google Account on your phone (such as your home and work accounts). Adding a Google Account takes just a few steps.</string>
 	<string name="addAccount_descriptionFooter">Touch "Next" to continue or press your phone\'s back button to exit.</string>
-	
-	
+
+	<string name="example_task_title">Example title Account takes just a few stepsasdasdasdasd.</string>
+	<string name="example_task_date">Fri, Jun 26, 2011</string>
+	<string name="example_task_day">Today</string>
+	<string name="example_task_note">Example note You can use more than one Google Account on your phone (such as your home and work accounts). Adding a Google Account takes just a few steps.
+	You can use more than one Google Account on your phone (such as your home and work accounts). Adding a Google Account takes just a few steps.
+	You can use more than one Google Account on your phone (such as your home and work accounts). Adding a Google Account takes just a few steps.</string>
 </resources>

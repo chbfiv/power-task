@@ -23,7 +23,7 @@
 			android:textColor="@android:color/black"
 			android:layout_weight="1"
 	        android:singleLine="true"
-	        android:text="Example 7ask Item With Long Info" 
+	        android:text="@string/example_task_title" 
 	        android:ellipsize="end"
 	        android:gravity="center_vertical" />	     
         <LinearLayout
@@ -45,31 +45,36 @@
 	        android:button="@drawable/btn_star_holo_light"
 	        android:checked="false" />         
     </LinearLayout>	
-    <TextView
-		android:id="@+id/taskItem_notes"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" 
+    
+    <LinearLayout
+    	android:id="@+id/taskItem_detials"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
     	android:minHeight="16dip"
-	    android:layout_marginLeft="16dip"
-		android:textSize="@dimen/text_size_small"
-		android:textColor="@android:color/darker_gray"
-        android:singleLine="true"
-        android:text="Example Note With Rambling Example of How Wrapping asd asd asdasdasdasd" 
-        android:ellipsize="end"
-        android:gravity="center_vertical"/>	 
-    <TextView
-		android:id="@+id/taskItem_dueDate"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" 
-    	android:minHeight="16dip"
-	    android:layout_marginLeft="16dip"
-		android:layout_span="1"
-		android:textSize="@dimen/text_size_small"
-		android:textColor="@android:color/darker_gray"
-        android:singleLine="true"
-        android:text="12/31/2999 asd asd asd asd asd asdasdasdasd  asdasd asd asd asd asd asd as dsa" 
-        android:ellipsize="end"
-        android:gravity="center_vertical"/>	
+        android:orientation="horizontal">
+	    <TextView
+			android:id="@+id/taskItem_dueDate"
+	        android:layout_width="wrap_content"
+	        android:layout_height="fill_parent" 
+	    	android:layout_marginLeft="16dip"
+			android:textSize="@dimen/text_size_small"
+			android:textColor="@android:color/darker_gray"
+	        android:singleLine="true"
+	        android:text="@string/example_task_date" 
+	        android:ellipsize="end"
+	        android:gravity="center_vertical"/>	
+	    <TextView
+			android:id="@+id/taskItem_notes"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent" 
+		    android:layout_marginLeft="16dip"
+			android:textSize="@dimen/text_size_small"
+			android:textColor="@android:color/darker_gray"
+	        android:singleLine="true"
+	        android:text="@string/example_task_note" 
+	        android:ellipsize="end"
+	        android:gravity="center_vertical"/>	 
+     </LinearLayout>
      <View
         android:layout_width="match_parent"
         android:layout_height="1dip"

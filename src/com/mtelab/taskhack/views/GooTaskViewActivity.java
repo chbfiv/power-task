@@ -4,7 +4,9 @@ import com.mtelab.taskhack.R;
 import com.mtelab.taskhack.base.ActivityHelper;
 import com.mtelab.taskhack.base.BaseActivity;
 import com.mtelab.taskhack.database.GooTasksOpenHelper;
+import com.mtelab.taskhack.helpers.DateTimeHelper;
 import com.mtelab.taskhack.models.GooBase;
+import com.mtelab.taskhack.models.GooSyncBase;
 import com.mtelab.taskhack.models.GooTask;
 
 import android.app.Activity;
@@ -15,10 +17,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class GooTaskViewActivity extends BaseActivity {
+public class GooTaskViewActivity extends BaseActivity 
+	implements OnCheckedChangeListener {
 
 	private static final String TAG = GooTaskViewActivity.class.getName();
 	
@@ -26,15 +32,14 @@ public class GooTaskViewActivity extends BaseActivity {
 	
     private TextView mTitle;
     private TextView mNotes;
-    private TextView taskEditDateField;
+    private TextView mDay;
+    private TextView mDate;
     private View mDetialsCollapsed;
     private View mDetials;
-    private LinearLayout mDetialsLayout;
+    private View mDetialsSeperator;
+    private CheckBox mStatusCheckBox;
     
-    static final int DATE_DIALOG_ID = 0;
-    private int mYear;
-    private int mMonth;
-    private int mDay;    
+    static final int DATE_DIALOG_ID = 0;  
 
 	public static final String EXTRA_ACTIVE_TASK_ID = "active_task_id";
 	private long mActiveTaskId = GooBase.INVALID_ID;
@@ -42,12 +47,6 @@ public class GooTaskViewActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-    	if(!dbTLHelper.initialize())
-    	{
-    		Log.e(TAG, "onCreate - db failed to initialize.");
-    		return;    		
-    	}
     	
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
@@ -62,18 +61,16 @@ public class GooTaskViewActivity extends BaseActivity {
         
         mTitle = (TextView) findViewById(R.id.taskView_titleField);
         mNotes = (TextView) findViewById(R.id.taskView_detialsField);        
-        taskEditDateField = (TextView) findViewById(R.id.taskView_dateField);        
-        mDetialsCollapsed = findViewById(R.id.taskView_detials_collapsed);           
+
+        mDay = (TextView) findViewById(R.id.taskView_dayField);  
+        mDate = (TextView) findViewById(R.id.taskView_dateField);    
+        
         mDetials = findViewById(R.id.taskView_detials);  
-        mDetialsLayout = (LinearLayout) findViewById(R.id.taskView_detialsLayout);  
+        mDetialsCollapsed = findViewById(R.id.taskView_detials_collapsed);   
+        mDetialsSeperator = findViewById(R.id.taskView_detials_seperator);  
 
         mDetials.setVisibility(View.GONE);
-        
-        mYear = 0;
-        mMonth = 0;
-        mDay = 0;
-    	
-    	refreshTask();
+        mStatusCheckBox = (CheckBox) findViewById(R.id.taskView_statusCheckBox);
     }    
     
     @Override
@@ -101,7 +98,7 @@ public class GooTaskViewActivity extends BaseActivity {
     	switch(item.getItemId())
     	{
 			case R.id.menu_edit_mode: {
-				editTask();
+				GooTaskEditActivity.go(this, false, mActiveTaskId);
 				return true;
 			}
     	}
@@ -136,17 +133,40 @@ public class GooTaskViewActivity extends BaseActivity {
     	}
     	
 		mTitle.setText(task.title);
-		mNotes.setText(task.notes);
-		
-		
-    }
+		mNotes.setText(task.notes);		
 
-    private void editTask()
-    {
-		Intent intent = new Intent(this, GooTaskComposeActivity.class);
-		intent.putExtra(GooTaskComposeActivity.EXTRA_ACTIVE_TASK_ID, mActiveTaskId);
-		startActivity(intent);    
-		overridePendingTransition(R.anim.fade, R.anim.hold);	
+        mStatusCheckBox.setOnCheckedChangeListener(null);
+        mStatusCheckBox.setChecked(task.isCompleted());   
+        mStatusCheckBox.setOnCheckedChangeListener(this);        
+        
+        mDetials.setVisibility(View.GONE);  
+        mDetialsCollapsed.setVisibility(View.GONE);   
+        mDetialsSeperator.setVisibility(View.GONE);   
+    	mDay.setVisibility(View.GONE);     
+    	mDate.setVisibility(View.GONE);         
+        
+        if(task.hasDueDate() && task.hasTags())
+        {
+	    	mDay.setText(DateTimeHelper.prettyDueDate(task.due));
+	    	mDate.setText(DateTimeHelper.prettyDueDate(task.due));
+        	mDay.setVisibility(View.VISIBLE);     
+        	mDate.setVisibility(View.VISIBLE);             	
+            mDetialsCollapsed.setVisibility(View.VISIBLE);   
+            mDetialsSeperator.setVisibility(View.VISIBLE);  
+        }        
+        else if(task.hasDueDate())
+        {
+	    	mDay.setText(DateTimeHelper.prettyDueDate(task.due));
+	    	mDate.setText(DateTimeHelper.prettyDueDate(task.due));
+        	mDay.setVisibility(View.VISIBLE);     
+        	mDate.setVisibility(View.VISIBLE);       
+        	mDetialsCollapsed.setVisibility(View.VISIBLE);   
+            mDetialsSeperator.setVisibility(View.VISIBLE);    
+        }      
+        else if(task.hasTags())
+        {
+        	
+        }  
     }
     
     public void collapseDetials(View v)
@@ -160,4 +180,17 @@ public class GooTaskViewActivity extends BaseActivity {
         mDetialsCollapsed.setVisibility(View.GONE);
         mDetials.setVisibility(View.VISIBLE); 
     }
+
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {		
+		if(mActiveTaskId != GooBase.INVALID_ID)
+		{
+			GooTask task = dbTLHelper.read(mActiveTaskId);					
+
+			GooTask.Status status = isChecked ? GooTask.Status.completed : GooTask.Status.needsAction;
+			task.setStatus(status);
+			task.flagSyncState(GooSyncBase.SYNC_UPDATE);				
+			dbTLHelper.update(task);		
+		}	
+	}
 }

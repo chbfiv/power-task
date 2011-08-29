@@ -13,6 +13,7 @@ import com.mtelab.taskhack.views.GooTasksActivity;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ public class GooTasksCursorAdapter extends CursorAdapter {
     	CheckBox statusCheckBox;
     	CheckBox starCheckBox;
     	LinearLayout colorStrip;
+    	LinearLayout detials;
     }
 
 	private final GooTasksActivity mActivity;
@@ -51,16 +53,23 @@ public class GooTasksCursorAdapter extends CursorAdapter {
     public boolean requery()
     {
     	boolean ret = false;
-    	Cursor c = getCursor();
-    	if(c != null)
+    	try
     	{
-    		ret = c.requery();    		
-    	}
-    	else
-    	{
-    	    Log.e(TAG, "requery null");	
-    		throw new NullPointerException();
-    	}
+	    	Cursor c = getCursor();
+	    	if(c != null)
+	    	{
+	    		ret = c.requery();    		
+	    	}
+	    	else
+	    	{
+	    	    Log.e(TAG, "requery null");	
+	    		throw new NullPointerException();
+	    	}
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}
     	return ret;
     }
     
@@ -69,6 +78,7 @@ public class GooTasksCursorAdapter extends CursorAdapter {
     	ViewHolder holder = (ViewHolder)view.getTag();
         holder.statusCheckBox.setOnCheckedChangeListener(null);
         holder.title.setOnClickListener(null);
+        holder.detials.setOnClickListener(null);
         holder.title.setOnLongClickListener(null);
         holder.starCheckBox.setOnCheckedChangeListener(null);
 
@@ -76,6 +86,7 @@ public class GooTasksCursorAdapter extends CursorAdapter {
 
         holder.statusCheckBox.setTag(task.getId());
         holder.title.setTag(task.getId());
+        holder.detials.setTag(task.getId());
         holder.colorStrip.setTag(task.getId());
         holder.starCheckBox.setTag(task.getId());
         holder.notes.setTag(task.getId());
@@ -89,6 +100,7 @@ public class GooTasksCursorAdapter extends CursorAdapter {
         
         holder.title.setText(task.title);      		
         holder.title.setOnClickListener(mActivity);
+        holder.detials.setOnClickListener(mActivity);
         holder.title.setOnLongClickListener(mActivity);
         if(task.isCompleted())
         	holder.title.setPaintFlags(holder.title.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -108,9 +120,11 @@ public class GooTasksCursorAdapter extends CursorAdapter {
         {
         	holder.colorStrip.setVisibility(View.GONE);        	
         }
-                
+
+    	holder.detials.setVisibility(View.GONE);
         if(task.notes != null && task.notes.length() > 0)
         {
+        	holder.detials.setVisibility(View.VISIBLE);
         	holder.notes.setText(task.notes);
         	holder.notes.setVisibility(View.VISIBLE);
         }
@@ -121,6 +135,7 @@ public class GooTasksCursorAdapter extends CursorAdapter {
 
         if(task.due != null && task.due.length() > 0)
         {
+        	holder.detials.setVisibility(View.VISIBLE);
         	holder.dueDate.setText(DateTimeHelper.prettyDueDate(task.due));
         	holder.dueDate.setVisibility(View.VISIBLE);
         }
@@ -140,6 +155,7 @@ public class GooTasksCursorAdapter extends CursorAdapter {
         holder.statusCheckBox = (CheckBox) newView.findViewById(R.id.taskItem_statusCheckBox);
         holder.starCheckBox = (CheckBox) newView.findViewById(R.id.taskItem_starCheckBox);
         holder.colorStrip = (LinearLayout) newView.findViewById(R.id.taskItem_colorStrip);
+        holder.detials = (LinearLayout) newView.findViewById(R.id.taskItem_detials);
         newView.setTag(holder);
 		return newView;
 	}

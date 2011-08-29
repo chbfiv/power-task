@@ -7,6 +7,7 @@ import com.mtelab.taskhack.views.GooAccountsActivity;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +23,6 @@ public class GooAccountsCursorAdapter extends CursorAdapter {
 	private final static class ViewHolder {
     	TextView name;
     	CheckBox checkbox;
-    	TextView info;
     }
 
 	private final GooAccountsActivity mActivity;
@@ -37,16 +37,23 @@ public class GooAccountsCursorAdapter extends CursorAdapter {
     public boolean requery()
     {
     	boolean ret = false;
-    	Cursor c = getCursor();
-    	if(c != null)
+    	try
     	{
-    		ret = c.requery();    		
-    	}
-    	else
-    	{
-    	    Log.e(TAG, "requery null");	
-    		throw new NullPointerException();
-    	}
+	    	Cursor c = getCursor();
+	    	if(c != null)
+	    	{
+	    		ret = c.requery();    		
+	    	}
+	    	else
+	    	{
+	    	    Log.e(TAG, "requery null");	
+	    		throw new NullPointerException();
+	    	}
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}
     	return ret;
     }
     
@@ -60,12 +67,9 @@ public class GooAccountsCursorAdapter extends CursorAdapter {
 
         holder.name.setTag(account.getId());
         holder.checkbox.setTag(account.getId());
-        holder.info.setTag(account.getId());
 
 	    holder.name.setText(account.getName());   
 	    holder.checkbox.setChecked(account.getSync());   
-	    String msg = account.getSync() ? "Authorized for Sync." : "Needs authorization for Sync.";
-	    holder.info.setText(msg);   
         
 	    holder.name.setOnClickListener(mActivity);
 	    holder.checkbox.setOnCheckedChangeListener(mActivity);
@@ -77,7 +81,6 @@ public class GooAccountsCursorAdapter extends CursorAdapter {
        	ViewHolder holder = new ViewHolder();
         holder.name = (TextView)newView.findViewById(R.id.accountName);
         holder.checkbox = (CheckBox)newView.findViewById(R.id.accountItem);
-        holder.info = (TextView)newView.findViewById(R.id.accountInfo);
         newView.setTag(holder);
 		return newView;
 	}

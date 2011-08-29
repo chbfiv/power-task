@@ -38,7 +38,7 @@
             </intent-filter>         
         </activity>        
         <activity android:name=".views.GooTasksActivity" />
-        <activity android:name=".views.GooTaskComposeActivity" />
+        <activity android:name=".views.GooTaskEditActivity" />
         <activity android:name=".views.GooTaskViewActivity" />
         <activity android:name=".views.GooAccountsActivity" />    
         <activity android:name=".views.TCTagListActivity" />    

@@ -327,6 +327,23 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		return task;
 	}
 	
+	public long create(long taskListId) 
+	{
+		initialize();
+		long ret = -1;
+		try
+		{
+			 ContentValues values = new ContentValues();
+			 values.put(KEY_taskListId, taskListId);
+			 ret = getDbReadWrite().insert(TABLE_NAME, null, values);	
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}
+		return ret;
+	}
+	
 	public long create(GooTask task) 
 	{
 		initialize();

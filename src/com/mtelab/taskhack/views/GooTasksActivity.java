@@ -125,7 +125,7 @@ public class GooTasksActivity extends BaseActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.sync_menu_items, menu);
-		getMenuInflater().inflate(R.menu.edit_mode_menu_item, menu);
+		//getMenuInflater().inflate(R.menu.edit_mode_menu_item, menu);
 		getMenuInflater().inflate(R.menu.compose_task_menu_items, menu);
 		return true;
 	}
@@ -138,7 +138,7 @@ public class GooTasksActivity extends BaseActivity implements
 				return true;
 			}
 			case R.id.menu_compose_task: {
-				//goAccounts();
+				GooTaskEditActivity.go(this, false, mActiveTaskListId, GooBase.INVALID_ID);
 				return true;
 			}
 			case R.id.menu_edit_mode: {
@@ -248,7 +248,7 @@ public class GooTasksActivity extends BaseActivity implements
 		if(mTaskActionsDialog != null && mTaskActionsDialog.isShowing())
 		{
 			mTaskActionsDialog.dismiss();
-			GooTaskComposeActivity.go(this, false, mTaskActionsDialog.getTaskId());
+			GooTaskEditActivity.go(this, false, mTaskActionsDialog.getTaskId());
 		}		
 	}
 	

@@ -6,6 +6,7 @@ import com.mtelab.taskhack.models.GooTaskList;
 import com.mtelab.taskhack.views.GooTaskListsActivity;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,16 +35,23 @@ public class GooTaskListsCursorAdapter extends CursorAdapter {
     public boolean requery()
     {
     	boolean ret = false;
-    	Cursor c = getCursor();
-    	if(c != null)
+    	try
     	{
-    		ret = c.requery();    		
-    	}
-    	else
-    	{
-    	    Log.e(TAG, "requery null");	
-    		throw new NullPointerException();
-    	}
+	    	Cursor c = getCursor();
+	    	if(c != null)
+	    	{
+	    		ret = c.requery();    		
+	    	}
+	    	else
+	    	{
+	    	    Log.e(TAG, "requery null");	
+	    		throw new NullPointerException();
+	    	}
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}
     	return ret;
     }
     

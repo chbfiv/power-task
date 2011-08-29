@@ -1,14 +1,22 @@
 package com.mtelab.taskhack.models;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import android.text.format.Time;
+import android.util.Log;
+import android.util.TimeFormatException;
 
 import com.google.api.services.tasks.v1.model.Task;
 import com.google.api.services.tasks.v1.model.TaskList;
 import com.google.api.services.tasks.v1.model.TaskLists;
 import com.google.api.services.tasks.v1.model.Tasks;
+import com.mtelab.taskhack.helpers.DateTimeHelper;
 
 public class GooTask extends GooSyncBase {
+	private static final String TAG = GooTask.class.getName();
 
 	public enum Status {
 		needsAction,
@@ -46,7 +54,7 @@ public class GooTask extends GooSyncBase {
 		this.parent = parent;
 		this.position = position;
 		this.notes = notes;
-		this.status = status;
+		this.status = status != null ? status : Status.needsAction.toString();
 		this.due = due;
 		this.completed = completed;
 		this.deleted = deleted;
@@ -72,7 +80,7 @@ public class GooTask extends GooSyncBase {
 		this.parent = parent;
 		this.position = position;
 		this.notes = notes;
-		this.status = status;
+		this.status = status != null ? status : Status.needsAction.toString();
 		this.due = due;
 		this.completed = completed;
 		this.deleted = deleted != 0;
@@ -99,7 +107,7 @@ public class GooTask extends GooSyncBase {
 		Status val;
 		try
 		{
-			val = Status.valueOf(status);
+			val =  status != null ? Status.valueOf(status) : Status.needsAction;
 		}
 		catch (IllegalArgumentException iaex) {
 			 val = Status.needsAction;
@@ -118,6 +126,73 @@ public class GooTask extends GooSyncBase {
 		return getStatus() == Status.completed;
 	}
 
+	public boolean hasDueDate()
+	{
+		return DateTimeHelper.isRFC3339Date(due);
+	}
+	
+	public Calendar getDueDate()
+	{
+		return DateTimeHelper.parseDateRFC3339(due);	
+	}
+	
+	public void setDueDate(int year, int month, int day)
+	{
+		try
+		{
+			due = DateTimeHelper.formatDateRFC3339(year, month, day);
+		}
+		catch(TimeFormatException tfex)
+		{
+	        Log.w(TAG, tfex);	
+		}
+	}
+	
+	public void setDueDate(Calendar date)
+	{
+		try
+		{
+			Time t = new Time();
+			t.set(date.getTimeInMillis());
+			due = t.format3339(false);
+		}
+		catch(TimeFormatException tfex)
+		{
+	        Log.w(TAG, tfex);	
+		}
+	}
+	
+	public void setDueDate(String date)
+	{
+		try
+		{
+			if(DateTimeHelper.isRFC3339Date(date))
+			{
+				due = date;				
+			}
+			else
+			{
+				Time t = new Time();
+				t.parse3339(date);
+				due = t.format3339(false);
+			}
+		}
+		catch(TimeFormatException tfex)
+		{
+	        Log.w(TAG, tfex);	
+		}
+	}
+	
+	public boolean hasNotes()
+	{
+		return notes != null && notes.length() > 0;
+	}
+	
+	public boolean hasTags()
+	{
+		return mTags != null && mTags.size() > 0;
+	}
+	
 	public static GooTask Convert(long taskListId, Task remoteTask, String eTag)
 	{
 		boolean deleted = remoteTask.deleted != null ? remoteTask.deleted : false;

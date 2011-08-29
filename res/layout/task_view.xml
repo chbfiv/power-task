@@ -13,52 +13,65 @@
 		android:layout_marginTop="@dimen/task_edit_detials_padding" 
 		android:layout_marginBottom="@dimen/task_edit_detials_padding" 
     	android:background="@color/task_edit_detials_paper"
-	    android:shrinkColumns="0"
-	    android:stretchColumns="0">   
-	    <TableRow>
+	    android:shrinkColumns="1"
+	    android:stretchColumns="1">   
+	    <TableRow
+		 	android:layout_width="fill_parent"
+			android:layout_height="wrap_content">   
+			<CheckBox  
+			    android:layout_width="wrap_content" 
+			    android:layout_height="wrap_content"
+			    android:id="@+id/taskView_statusCheckBox" 
+		    	android:layout_marginLeft="4dip"
+		        android:button="@drawable/btn_check_holo_light" />
 			<TextView
 			 	android:layout_width="fill_parent"
 				android:layout_height="wrap_content" 
 				android:id="@+id/taskView_titleField"				
-	        	android:text="Example Title"
-				android:layout_span="2"
-				android:paddingLeft="@dimen/textPaddingSides"
-				android:paddingRight="@dimen/textPaddingSides"
-				android:paddingTop="@dimen/textPaddingEdges"
-				android:paddingBottom="@dimen/textPaddingEdges"
-	        	android:singleLine="true"
-				android:textColor="@color/task_textfield_color" />
+	        	android:text="@string/example_task_title"
+		    	android:layout_marginLeft="4dip"
+		    	android:paddingTop="2dip"
+		    	android:paddingBottom="2dip"
+				android:textSize="@dimen/text_size_large"
+				android:textColor="@color/task_textfield_color" />		
 	    </TableRow>
 	     <View
 	        android:layout_width="fill_parent"
 	        android:layout_height="1dip"
+	        android:id="@+id/taskView_detials_seperator"
 			android:layout_span="2"
 			android:layout_marginLeft="@dimen/textPaddingSides"
 			android:layout_marginRight="@dimen/textPaddingSides" 
 			android:layout_marginTop="@dimen/textPaddingSides"
 			android:layout_marginBottom="@dimen/textPaddingSides" 
 	        android:background="#c2c2c2" />
-	    <TableRow android:id="@+id/taskView_detials_collapsed">
-			<TextView
-			 	android:layout_width="fill_parent"
-				android:layout_height="wrap_content" 
-				android:id="@+id/taskView_dateField"
-				android:paddingLeft="@dimen/textPaddingSides"
-				android:paddingRight="@dimen/textPaddingSides"
-				android:paddingTop="@dimen/textPaddingEdges"
-				android:paddingBottom="@dimen/textPaddingEdges"
-	        	android:text="Today"
-				android:textColor="@color/task_textfield_color" 
-				android:singleLine="true"
-				android:textSize="@dimen/text_size_medium" />				
+	    <TableRow android:id="@+id/taskView_detials_collapsed">		
 		    <ImageView
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"
 		        android:scaleType="center"
 		        android:src="@drawable/expander_open_holo_light"
 		        android:onClick="expandDetials" /> 
+			<TextView
+			 	android:layout_width="fill_parent"
+				android:layout_height="wrap_content" 
+				android:id="@+id/taskView_dayField"
+				android:paddingLeft="@dimen/textPaddingSides"
+				android:paddingRight="@dimen/textPaddingSides"
+				android:paddingTop="@dimen/textPaddingEdges"
+				android:paddingBottom="@dimen/textPaddingEdges"
+	        	android:text="@string/example_task_day"
+				android:textColor="@color/task_textfield_color" 
+				android:singleLine="true"
+				android:textSize="@dimen/text_size_medium" />		
 	    </TableRow>
 	    <TableRow android:id="@+id/taskView_detials">
+		    <ImageView
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:scaleType="center"
+		        android:src="@drawable/expander_close_holo_light"
+		        android:onClick="collapseDetials" /> 
 		    <LinearLayout
 				 	android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
@@ -68,7 +81,7 @@
 				 	android:layout_width="fill_parent"
 					android:layout_height="wrap_content" 
 					android:id="@+id/taskView_dateField"
-		        	android:text="11/01/09"
+		        	android:text="@string/example_task_date"
 					android:paddingLeft="@dimen/textPaddingSides"
 					android:paddingRight="@dimen/textPaddingSides"
 					android:paddingTop="@dimen/textPaddingEdges"
@@ -84,12 +97,6 @@
 					android:singleLine="true"
 			        android:background="@drawable/btn_erase_pressed" /> 
 		    </LinearLayout>
-		    <ImageView
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:scaleType="center"
-		        android:src="@drawable/expander_close_holo_light"
-		        android:onClick="collapseDetials" /> 
 	    </TableRow>
 	     <View
 	        android:layout_width="fill_parent"
@@ -99,19 +106,25 @@
 			android:layout_marginRight="@dimen/textPaddingSides" 
 			android:layout_marginTop="@dimen/textPaddingSides"
 			android:layout_marginBottom="@dimen/textPaddingSides" 
-	        android:background="#c2c2c2" />
-		<TextView 
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent" 
-			android:layout_span="2"
-        	android:text="Example Notes"
-			android:id="@+id/taskView_detialsField" 
-			android:paddingLeft="@dimen/textPaddingSides"
-			android:paddingRight="@dimen/textPaddingSides"
-			android:paddingTop="@dimen/textPaddingEdges"
-			android:paddingBottom="@dimen/textPaddingEdges"
-			android:textColor="@color/task_textfield_color"
-			android:inputType="textMultiLine"
-			android:gravity="top" />
+	        android:background="#c2c2c2" />	        
+        <ScrollView 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false">    
+			<TextView 
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" 
+				android:layout_span="2"
+				android:textSize="@dimen/text_size_large"
+	        	android:text="@string/example_task_note"
+				android:id="@+id/taskView_detialsField" 
+				android:paddingLeft="@dimen/textPaddingSides"
+				android:paddingRight="@dimen/textPaddingSides"
+				android:paddingTop="@dimen/textPaddingEdges"
+				android:paddingBottom="@dimen/textPaddingEdges"
+				android:textColor="@color/task_textfield_color"
+				android:inputType="textMultiLine"
+				android:gravity="top" />
+		</ScrollView>			
 	</TableLayout>		
 </LinearLayout>

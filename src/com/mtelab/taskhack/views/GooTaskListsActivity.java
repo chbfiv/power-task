@@ -140,7 +140,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.sync_menu_items, menu);
-		getMenuInflater().inflate(R.menu.edit_mode_menu_item, menu);
+		//getMenuInflater().inflate(R.menu.edit_mode_menu_item, menu);
 		getMenuInflater().inflate(R.menu.create_task_list_menu_item, menu);
 		return true;
 	}
@@ -177,6 +177,11 @@ public class GooTaskListsActivity extends BaseActivity implements
 	    return dialog;
 	}
 	
+    public static void go(Activity activity)
+    {
+    	go(activity, true);
+    }
+    
     public static void go(Activity activity, long accountId)
     {
     	go(activity, true, accountId);
@@ -185,6 +190,13 @@ public class GooTaskListsActivity extends BaseActivity implements
 	public static void go(Activity activity, boolean finishActivity, long accountId) {
 		final Intent intent = new Intent(activity, GooTaskListsActivity.class);
 		intent.putExtra(EXTRA_ACTIVE_ACCOUNT_ID, accountId);
+		activity.startActivity(intent);
+		activity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
+		if(finishActivity) activity.finish();
+	}
+	
+	public static void go(Activity activity, boolean finishActivity) {
+		final Intent intent = new Intent(activity, GooTaskListsActivity.class);
 		activity.startActivity(intent);
 		activity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
 		if(finishActivity) activity.finish();
@@ -220,6 +232,15 @@ public class GooTaskListsActivity extends BaseActivity implements
 		showDialog(TaskListActionsDialog.DIALOG_ID);		
 		mTaskListActionsDialog.setTaskListId(taskListId);		
 	}
+	
+	public void openAction(View v)
+	{
+		if(mTaskListActionsDialog != null && mTaskListActionsDialog.isShowing())
+		{
+			mTaskListActionsDialog.dismiss();
+			GooTasksActivity.go(this, false, mTaskListActionsDialog.getTaskListId());
+		}		
+	}	
 	
 	public void deleteAction(View v)
 	{

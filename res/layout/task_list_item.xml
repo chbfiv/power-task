@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="3dip"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
     android:stretchColumns="0"
     android:shrinkColumns="0">    
-    <TableRow>
+    <TableRow
+    	android:minHeight="48dip">
 	    <TextView
 			android:id="@+id/taskListItem_title"
 	        android:layout_width="match_parent"
 	        android:layout_height="fill_parent" 
 	        android:layout_marginLeft="6dip"
 			android:textSize="@dimen/text_size_large"
+			android:textColor="@android:color/black"
 	        android:singleLine="true"
 	        android:text="Example List" 
 	        android:ellipsize="end"
@@ -25,7 +27,8 @@
 	        android:text="104" 
 	        android:gravity="center_vertical"
 	        android:layout_marginLeft="2dip"
-	        android:layout_marginRight="6dip"/>
+	        android:layout_marginRight="6dip" 
+	        android:visibility="gone" />
 	    <ImageView
         	android:id="@+id/taskItem_icon"
 	        android:layout_width="fill_parent"

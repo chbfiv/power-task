@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>taskhack-Android</name>
+	<name>task-tags</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -31,11 +31,4 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>com.google.gdt.eclipse.mobile.android.cloudConnectedNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>shared</name>
-			<type>2</type>
-			<locationURI>WORKSPACE_LOC/taskhack-AppEngine/shared</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

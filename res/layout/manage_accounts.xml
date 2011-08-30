@@ -23,7 +23,7 @@
         android:padding="6dip"
         android:background="#000000"
         android:textColor="#ffffff"
-        android:text="Autherize the accounts you want to sync."
+        android:text="Authorize the accounts you want to sync."
         android:textSize="16dip"/>
 
     <View

@@ -67,14 +67,19 @@ public class GooAccountsActivity extends BaseActivity
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.account_settings_menu_items, menu);
-		getMenuInflater().inflate(R.menu.add_account_menu_items, menu);
+		getMenuInflater().inflate(R.menu.general_settings_menu_item, menu);
+		//getMenuInflater().inflate(R.menu.account_settings_menu_items, menu);
+		//getMenuInflater().inflate(R.menu.add_account_menu_items, menu);
 		return true;
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+			case R.id.menu_general_settings: {
+				GeneralSettingsActivity.go(this, false);
+				return true;
+			}
 			case R.id.menu_add_account: {
 				addAccount();
 				return true;

@@ -11,6 +11,8 @@ public class SharedPrefUtil {
 
 	public static final String PREF_ACTIVE_ACCOUNT_ID = "active_account_id";
 	public static final String PREF_AUTH_ATTEMPTS = "auth_attempts";
+	public static final String PREF_DEBUG = "debug";
+	public static final String PREF_OFFLINE_MODE = "offline_mode";
 	
     protected Context mContext;
 

@@ -37,6 +37,8 @@ public class TasksAppService extends IntentService {
 
 	private static final String TAG = TasksAppService.class.getName();
 
+	private final SharedPrefUtil mSharedPref = SharedPrefUtil.createInstance(this);
+	
 	public static final String REQUEST_RECEIVER_EXTRA = TasksAppService.class + ".extra";
 	
 	public static final String EXTRA_TASK_LIST_ID = "task_list_id";
@@ -85,16 +87,33 @@ public class TasksAppService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		//TLog(TAG + " service onHandleIntent - started; action:" + intent.getAction());
-
-		intent.getLongExtra(EXTRA_TASK_LIST_ID, GooBase.INVALID_ID);
-
+	
 	    long accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, GooBase.INVALID_ID);
 	    if(accountId == GooBase.INVALID_ID)
 	    {
 		    SharedPreferences prefs = SharedPrefUtil.getSharedPref(this);	    
 		    accountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, GooBase.INVALID_ID);
 	    }
+	    
+	    //if still invalid exit cleanly
+	    if(accountId == GooBase.INVALID_ID)
+	    {
+	    	TLog(TAG + " accountId is invalid " + intent.getAction());	    	
+	    	return;
+	    }
+	    
+	    GooAccount account = dbACCHelper.read(accountId);
+	    //if still null exit cleanly
+	    if(account == null)
+	    {
+	    	TLog(TAG + " account is null " + intent.getAction());	    	
+	    	return;
+	    }
+	    
+	    if(intent.getFlags() != REQUEST_SYNC_ACCOUNTS && !account.getSync())
+	    {
+	    	return;
+	    }	    
 	    
 	    final long taskListId = intent.getLongExtra(EXTRA_TASK_LIST_ID, GooBase.INVALID_ID);
 	    final long taskId = intent.getLongExtra(EXTRA_TASK_ID, GooBase.INVALID_ID);
@@ -297,25 +316,42 @@ public class TasksAppService extends IntentService {
 	
 	private void TLog(String msg)
 	{
-	    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        Log.i(TAG, msg);	
+	    boolean debug = mSharedPref.getSharedPref().getBoolean(SharedPrefUtil.PREF_DEBUG, false);	
+	    
+	    if(debug)
+	    {
+		    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+	        Log.i(TAG, msg);
+	    }
 	}	
 	
 	public static void syncTaskLists(Context context, ResultReceiver receiver)
 	{
-		Intent intent = new Intent(context, TasksAppService.class);
-		intent.setFlags(REQUEST_SYNC_TASK_LISTS);
-		intent.putExtra(REQUEST_RECEIVER_EXTRA, receiver);
-		context.startService(intent);		
+		final SharedPrefUtil sharedPref = SharedPrefUtil.createInstance(context);
+	    boolean offlineMode = sharedPref.getSharedPref().getBoolean(SharedPrefUtil.PREF_OFFLINE_MODE, false);	
+	    
+	    if(!offlineMode)
+	    {
+			Intent intent = new Intent(context, TasksAppService.class);
+			intent.setFlags(REQUEST_SYNC_TASK_LISTS);
+			intent.putExtra(REQUEST_RECEIVER_EXTRA, receiver);
+			context.startService(intent);
+	    }
 	}	
 	
 	public static void syncTasks(Context context, long taskListId, ResultReceiver receiver)
 	{
-		Intent intent = new Intent(context, TasksAppService.class);
-		intent.setFlags(REQUEST_SYNC_TASKS);
-		intent.putExtra(EXTRA_TASK_LIST_ID, taskListId);		
-		intent.putExtra(REQUEST_RECEIVER_EXTRA, receiver);
-		context.startService(intent);		
+		final SharedPrefUtil sharedPref = SharedPrefUtil.createInstance(context);	    
+	    boolean offlineMode = sharedPref.getSharedPref().getBoolean(SharedPrefUtil.PREF_OFFLINE_MODE, false);
+
+	    if(!offlineMode)
+	    {
+			Intent intent = new Intent(context, TasksAppService.class);
+			intent.setFlags(REQUEST_SYNC_TASKS);
+			intent.putExtra(EXTRA_TASK_LIST_ID, taskListId);		
+			intent.putExtra(REQUEST_RECEIVER_EXTRA, receiver);
+			context.startService(intent);		
+	    }
 	}	
 	
 	

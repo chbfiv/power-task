@@ -24,7 +24,7 @@
     <dimen name="text_size_small">14sp</dimen>
     <dimen name="text_size_medium">18sp</dimen>
     <dimen name="text_size_large">20sp</dimen>
-    <dimen name="text_size_xlarge">22sp</dimen>
+    <dimen name="text_size_xlarge">26sp</dimen>
     <dimen name="padding">2dip</dimen>
         
     <dimen name="textPaddingSides">6dip</dimen>

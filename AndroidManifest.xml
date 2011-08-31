@@ -41,6 +41,8 @@
         <activity android:name=".activities.GooTaskEditActivity" />
         <activity android:name=".activities.GooTaskViewActivity" />
         <activity android:name=".activities.GooAccountsActivity" />    
-        <activity android:name=".activities.TCTagListActivity" />    
+        <activity android:name=".activities.TCTagListActivity" />      
+        <activity android:name=".activities.GeneralSettingsActivity" />   
+        
     </application>
 </manifest>

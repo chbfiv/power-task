@@ -22,8 +22,8 @@
 			android:textSize="@dimen/text_size_large"
 			android:textColor="@android:color/black"
 			android:layout_weight="1"
-	        android:singleLine="true"
 	        android:text="@string/example_task_title" 
+	        android:singleLine="true"
 	        android:ellipsize="end"
 	        android:gravity="center_vertical" />	     
         <LinearLayout

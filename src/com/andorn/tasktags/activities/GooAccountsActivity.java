@@ -2,6 +2,7 @@ package com.andorn.tasktags.activities;
 
 import com.andorn.tasktags.adapters.GooAccountsCursorAdapter;
 import com.andorn.tasktags.auth.OAuthHelper;
+import com.andorn.tasktags.base.ActivityHelper;
 import com.andorn.tasktags.base.BaseActivity;
 import com.andorn.tasktags.database.GooAccountsOpenHelper;
 import com.andorn.tasktags.models.GooBase;
@@ -14,6 +15,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +25,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 
 public class GooAccountsActivity extends BaseActivity 
-	implements OnClickListener, OnCheckedChangeListener {
+	implements OnClickListener {
 	
 	private static final String TAG = GooAccountsActivity.class.getName();
 
@@ -36,13 +38,11 @@ public class GooAccountsActivity extends BaseActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     	
-        setContentView(R.layout.manage_accounts);	
+        setContentView(R.layout.account_list);	
         
-		mListView = (ListView) findViewById(R.id.manageAccounts_list);
-		
-//		if (c.getCount() <= 0) {	 	
-//			addAccount(); 		
-//		}	
+		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_ACCOUNT_LIST);
+        
+		mListView = (ListView) findViewById(R.id.accountsList);			
     }
 
     @Override
@@ -68,8 +68,7 @@ public class GooAccountsActivity extends BaseActivity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.general_settings_menu_item, menu);
-		//getMenuInflater().inflate(R.menu.account_settings_menu_items, menu);
-		//getMenuInflater().inflate(R.menu.add_account_menu_items, menu);
+		getMenuInflater().inflate(R.menu.add_account_menu_items, menu);
 		return true;
 	}
 	
@@ -81,11 +80,7 @@ public class GooAccountsActivity extends BaseActivity
 				return true;
 			}
 			case R.id.menu_add_account: {
-				addAccount();
-				return true;
-			}
-			case R.id.menu_account_settings: {
-				syncSettings();
+				GeneralSettingsActivity.addAccount(this, false);
 				return true;
 			}
 		}
@@ -103,33 +98,11 @@ public class GooAccountsActivity extends BaseActivity
 		activity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
 		if(finishActivity) activity.finish();
 	}
-    
-	protected void addAccount() {
-		Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-		intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {
-			    "com.android.contacts"
-		});
-		startActivityForResult(intent, OAuthHelper.REQUEST_ADD_ACCOUNT);		
-	}
-	
-	protected void syncSettings() {
-		Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-		intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {
-			    "com.android.contacts"
-		});
-		startActivityForResult(intent, OAuthHelper.REQUEST_SYNC_SETTINGS);		
-	}
 
 	@Override
 	public void sync(boolean withRefresh) { 	
 		if(withRefresh) mAdapter.requery();
-		
-		Intent intent = new Intent(this, TasksAppService.class);
-		intent.setFlags(TasksAppService.REQUEST_SYNC_ACCOUNTS);
-		intent.putExtra(TasksAppService.REQUEST_RECEIVER_EXTRA, mSyncReceiver);
-		startService(intent);
+		TasksAppService.syncAccounts(this, mSyncReceiver);
     }
 
 	@Override
@@ -140,15 +113,6 @@ public class GooAccountsActivity extends BaseActivity
 			GooTaskListsActivity.go(this, false, accountId);
 		}
 	}
-
-	@Override
-	public void onCheckedChanged(CompoundButton v, boolean val) {
-		long accountId = (Long)v.getTag();
-		if(accountId != GooBase.INVALID_ID)
-		{
-			dbACCHelper.update(accountId, val);
-		}
-	} 	
 
 	private ResultReceiver mSyncReceiver = new ResultReceiver(null) {
 		

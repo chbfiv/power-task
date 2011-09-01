@@ -3,5 +3,5 @@
     <item android:id="@+id/menu_general_settings"
         android:icon="@drawable/ic_menu_manage"
         android:title="Settings"
-        android:orderInCategory="100" />
+        android:orderInCategory="199" />
 </menu>

@@ -3,6 +3,7 @@ package com.andorn.tasktags.activities;
 import java.util.List;
 
 import com.andorn.tasktags.adapters.GooAccountsCursorAdapter;
+import com.andorn.tasktags.auth.OAuthHelper;
 import com.andorn.tasktags.base.BaseActivity;
 import com.andorn.tasktags.database.GooAccountsOpenHelper;
 import com.andorn.tasktags.helpers.SharedPrefUtil;
@@ -16,6 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -134,4 +136,29 @@ public class GeneralSettingsActivity extends BaseActivity {
 		activity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
 		if(finishActivity) activity.finish();
 	}
+    
+	public static void addAccount(Activity activity, boolean finishActivity) {
+		Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+		intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {
+			    "com.android.contacts"
+		});
+		activity.startActivity(intent);		
+		if(finishActivity) activity.finish();
+	}
+	
+	protected void syncSettings(Activity activity, boolean finishActivity) {
+		Intent intent = new Intent(Settings.ACTION_SYNC_SETTINGS);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+		intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {
+			    "com.android.contacts"
+		});
+		activity.startActivity(intent);		
+		if(finishActivity) activity.finish();	
+	}
+	
+	public void addAcount_onClick(View v)
+	{
+		addAccount(this, false);
+	}	
 }

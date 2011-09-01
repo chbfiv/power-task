@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="fill_parent"
+   android:layout_height="wrap_content"
+   android:background="@android:color/white" 
+   android:orientation="vertical">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	   android:layout_width="fill_parent"
+	   android:layout_height="48dip"
+	   android:orientation="horizontal">
+	    <ImageView
+	        android:layout_width="wrap_content"
+	        android:layout_height="fill_parent"
+		    android:paddingLeft="12dip"
+	        android:src="@drawable/ic_menu_login" />   
+	    <TextView
+			android:id="@+id/accountListItem_name"
+	        android:layout_width="match_parent"
+	        android:layout_height="fill_parent" 
+	        android:layout_marginLeft="6dip"
+			android:layout_weight="1"
+			android:textSize="@dimen/text_size_large"
+			android:textColor="@android:color/black"
+	        android:singleLine="true"
+	        android:text="Example List asd asd asd asd asdasd" 
+	        android:ellipsize="end"
+	        android:gravity="center_vertical"/>	    
+	    <ImageView
+	        android:layout_width="wrap_content"
+	        android:layout_height="fill_parent"
+	        android:src="@drawable/ic_go_search_api_holo_light"
+	        android:scaleType="center"
+	        android:layout_marginLeft="6dip"
+	        android:layout_marginRight="6dip"/>  
+    </LinearLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="#c2c2c2" />
+  </LinearLayout>

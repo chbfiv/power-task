@@ -53,6 +53,10 @@ public class GooTaskListsCursorAdapter extends CursorAdapter {
 		{
 	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
 		}
+		catch(Exception ex)
+		{
+	    	  Log.e(TAG, "exception - " + ex.getMessage());				
+		}
     	return ret;
     }
     

@@ -22,7 +22,6 @@ public class GooAccountsCursorAdapter extends CursorAdapter {
     
 	private final static class ViewHolder {
     	TextView name;
-    	CheckBox checkbox;
     }
 
 	private final GooAccountsActivity mActivity;
@@ -54,6 +53,10 @@ public class GooAccountsCursorAdapter extends CursorAdapter {
 		{
 	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
 		}
+		catch(Exception ex)
+		{
+	    	  Log.e(TAG, "exception - " + ex.getMessage());				
+		}
     	return ret;
     }
     
@@ -61,26 +64,21 @@ public class GooAccountsCursorAdapter extends CursorAdapter {
 	public void bindView(View view, Context context, Cursor cursor) {		
     	ViewHolder holder = (ViewHolder)view.getTag();
         holder.name.setOnClickListener(null);
-        holder.checkbox.setOnCheckedChangeListener(null);
         
         GooAccount account = GooAccountsOpenHelper.read(cursor);
 
         holder.name.setTag(account.getId());
-        holder.checkbox.setTag(account.getId());
 
-	    holder.name.setText(account.getName());   
-	    holder.checkbox.setChecked(account.getSync());   
+	    holder.name.setText(account.getName());     
         
 	    holder.name.setOnClickListener(mActivity);
-	    holder.checkbox.setOnCheckedChangeListener(mActivity);
 	}
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View newView = inflater.inflate(R.layout.account, null);
+        View newView = inflater.inflate(R.layout.account_list_item, null);
        	ViewHolder holder = new ViewHolder();
-        holder.name = (TextView)newView.findViewById(R.id.accountName);
-        holder.checkbox = (CheckBox)newView.findViewById(R.id.accountItem);
+        holder.name = (TextView)newView.findViewById(R.id.accountListItem_name);
         newView.setTag(holder);
 		return newView;
 	}

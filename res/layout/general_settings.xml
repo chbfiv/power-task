@@ -108,7 +108,8 @@
 		        android:paddingLeft="12dip"
 		        android:textColor="#ffffff"
 		        android:text="Add account"
-		        android:textSize="@dimen/text_size_large"/>
+		        android:textSize="@dimen/text_size_large"
+		        android:onClick="addAcount_onClick"/>
 		    <View
 		        android:layout_width="fill_parent"
 		        android:layout_height="1dip"

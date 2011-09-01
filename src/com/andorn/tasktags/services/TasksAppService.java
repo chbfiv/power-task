@@ -96,7 +96,7 @@ public class TasksAppService extends IntentService {
 	    }
 	    
 	    //if still invalid exit cleanly
-	    if(accountId == GooBase.INVALID_ID)
+	    if(intent.getFlags() != REQUEST_SYNC_ACCOUNTS && accountId == GooBase.INVALID_ID)
 	    {
 	    	TLog(TAG + " accountId is invalid " + intent.getAction());	    	
 	    	return;
@@ -104,7 +104,7 @@ public class TasksAppService extends IntentService {
 	    
 	    GooAccount account = dbACCHelper.read(accountId);
 	    //if still null exit cleanly
-	    if(account == null)
+	    if(intent.getFlags() != REQUEST_SYNC_ACCOUNTS && account == null)
 	    {
 	    	TLog(TAG + " account is null " + intent.getAction());	    	
 	    	return;
@@ -323,6 +323,14 @@ public class TasksAppService extends IntentService {
 		    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 	        Log.i(TAG, msg);
 	    }
+	}	
+	
+	public static void syncAccounts(Context context, ResultReceiver receiver)
+	{
+		Intent intent = new Intent(context, TasksAppService.class);
+		intent.setFlags(TasksAppService.REQUEST_SYNC_ACCOUNTS);
+		intent.putExtra(TasksAppService.REQUEST_RECEIVER_EXTRA, receiver);
+		context.startService(intent);
 	}	
 	
 	public static void syncTaskLists(Context context, ResultReceiver receiver)

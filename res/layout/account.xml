@@ -29,6 +29,5 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dip"
-        android:layout_below="@+id/manageAccounts_title"
         android:background="#808080" />
   </LinearLayout>

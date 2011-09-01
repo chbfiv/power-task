@@ -47,6 +47,7 @@ public class ActivityHelper {
 	public static final int ACTIONBAR_TASK_LIST_COLLECTION = 4;
 	public static final int ACTIONBAR_TASK_VIEW = 5;
 	public static final int ACTIONBAR_TASK_EDIT = 6;
+	public static final int ACTIONBAR_ACCOUNT_LIST = 7;
 	
     protected Activity mActivity;
 
@@ -83,7 +84,12 @@ public class ActivityHelper {
         // TODO: call onPreparePanelMenu here as well
         for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
-            addActionButtonCompatFromMenuItem(item);
+
+            if (item.getItemId() != R.id.menu_general_settings &&
+        		item.getItemId() != R.id.menu_add_account) 
+            {
+            	addActionButtonCompatFromMenuItem(item);
+            }
         }
     }
     
@@ -128,7 +134,18 @@ public class ActivityHelper {
         View spring;
         ImageButton logo;
         
-        switch (actionBarId) {	        
+        switch (actionBarId) {	         
+        case ACTIONBAR_ACCOUNT_LIST:
+        	// Add logo
+            logo = new ImageButton(mActivity, null, R.attr.actionbarCompatLogoStyle);
+            actionBarCompat.addView(logo);
+
+            titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
+            titleText.setLayoutParams(springLayoutParams);
+            titleText.setText("Accounts");
+            titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
+            actionBarCompat.addView(titleText);
+			break;     
         case ACTIONBAR_TASK_LIST_COLLECTION:
         	// Add logo
             logo = new ImageButton(mActivity, null, R.attr.actionbarCompatLogoStyle);

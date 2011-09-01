@@ -124,8 +124,8 @@ public class GooTasksActivity extends BaseActivity implements
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.general_settings_menu_item, menu);
 		getMenuInflater().inflate(R.menu.sync_menu_items, menu);
-		//getMenuInflater().inflate(R.menu.edit_mode_menu_item, menu);
 		getMenuInflater().inflate(R.menu.compose_task_menu_items, menu);
 		return true;
 	}
@@ -133,6 +133,10 @@ public class GooTasksActivity extends BaseActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+			case R.id.menu_general_settings: {
+				GeneralSettingsActivity.go(this, false);
+				return true;
+			}
 			case R.id.menu_sync: {
 				sync();
 				return true;

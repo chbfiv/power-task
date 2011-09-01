@@ -73,7 +73,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 
     	if(mActiveAccountId == GooBase.INVALID_ID)
     	{
-    		Log.e(TAG, "onCreate - invalid account id.");
+    		Log.w(TAG, "onCreate - invalid account id.");
     		GooAccountsActivity.go(this);
     		return;
     	}    	
@@ -139,8 +139,8 @@ public class GooTaskListsActivity extends BaseActivity implements
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.general_settings_menu_item, menu);
 		getMenuInflater().inflate(R.menu.sync_menu_items, menu);
-		//getMenuInflater().inflate(R.menu.edit_mode_menu_item, menu);
 		getMenuInflater().inflate(R.menu.create_task_list_menu_item, menu);
 		return true;
 	}
@@ -148,6 +148,10 @@ public class GooTaskListsActivity extends BaseActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+			case R.id.menu_general_settings: {
+				GeneralSettingsActivity.go(this, false);
+				return true;
+			}
 			case R.id.menu_sync: {
 				sync();
 				return true;

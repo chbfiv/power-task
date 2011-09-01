@@ -102,11 +102,11 @@ public class GooTaskListsActivity extends BaseActivity implements
 		headerContainer.setEnabled(false);
 		header.setText(account.getName());
 		
-		setContentView(R.layout.task_list_collection);
+		setContentView(R.layout.activity_task_lists);
 		
 		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_LIST_COLLECTION);
 
-		listView = (ListView) findViewById(R.id.task_list_collection);
+		listView = (ListView) findViewById(R.id.task_lists);
 		
 		listView.addHeaderView(headerContainer);
 	}	

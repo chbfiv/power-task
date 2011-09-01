@@ -81,11 +81,11 @@ public class GooTasksActivity extends BaseActivity implements
 		headerContainer.setEnabled(false);
 		header.setText(list.title);
 		
-		setContentView(R.layout.task_list);
+		setContentView(R.layout.activity_tasks);
         
 		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_LIST);
 
-		listView = (ListView) findViewById(R.id.task_list);
+		listView = (ListView) findViewById(R.id.tasks);
 		
 		listView.addHeaderView(headerContainer);
 	}	

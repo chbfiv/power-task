@@ -13,6 +13,6 @@
 		android:dividerHeight="0dip"
     	android:background="@color/task_list_background" 
     	android:cacheColorHint="@color/task_list_background"
-		android:id="@+id/task_list_collection" />
+		android:id="@+id/task_lists" />
 	
 </LinearLayout>

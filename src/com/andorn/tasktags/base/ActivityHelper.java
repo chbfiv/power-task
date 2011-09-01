@@ -114,7 +114,10 @@ public class ActivityHelper {
         
         View.OnClickListener accountsClickListener = new View.OnClickListener() {
             public void onClick(View view) {
-            	GooAccountsActivity.go(mActivity, true);
+            	if(mActivity.isTaskRoot())
+            		GooAccountsActivity.go(mActivity, true);
+            	else
+            		mActivity.finish();
             }
         };
         

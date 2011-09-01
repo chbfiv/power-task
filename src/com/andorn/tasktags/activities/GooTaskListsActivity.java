@@ -74,7 +74,10 @@ public class GooTaskListsActivity extends BaseActivity implements
     	if(mActiveAccountId == GooBase.INVALID_ID)
     	{
     		Log.w(TAG, "onCreate - invalid account id.");
-    		GooAccountsActivity.go(this);
+    		if(isTaskRoot())    		
+    			GooAccountsActivity.go(this, true);
+    		else
+    			finish();
     		return;
     	}    	
 
@@ -86,7 +89,10 @@ public class GooTaskListsActivity extends BaseActivity implements
     	if(account == null)
     	{
     		Log.e(TAG, "onCreate - account is null");
-    		GooAccountsActivity.go(this);
+    		if(isTaskRoot())    		
+    			GooAccountsActivity.go(this, true);
+    		else
+    			finish();
     		return;
     	}
     	

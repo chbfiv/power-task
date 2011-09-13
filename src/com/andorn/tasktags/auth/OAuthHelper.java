@@ -29,7 +29,7 @@ public class OAuthHelper {
 
     protected Activity mActivity;
     
-	private final GooAccountsOpenHelper dbHelper;
+	private final GooAccountsOpenHelper dbACCHelper;
     
     public static OAuthHelper createInstance(Activity activity) {
         return new OAuthHelper(activity);                
@@ -37,7 +37,7 @@ public class OAuthHelper {
 
     public OAuthHelper(Activity activity) {
         mActivity = activity;
-        dbHelper = new GooAccountsOpenHelper(activity);
+        dbACCHelper = new GooAccountsOpenHelper(activity);
     }
     
     private static final String TAG = OAuthHelper.class.getName();
@@ -79,18 +79,35 @@ public class OAuthHelper {
         resetAuthAttempts();
         updateTokenExpiration(false);
     }
+
+	public void onStart() {
+
+    }
+	
+	public void onStop() {
+
+    }
+	
+	public void onPause() {
+
+    }
+	
+	public void onDestroy() {
+        resetAuthAttempts();        
+		if (dbACCHelper != null) dbACCHelper.close();
+    }
     
 	public void updateTokenExpiration(boolean tokenExpired) {
 	    SharedPreferences prefs = SharedPrefUtil.getSharedPref(mActivity);
 	    long accountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, -1);
 	    int authAttempts = prefs.getInt(SharedPrefUtil.PREF_AUTH_ATTEMPTS, 0);
-	    GooAccount gooAccount = dbHelper.read(accountId);	    
+	    GooAccount gooAccount = dbACCHelper.read(accountId);	    
 	    
 	    if (gooAccount != null) {
 	      if (tokenExpired) {
 	        accountManager.invalidateAuthToken(gooAccount.getAuthToken());	       
 	        gooAccount.setAuthToken(null);
-	        dbHelper.update(gooAccount);
+	        dbACCHelper.update(gooAccount);
 	      }
 	      
 	      if(authAttempts >= MAX_AUTH_ATTEMPTS)	      
@@ -151,7 +168,7 @@ public class OAuthHelper {
 	      
 		final SharedPreferences prefs = SharedPrefUtil.getSharedPref(mActivity);	   
 		long accountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, -1);
-		if(dbHelper.update(accountId, authToken))
+		if(dbACCHelper.update(accountId, authToken))
 		{	    
 			final Intent intent = new Intent(INTENT_ON_AUTH);
 			intent.putExtra(INTENT_EXTRA_AUTH_TOKEN, authToken);

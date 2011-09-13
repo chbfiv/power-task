@@ -39,6 +39,13 @@ public class GooTask extends GooSyncBase {
 	
 	private List<TCTag> mTags;
 	
+	public GooTask(long taskListId)
+	{
+		this.taskListId = taskListId;	
+		this.status = status != null ? status : Status.needsAction.toString();	
+		this.completed = isCompleted() ? this.completed : null;
+	}
+	
 	public GooTask(long taskListId, String remoteId, String kind,
 			String title, String selfLink, String parent,
 			String position, String notes, String status,

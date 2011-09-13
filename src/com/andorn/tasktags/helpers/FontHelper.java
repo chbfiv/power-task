@@ -26,7 +26,7 @@ public class FontHelper {
     {
     	if(mgr != null)
     	{
-    		CuprumRegular = Typeface.createFromAsset(mgr, "IMFeDPrm28P.ttf");
+    		CuprumRegular = Typeface.createFromAsset(mgr, "Comic_Book.ttf");
     	}
     }
     

@@ -6,8 +6,6 @@ import com.andorn.tasktags.TaskApplication;
 import com.andorn.tasktags.database.GooAccountsOpenHelper;
 import com.andorn.tasktags.database.GooTaskListsOpenHelper;
 import com.andorn.tasktags.database.GooTasksOpenHelper;
-import com.andorn.tasktags.database.TCTagMapOpenHelper;
-import com.andorn.tasktags.database.TCTagsOpenHelper;
 import com.andorn.tasktags.helpers.SharedPrefUtil;
 import com.andorn.tasktags.models.GooAccount;
 import com.andorn.tasktags.models.GooBase;
@@ -75,8 +73,6 @@ public class TasksAppService extends IntentService {
     private final GooAccountsOpenHelper dbACCHelper = new GooAccountsOpenHelper(this);
     private final GooTaskListsOpenHelper dbTLCHelper = new GooTaskListsOpenHelper(this);
     private final GooTasksOpenHelper dbTLHelper = new GooTasksOpenHelper(this);
-    private final TCTagsOpenHelper dbTagsHelper = new TCTagsOpenHelper(this);
-    private final TCTagMapOpenHelper dbTagMapHelper = new TCTagMapOpenHelper(this);
 	
     private com.google.api.services.tasks.v1.Tasks taskService;
     
@@ -297,9 +293,10 @@ public class TasksAppService extends IntentService {
 	public void onDestroy() {
 		TLog(TAG + " service onDestroy.");
 		super.onDestroy();
-		if (dbTLCHelper != null) {
-			dbTLCHelper.close();
-	    }
+		
+		if (dbACCHelper != null) dbACCHelper.close();
+		if (dbTLCHelper != null) dbTLCHelper.close();
+		if (dbTLHelper != null) dbTLHelper.close();
 	}
 	
 	@Override

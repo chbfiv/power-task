@@ -1,8 +1,8 @@
 package com.andorn.tasktags.adapters;
 
-import com.andorn.tasktags.activities.ColorStripItem;
 import com.andorn.tasktags.activities.GooTasksActivity;
 import com.andorn.tasktags.database.GooTasksOpenHelper;
+import com.andorn.tasktags.fragments.GooTasksFragment;
 import com.andorn.tasktags.helpers.DateTimeHelper;
 import com.andorn.tasktags.models.GooTask;
 import com.andorn.tasktags.models.TCTag;
@@ -12,6 +12,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Paint;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,16 +38,18 @@ public class GooTasksCursorAdapter extends CursorAdapter {
     }
 
 	private final GooTasksActivity mActivity;
+	private final GooTasksFragment mFragment;
     private final LayoutInflater inflater;
     private static float mScale;
     
-    public GooTasksCursorAdapter(Context context, Cursor c, boolean autoRequery) {
+    public GooTasksCursorAdapter(Context context, Fragment frag, Cursor c, boolean autoRequery) {
 		super(context, c, autoRequery);
-		mActivity = (GooTasksActivity)context;
+		mActivity = (GooTasksActivity) context;
+		mFragment = (GooTasksFragment) frag;
 		inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);	
 		mScale = mActivity.getResources().getDisplayMetrics().density; 	
 	}    
-
+    
     public boolean requery()
     {
     	boolean ret = false;
@@ -94,33 +97,33 @@ public class GooTasksCursorAdapter extends CursorAdapter {
         holder.dueDate.setTag(task.getId());
         
         holder.starCheckBox.setChecked(hasBlueStarTag(task));   
-        holder.starCheckBox.setOnCheckedChangeListener(mActivity);
+        holder.starCheckBox.setOnCheckedChangeListener(mFragment.new TaskStarCheckedChanged());
         
         holder.statusCheckBox.setChecked(task.isCompleted());   
-        holder.statusCheckBox.setOnCheckedChangeListener(mActivity);
+        holder.statusCheckBox.setOnCheckedChangeListener(mFragment.new TaskStatusCheckedChanged());
         
         holder.title.setText(task.title);      		
-        holder.title.setOnClickListener(mActivity);
-        holder.detials.setOnClickListener(mActivity);
-        holder.title.setOnLongClickListener(mActivity);
+        holder.title.setOnClickListener(mFragment.new TaskClick());
+        holder.detials.setOnClickListener(mFragment.new TaskClick());
+        holder.title.setOnLongClickListener(mFragment.new TaskLongClick());
         if(task.isCompleted())
         	holder.title.setPaintFlags(holder.title.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
     	else
         	holder.title.setPaintFlags(holder.title.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);  
 
-        if(task.getTags().size() > 0)
-        {
-        	holder.colorStrip.removeAllViews();
-        	 for (TCTag tag : task.getTags()) {
-        		 ColorStripItem colorstripItem = new ColorStripItem(mActivity, tag.getColor(), mScale);
-        		 holder.colorStrip.addView(colorstripItem);
-        	 }
-        	holder.colorStrip.setVisibility(View.VISIBLE);   
-        }
-        else
-        {
+//        if(task.getTags().size() > 0)
+//        {
+//        	holder.colorStrip.removeAllViews();
+//        	 for (TCTag tag : task.getTags()) {
+//        		 ColorStripItem colorstripItem = new ColorStripItem(mActivity, tag.getColor(), mScale);
+//        		 holder.colorStrip.addView(colorstripItem);
+//        	 }
+//        	holder.colorStrip.setVisibility(View.VISIBLE);   
+//        }
+//        else
+//        {
         	holder.colorStrip.setVisibility(View.GONE);        	
-        }
+//        }
 
     	holder.detials.setVisibility(View.GONE);
         if(task.notes != null && task.notes.length() > 0)

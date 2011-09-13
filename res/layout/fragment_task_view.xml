@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"	
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:orientation="vertical"
-	android:background="@color/task_edit_detials_background">
-   	<include layout="@layout/actionbar" />
+ <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	 	android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+	   	android:background="@color/task_edit_detials_paper"  > 
+    <LinearLayout 
+	 	android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+	    android:id="@+id/taskView_taskNotFound"
+	    android:visibility="gone" >
+		<TextView
+		 	android:layout_width="fill_parent"
+			android:layout_height="wrap_content" 			
+        	android:text="@string/task_unselected"
+	    	android:layout_marginLeft="4dip"
+	    	android:paddingTop="2dip"
+	    	android:paddingBottom="2dip"
+			android:textSize="@dimen/text_size_large"
+			android:textColor="@color/task_textfield_color" />	
+	</LinearLayout>
 	<TableLayout 
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
-		android:layout_marginLeft="@dimen/task_edit_detials_padding"
-		android:layout_marginRight="@dimen/task_edit_detials_padding" 
-		android:layout_marginTop="@dimen/task_edit_detials_padding" 
-		android:layout_marginBottom="@dimen/task_edit_detials_padding" 
-    	android:background="@color/task_edit_detials_paper"
+	    android:id="@+id/taskView_taskFound" 
 	    android:shrinkColumns="1"
 	    android:stretchColumns="1">   
 	    <TableRow
@@ -49,9 +59,9 @@
 		    <ImageView
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"
+				android:id="@+id/taskView_detials_collapsed_btn"
 		        android:scaleType="center"
-		        android:src="@drawable/expander_open_holo_light"
-		        android:onClick="expandDetials" /> 
+		        android:src="@drawable/expander_open_holo_light" /> 
 			<TextView
 			 	android:layout_width="fill_parent"
 				android:layout_height="wrap_content" 
@@ -69,9 +79,9 @@
 		    <ImageView
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content"
+				android:id="@+id/taskView_detials_btn"
 		        android:scaleType="center"
-		        android:src="@drawable/expander_close_holo_light"
-		        android:onClick="collapseDetials" /> 
+		        android:src="@drawable/expander_close_holo_light" /> 
 		    <LinearLayout
 				 	android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
@@ -107,10 +117,10 @@
 			android:layout_marginTop="@dimen/textPaddingSides"
 			android:layout_marginBottom="@dimen/textPaddingSides" 
 	        android:background="#c2c2c2" />	        
-        <ScrollView 
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false">    
+	       <ScrollView 
+	           android:layout_width="fill_parent"
+	           android:layout_height="wrap_content"
+	           android:clipToPadding="false">    
 			<TextView 
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content" 
@@ -125,6 +135,6 @@
 				android:textColor="@color/task_textfield_color"
 				android:inputType="textMultiLine"
 				android:gravity="top" />
-		</ScrollView>			
+		</ScrollView>	
 	</TableLayout>		
-</LinearLayout>
+</LinearLayout>		

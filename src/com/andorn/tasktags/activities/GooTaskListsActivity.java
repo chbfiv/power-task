@@ -28,10 +28,11 @@ import com.andorn.tasktags.adapters.GooTaskListsCursorAdapter;
 import com.andorn.tasktags.auth.OAuthHelper;
 import com.andorn.tasktags.auth.OAuthReceiver;
 import com.andorn.tasktags.base.ActivityHelper;
-import com.andorn.tasktags.base.BaseActivity;
 import com.andorn.tasktags.database.GooAccountsOpenHelper;
 import com.andorn.tasktags.database.GooTaskListsOpenHelper;
 import com.andorn.tasktags.dialogs.TaskListActionsDialog;
+import com.andorn.tasktags.fragments.GooTaskViewFragment;
+import com.andorn.tasktags.fragments.GooTasksFragment;
 import com.andorn.tasktags.helpers.SharedPrefUtil;
 import com.andorn.tasktags.models.GooAccount;
 import com.andorn.tasktags.models.GooBase;
@@ -59,7 +60,6 @@ public class GooTaskListsActivity extends BaseActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getOAuthHelper().onCreate(savedInstanceState);
     	
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -97,8 +97,8 @@ public class GooTaskListsActivity extends BaseActivity implements
     	}
     	
 		final LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View headerContainer = inflater.inflate(R.layout.task_list_item_header, null);
-		TextView header = (TextView)headerContainer.findViewById(R.id.taskList_header);
+		View headerContainer = inflater.inflate(R.layout.task_list_header, null);
+		TextView header = (TextView)headerContainer.findViewById(R.id.task_list_header_title);
 		headerContainer.setEnabled(false);
 		header.setText(account.getName());
 		
@@ -114,27 +114,42 @@ public class GooTaskListsActivity extends BaseActivity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
-		getOAuthHelper().onResume();
-
-		listView.setAdapter(null);	 
-		Cursor c = dbTLCHelper.queryCursor(mActiveAccountId, GooSyncBase.SYNC_DELETE);
-		mAdapter = new GooTaskListsCursorAdapter(this, c, true);		
-		listView.setAdapter(mAdapter);	  
 		
-		mAdapter.requery();			
+		synchronized(this)
+		{
+			listView.setAdapter(null);	 
+			Cursor c = dbTLCHelper.queryCursor(mActiveAccountId, GooSyncBase.SYNC_DELETE);
+			mAdapter = new GooTaskListsCursorAdapter(this, c, true);		
+			listView.setAdapter(mAdapter);	  			
+			mAdapter.requery();			
+		}
 		
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(OAuthHelper.INTENT_ON_AUTH);
 		registerReceiver(mOAuthReceiver, filter);		
 	}
 
+    @Override
+    protected void onStop() {
+    	super.onStop();
+		synchronized(this)
+		{
+			if(mAdapter.getCursor() != null) mAdapter.getCursor().deactivate();
+		}
+    }
+    
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-
-		if(mAdapter != null) mAdapter.getCursor().close();
-		if (dbACCHelper != null) dbACCHelper.close(); 
-		if (dbTLCHelper != null) dbTLCHelper.close(); 
+		
+		synchronized(this)
+		{
+			if(mAdapter.getCursor() != null) mAdapter.getCursor().close();
+			
+			if(mAdapter != null) mAdapter.getCursor().close();
+			if (dbACCHelper != null) dbACCHelper.close(); 
+			if (dbTLCHelper != null) dbTLCHelper.close(); 
+		}
 	}
 	
 	@Override

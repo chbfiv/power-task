@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"	
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:background="@color/task_list_background">
+   	<include layout="@layout/actionbar" />   	
+   	<LinearLayout 
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="horizontal">	
+		<android.support.v4.view.ViewPager
+	            android:id="@+id/tasks_viewPager"
+	            android:layout_width="match_parent"
+	            android:layout_height="match_parent" 
+	            android:layout_weight="1.5"/>
+	    <fragment android:name="com.andorn.tasktags.fragments.GooTaskViewFragment"
+	            android:id="@+id/task_view_fragment"
+	            android:layout_weight="1"
+	            android:layout_width="match_parent"
+	            android:layout_height="match_parent" >
+	        <!-- Preview: layout=@layout/fragment_task_view -->
+	    </fragment>
+    </LinearLayout>
+</LinearLayout>

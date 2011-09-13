@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.andorn.tasktags.models.GooTask;
-import com.andorn.tasktags.models.GooTaskList;
-import com.andorn.tasktags.models.TCTag;
 import com.andorn.tasktags.services.TasksAppService;
 import com.google.api.services.tasks.v1.model.Task;
-import com.google.api.services.tasks.v1.model.TaskList;
-import com.google.api.services.tasks.v1.model.TaskLists;
 import com.google.api.services.tasks.v1.model.Tasks;
 
 import android.content.ContentValues;
@@ -23,7 +19,7 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	
     private static final String TAG = GooTasksOpenHelper.class.getName();
     
-	private final TCTagMapOpenHelper dbTagMapHelper;
+//	private final TCTagMapOpenHelper dbTagMapHelper;
 
     protected static final String TABLE_NAME = "goo_tasks";
     protected static final String KEY_taskListId = "taskListId";
@@ -105,7 +101,7 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
     
     public GooTasksOpenHelper(Context context) {
         super(context);
-        dbTagMapHelper = new TCTagMapOpenHelper(context);
+//        dbTagMapHelper = new TCTagMapOpenHelper(context);
     }
 
     @Override
@@ -133,20 +129,20 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		super.onOpen(db);
 	}
 	
-	public List<GooTask> query(long taskListId, int syncStateFilter) {
+	public List<GooTask> query(long taskListId, int syncStateFilter, int taskSortType) {
 		initialize();
 		List<GooTask> taskList = new ArrayList<GooTask>();
 		Cursor c = null;
 		try
 		{
-			c = queryCursor(taskListId, syncStateFilter);
+			c = queryCursor(taskListId, syncStateFilter, taskSortType);
 			if(c != null && c.moveToFirst())
 			{
 				do
 				{
 					GooTask task = read(c);									
-					List<TCTag> tags = dbTagMapHelper.query(task.getId());
-					task.setTags(tags);			
+//					List<TCTag> tags = dbTagMapHelper.query(task.getId());
+//					task.setTags(tags);			
 					taskList.add(task);
 				}
 				while(c.moveToNext());
@@ -175,8 +171,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 				do
 				{
 					GooTask task = read(c);								
-					List<TCTag> tags = dbTagMapHelper.query(task.getId());
-					task.setTags(tags);	
+//					List<TCTag> tags = dbTagMapHelper.query(task.getId());
+//					task.setTags(tags);	
 					taskList.add(task);
 				}
 				while(c.moveToNext());
@@ -193,11 +189,13 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		return taskList;
 	}	
 	
-	public Cursor queryCursor(long taskListId, int syncStateFilter)  {
+	public Cursor queryCursor(long taskListId, int syncStateFilter, int taskSortType)  {
 		initialize();
 		Cursor c = null;
 		try
 		{
+			String sort = buildOrderBySql(taskSortType);
+	    	
 			c = getDbReadOnly().query(
 					TABLE_NAME,            // The database to query
 					PROJECTION,    // The columns to return from the query
@@ -205,7 +203,7 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		           new String[] { String.valueOf(taskListId) }, // The values for the where clause
 		           null,          // don't group the rows
 		           null,          // don't filter by row groups
-		           null        // The sort order
+		           sort        // The sort order
 		       );
 		}
 		catch(SQLException sqle)
@@ -278,8 +276,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 			if(c != null && c.moveToFirst())
 			{
 				task = read(c);						
-				List<TCTag> tags = dbTagMapHelper.query(task.getId());
-				task.setTags(tags);	
+//				List<TCTag> tags = dbTagMapHelper.query(task.getId());
+//				task.setTags(tags);	
 			}
 		}
 		catch(SQLException sqle)
@@ -312,8 +310,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 			if(c != null && c.moveToFirst())
 			{
 				task = read(c);						
-				List<TCTag> tags = dbTagMapHelper.query(task.getId());
-				task.setTags(tags);	
+//				List<TCTag> tags = dbTagMapHelper.query(task.getId());
+//				task.setTags(tags);	
 			}			
 		}
 		catch(SQLException sqle)
@@ -510,4 +508,35 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 			}
 			return ret;
 		}		
+		
+		public static String buildOrderBySql(int value)
+		{
+			String orderBy = null;
+			if(GooTaskSortType.isCustomPosition(value))
+			{
+				orderBy = KEY_position + " ASC";				
+			}
+			if(GooTaskSortType.isTitleAscending(value))
+			{
+				if(orderBy != null) orderBy += ", ";
+				orderBy = KEY_title + " ASC";	
+			}
+			if(GooTaskSortType.isTitleDescending(value))
+			{
+				if(orderBy != null) orderBy += ", ";
+				orderBy = KEY_title + " DESC";	
+			}
+			if(GooTaskSortType.isDateAscending(value))
+			{
+				if(orderBy != null) orderBy += ", ";
+				orderBy = KEY_due + " ASC";	
+			}
+			if(GooTaskSortType.isDateDescending(value))
+			{
+				if(orderBy != null) orderBy += ", ";
+				orderBy = KEY_due + " DESC";	
+			}
+			
+	    	return orderBy;
+		}
 }

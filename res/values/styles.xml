@@ -71,7 +71,7 @@
         <item name="android:clickable">false</item>
         <item name="android:scaleType">center</item>
         <item name="android:contentDescription">@string/description_logo</item>
-        <item name="android:src">@drawable/title</item>
+        <item name="android:src">@drawable/launcher</item>
     </style>
 
     <style name="ActionBarCompatText">

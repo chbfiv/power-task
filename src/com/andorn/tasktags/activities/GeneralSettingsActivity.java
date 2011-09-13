@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.andorn.tasktags.adapters.GooAccountsCursorAdapter;
 import com.andorn.tasktags.auth.OAuthHelper;
-import com.andorn.tasktags.base.BaseActivity;
 import com.andorn.tasktags.database.GooAccountsOpenHelper;
 import com.andorn.tasktags.helpers.SharedPrefUtil;
 import com.andorn.tasktags.models.GooAccount;

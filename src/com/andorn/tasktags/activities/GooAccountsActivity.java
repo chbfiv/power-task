@@ -3,7 +3,6 @@ package com.andorn.tasktags.activities;
 import com.andorn.tasktags.adapters.GooAccountsCursorAdapter;
 import com.andorn.tasktags.auth.OAuthHelper;
 import com.andorn.tasktags.base.ActivityHelper;
-import com.andorn.tasktags.base.BaseActivity;
 import com.andorn.tasktags.database.GooAccountsOpenHelper;
 import com.andorn.tasktags.models.GooBase;
 import com.andorn.tasktags.services.TasksAppService;
@@ -46,13 +45,25 @@ public class GooAccountsActivity extends BaseActivity
     }
 
     @Override
+    protected void onStop() {
+    	super.onStop();
+		synchronized(this)
+		{
+			if(mAdapter.getCursor() != null) mAdapter.getCursor().deactivate();
+		}
+    }
+    
+    @Override
     protected void onResume() {
-        super.onResume();        
+        super.onResume();
 
-		mListView.setAdapter(null);	
-		Cursor c = dbACCHelper.queryCursor();
-		mAdapter = new GooAccountsCursorAdapter(this, c, true);
-		mListView.setAdapter(mAdapter);	
+		synchronized(this)
+		{
+			mListView.setAdapter(null);	
+			Cursor c = dbACCHelper.queryCursor();
+			mAdapter = new GooAccountsCursorAdapter(this, c, true);
+			mListView.setAdapter(mAdapter);	
+		}
 		
         sync();		
     }    
@@ -60,9 +71,13 @@ public class GooAccountsActivity extends BaseActivity
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		
-		if(mAdapter != null) mAdapter.getCursor().close();
-		if (dbACCHelper != null) dbACCHelper.close(); 
+
+		synchronized(this)
+		{
+			if(mAdapter.getCursor() != null) mAdapter.getCursor().close();
+			if(mAdapter != null) mAdapter.getCursor().close();
+			if (dbACCHelper != null) dbACCHelper.close(); 
+		}
 	}
 	
 	@Override

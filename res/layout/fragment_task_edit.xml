@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+   	android:background="@color/task_edit_detials_paper"
+    android:shrinkColumns="1"
+    android:stretchColumns="1">   
+    <TableRow>
+		<CheckBox  
+		    android:layout_width="wrap_content" 
+		    android:layout_height="wrap_content"
+		    android:id="@+id/taskEdit_statusCheckBox" 
+	    	android:layout_marginLeft="4dip"
+	        android:button="@drawable/btn_check_holo_light" />
+		<EditText
+		 	android:layout_width="fill_parent"
+			android:layout_height="wrap_content" 
+			android:id="@+id/taskEdit_titleField"
+			android:layout_span="2"
+			android:background="@drawable/edit_multiline_text_holo_light"
+			android:hint="@string/task_title_hint" 
+			android:layout_marginTop="@dimen/padding"
+			android:textColor="@color/task_textfield_color" 
+			android:textSize="@dimen/text_size_large" 
+        	android:text="@string/example_task_title" />
+    </TableRow>
+    <TableRow android:id="@+id/taskEdit_dateRow">
+    	<View
+			android:layout_width="32dp"
+			android:layout_height="32dp"  />
+		<TextView
+		 	android:layout_width="fill_parent"
+			android:layout_height="wrap_content" 
+			android:id="@+id/taskEdit_dateField"
+			android:inputType="datetime"
+			android:background="@drawable/edit_text_holo_light"
+			android:hint="@string/task_date_hint" 
+			android:layout_marginTop="@dimen/padding"
+			android:textColor="@color/task_textfield_color" 
+			android:singleLine="true"
+			android:textSize="@dimen/text_size_medium"
+			/>
+		<Button 
+			android:layout_width="32dp"
+			android:layout_height="32dp"
+			android:id="@+id/taskEdit_dateClear"
+			android:background="@drawable/ic_menu_close_clear_cancel" />
+    </TableRow>
+	<EditText 
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent" 
+		android:layout_span="3"
+		android:id="@+id/taskEdit_detialsField" 
+		android:textColor="@color/task_textfield_color"
+		android:hint="@string/task_notes_hint" 
+		android:background="@drawable/edit_multiline_text_holo_light"
+		android:inputType="textMultiLine"
+		android:gravity="top"
+       	android:text="@string/example_task_note"
+		android:textSize="@dimen/text_size_large" />
+</TableLayout>	

@@ -50,7 +50,12 @@ public class ActivityHelper {
 	public static final int ACTIONBAR_ACCOUNT_LIST = 7;
 	
     protected Activity mActivity;
-
+    protected float displayDensity;
+    protected int height;
+    protected int width;
+    protected int scaledHeight;
+    protected int scaledWidth;
+    
     /**
      * Factory method for creating {@link ActivityHelper} objects for a given activity. Depending
      * on which device the app is running, either a basic helper or Honeycomb-specific helper will
@@ -77,7 +82,21 @@ public class ActivityHelper {
         mActivity.startSearch(null, false, Bundle.EMPTY, false);
     }
     
+    public void onCreate(Bundle savedInstanceState)
+    {
+    	displayDensity = mActivity.getResources().getDisplayMetrics().density;
+    	width = mActivity.getResources().getDisplayMetrics().heightPixels;
+    	height = mActivity.getResources().getDisplayMetrics().widthPixels;
+    	scaledWidth = (int)(width * displayDensity + 0.5f);
+    	scaledHeight = (int)(height * displayDensity + 0.5f);
+    }
+    
     public void onPostCreate(Bundle savedInstanceState) {
+    	
+        displayDensity = mActivity.getResources().getDisplayMetrics().density; 
+        height = mActivity.getResources().getDisplayMetrics().heightPixels; 
+        width = mActivity.getResources().getDisplayMetrics().widthPixels; 
+        
         // Create the action bar
         SimpleMenu menu = new SimpleMenu(mActivity);
         mActivity.onCreatePanelMenu(Window.FEATURE_OPTIONS_PANEL, menu);
@@ -311,6 +330,15 @@ public class ActivityHelper {
             return null;
         }
 
+//        for(int i = 0; i < actionBar.getChildCount(); i++)
+//        {
+//        	View child = actionBar.getChildAt(i);
+//        	if(child != null && child.getId() == item.getItemId())
+//        	{
+//    			return null;
+//        	}
+//        }
+        
         // Create the separator
         ImageView separator = new ImageView(mActivity, null, R.attr.actionbarCompatSeparatorStyle);
         separator.setLayoutParams(new ViewGroup.LayoutParams(2, ViewGroup.LayoutParams.FILL_PARENT));
@@ -364,5 +392,33 @@ public class ActivityHelper {
         if (syncIndicator != null) {
             syncIndicator.setVisibility(syncing ? View.VISIBLE : View.GONE);
         }
+    }
+    
+    public boolean isXLargeDip()
+    {
+		//    	xlarge screens are at least 960dp x 720dp
+		return 	(scaledWidth >= 960 && scaledHeight >= 720) ||
+			   	(scaledHeight >= 960 && scaledWidth >= 720);
+    }
+    
+    public boolean isLarge()
+    {
+    	//    	large screens are at least 640dp x 480dp
+		return 	(scaledWidth >= 640 && scaledHeight >= 480) ||
+	   	(scaledHeight >= 640 && scaledWidth >= 480);
+    }
+    
+    public boolean isNormal()
+    {
+		//    	normal screens are at least 470dp x 320dp
+		return 	(scaledWidth >= 470 && scaledHeight >= 320) ||
+	   	(scaledHeight >= 470 && scaledWidth >= 320);
+    }
+    
+    public boolean isSmall()
+    {
+		//    	small screens are at least 426dp x 320dp	
+		return 	(scaledWidth >= 426 && scaledHeight >= 320) ||
+	   	(scaledHeight >= 426 && scaledWidth >= 320);
     }
 }

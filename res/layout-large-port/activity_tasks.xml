@@ -14,7 +14,7 @@
        android:layout_width="match_parent"
        android:layout_height="20dip"
        android:background="#4c4c4c" />
-    <fragment android:name="com.andorn.tasktags.fragments.GooTaskViewFragment"
+    <fragment android:name="com.andorn.powertask.fragments.GooTaskViewFragment"
             android:id="@+id/task_view_fragment"
             android:layout_weight="1.5"
             android:layout_width="match_parent"

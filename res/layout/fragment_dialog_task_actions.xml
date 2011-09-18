@@ -119,50 +119,6 @@
 		            android:layout_marginLeft="16dip"
 		            android:layout_marginRight="16dip"
 		            android:src="@drawable/divider_horizontal_holo_light" />
-	            <TextView 
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:id="@+id/taskAction_changeTags"
-	                android:textSize="@dimen/text_size_large"
-   					android:minHeight="64dip" 
-		            android:layout_marginLeft="32dip"
-		            android:layout_marginRight="32dip"
-                	android:textColor="@android:color/white"
-			        android:singleLine="true"
-			        android:ellipsize="end"
-			        android:gravity="center_vertical"
-	                android:text="Change Tags" 
-	                android:clickable="true" />
-		        <ImageView 
-		            android:layout_width="match_parent"
-		            android:layout_height="1dip"
-		            android:scaleType="fitXY"
-		            android:gravity="fill_horizontal"
-		            android:layout_marginLeft="16dip"
-		            android:layout_marginRight="16dip"
-		            android:src="@drawable/divider_horizontal_holo_light" />
-	            <TextView 
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:id="@+id/taskAction_help"
-	                android:textSize="@dimen/text_size_large"
-    				android:minHeight="64dip"
-		            android:layout_marginLeft="32dip"
-		            android:layout_marginRight="32dip"
-                	android:textColor="@android:color/white"
-			        android:singleLine="true"
-			        android:ellipsize="end"
-			        android:gravity="center_vertical"
-	                android:text="Help" 
-	                android:clickable="true"  />
-		        <ImageView 
-		            android:layout_width="match_parent"
-		            android:layout_height="1dip"
-		            android:scaleType="fitXY"
-		            android:gravity="fill_horizontal"
-		            android:layout_marginLeft="16dip"
-		            android:layout_marginRight="16dip"
-		            android:src="@drawable/divider_horizontal_holo_light" />
                </LinearLayout>
         </ScrollView>
     </LinearLayout>

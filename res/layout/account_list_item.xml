@@ -4,7 +4,8 @@
    android:layout_height="wrap_content"
    android:background="@android:color/white" 
    android:orientation="vertical">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout 
+		android:id="@+id/accountListItem_row"
 	   android:layout_width="fill_parent"
 	   android:layout_height="48dip"
 	   android:orientation="horizontal">

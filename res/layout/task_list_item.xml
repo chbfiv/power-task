@@ -6,6 +6,7 @@
     android:stretchColumns="0"
     android:shrinkColumns="0">    
     <TableRow
+		android:id="@+id/taskListItem_row"
     	android:minHeight="48dip">
 	    <TextView
 			android:id="@+id/taskListItem_title"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="description_logo">7ask 7ags</string>
+    <string name="description_logo">Power Task</string>
     <string name="description_add">Add Tasks</string>
 
     <string name="task_title">Title:</string>

@@ -103,7 +103,7 @@
 			    <Button
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
-		        	android:text="Example 7ask List"
+		        	android:text="Example Task List"
 					android:singleLine="true"
 			        android:background="@drawable/btn_erase_pressed" /> 
 		    </LinearLayout>

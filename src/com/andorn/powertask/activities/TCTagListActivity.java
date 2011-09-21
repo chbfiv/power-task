@@ -54,12 +54,6 @@ public class TCTagListActivity extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-    	if(!dbTLHelper.initialize() || !dbTagMapHelper.initialize() || !dbTagsHelper.initialize())
-    	{
-    		Log.e(TAG, "onCreate - db failed to initialize.");
-    		return;    		
-    	}
-    	
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			Log.e(TAG, "onCreate - failed to get intent bundle.");

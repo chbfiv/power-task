@@ -63,15 +63,15 @@ public class GooTasksActivity extends BaseActivity
 	
     	mViewPager = (ViewPager) findViewById(R.id.tasks_viewPager);
 		mAdapter = new GooTasksPagerAdapter(getSupportFragmentManager());
-		mViewPager.setAdapter(mAdapter);
+		mViewPager.setAdapter(mAdapter);		
+		mViewPager.setOnPageChangeListener(mAdapter);
 		
 		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_LIST);
 	}	
 	
 	@Override
 	protected void onResume() {
-		super.onResume();
-		
+		super.onResume();		
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(OAuthHelper.INTENT_ON_AUTH);
 		registerReceiver(mOAuthReceiver, filter);		
@@ -106,6 +106,7 @@ public class GooTasksActivity extends BaseActivity
 				return true;
 			}
 			case R.id.menu_sync: {
+				getOAuthHelper().resetAuthAttempts();
 				sync();
 				return true;
 			}
@@ -131,10 +132,8 @@ public class GooTasksActivity extends BaseActivity
 
 	public void setActiveTaskId(long taskId) {
 		mActiveTaskId = taskId;
-		if(mTaskViewFragment != null) 
-			BaseFragment.<IGooTaskFrag>frag(mTaskViewFragment).reload();
-		else
-			GooTaskViewActivity.go(this, false, taskId);
+		if(mTaskViewFragment != null) BaseFragment.<IGooTaskFrag>frag(mTaskViewFragment).refresh();
+		else GooTaskViewActivity.go(this, false, taskId);
 	}
 	
 	public GooTasksOpenHelper getDbhTasks() {
@@ -143,11 +142,6 @@ public class GooTasksActivity extends BaseActivity
 
 	public GooTaskListsOpenHelper getDbhTaskLists() {
 		return dbhTaskLists;
-	}
-
-	public void onDbChange()
-	{
-    	requery();	
 	}
 	
     public static void go(Activity activity, long taskListId) 
@@ -167,23 +161,18 @@ public class GooTasksActivity extends BaseActivity
 		sync(true);
 	}
 	
-	public void sync(boolean withRefresh) {
-		
-    	GooTasksFragment frag = mAdapter.getCurrentFragment();
-		if(frag != null)
-		{
-			if(withRefresh) requery();
-			TasksAppService.syncTasks(this, getActiveTaskListId(), mSyncReceiver);
-		}
+	public void sync(boolean withRefresh) {		
+		if(withRefresh) refresh();
+		TasksAppService.syncTasks(this, getActiveTaskListId(), mSyncReceiver);
 	}
 	
-	public void requery()
+	public void refresh()
 	{
-    	GooTasksFragment frag = mAdapter.getCurrentFragment();
-		if(frag != null)
+		for (GooTasksFragment frag : mAdapter.getFragments())
 		{
-			if(frag.getTasksAdapter() != null) frag.getTasksAdapter().requery();
-		}		
+			if(frag != null) frag.refresh();				
+		}
+		if(mTaskViewFragment != null) BaseFragment.<IGooTaskFrag>frag(mTaskViewFragment).refresh();
 	}
 	
 	private OAuthReceiver mOAuthReceiver = new OAuthReceiver() {	
@@ -203,7 +192,7 @@ public class GooTasksActivity extends BaseActivity
 				public void run() {					
 					if (resultCode == TasksAppService.RESULT_SYNC_TASKS_SUCCESS) {
 						getOAuthHelper().resetAuthAttempts();	
-						requery();
+						refresh();
 			        }
 					else if (resultCode == TasksAppService.RESULT_FAILED_UNAUTHORIZED) {
 						getOAuthHelper().updateTokenExpiration(true);

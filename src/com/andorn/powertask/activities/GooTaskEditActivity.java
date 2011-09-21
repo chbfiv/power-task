@@ -2,6 +2,9 @@ package com.andorn.powertask.activities;
 
 import com.andorn.powertask.base.ActivityHelper;
 import com.andorn.powertask.database.GooTasksOpenHelper;
+import com.andorn.powertask.fragments.BaseFragment;
+import com.andorn.powertask.fragments.GooTaskEditFragment;
+import com.andorn.powertask.interfaces.IGooTaskEditFrag;
 import com.andorn.powertask.interfaces.IGooTaskEditHost;
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.R;
@@ -25,7 +28,7 @@ public class GooTaskEditActivity extends BaseActivity
 
 	private final GooTasksOpenHelper dbhTasks = new GooTasksOpenHelper(this);
 
-//	private GooTaskEditFragment mTaskEditFragment;
+	private GooTaskEditFragment mTaskEditFragment;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,20 +43,19 @@ public class GooTaskEditActivity extends BaseActivity
 		mActiveTaskId = extras.getLong(EXTRA_ACTIVE_TASK_ID, GooBase.INVALID_ID);
 		mActiveTaskListId = extras.getLong(EXTRA_ACTIVE_TASK_LIST_ID, GooBase.INVALID_ID);
 		
-        setContentView(R.layout.activity_task_edit);
+        setContentView(R.layout.activity_task_edit);         
+
+        mTaskEditFragment = (GooTaskEditFragment) getSupportFragmentManager().findFragmentById(R.id.task_edit_fragment);
         
         if(mActiveTaskId == GooBase.INVALID_ID)        
         	getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_COMPOSE);
         else
-        	getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_EDIT);            
-
-//        mTaskEditFragment = (GooTaskEditFragment) getSupportFragmentManager().findFragmentById(R.id.task_edit_fragment);
+        	getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_EDIT);   
     }
     
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
-		
+		super.onDestroy();		
 		if (dbhTasks != null) dbhTasks.close(); 
 	}
 
@@ -78,9 +80,9 @@ public class GooTaskEditActivity extends BaseActivity
 		return dbhTasks;
 	}
 
-	public void onDbChange()
+	public void refresh()
 	{
-		
+		if(mTaskEditFragment != null) BaseFragment.<IGooTaskEditFrag>frag(mTaskEditFragment).refresh();		
 	}
 	
     public static void go(Activity activity, long taskListId, long taskId) 

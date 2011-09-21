@@ -45,8 +45,7 @@ public abstract class GooBaseOpenHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		
-	}
-	
+	}	
     
 	public boolean initialize()
 	{
@@ -78,7 +77,7 @@ public abstract class GooBaseOpenHelper extends SQLiteOpenHelper {
 		else
 		{
 	    	  Log.e(TAG, "getDbReadOnly - null. should already be opened...");	
-	    	  throw new NullPointerException();
+	    	  throw new NullPointerException("getDbReadOnly - null. should already be opened...");
 		}
 		return ret;
 	}
@@ -93,7 +92,7 @@ public abstract class GooBaseOpenHelper extends SQLiteOpenHelper {
 		else
 		{
 	    	  Log.e(TAG, "getDbReadWrite - null. should already be opened...");	
-	    	  throw new NullPointerException();
+	    	  throw new NullPointerException("getDbReadWrite - null. should already be opened..");
 		}
 		return ret;
 	}

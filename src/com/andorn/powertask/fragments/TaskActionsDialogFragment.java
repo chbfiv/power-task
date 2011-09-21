@@ -152,8 +152,8 @@ public class TaskActionsDialogFragment extends DialogFragment {
 			return ret;	    	 
 	     }
 	
-	     protected void onPostExecute(Boolean result) {	    	 
-	    	 frag().getTasksAdapter().requery();
+	     protected void onPostExecute(Boolean result) {	 
+    		 host().refresh();
 	     }
 	}
 }

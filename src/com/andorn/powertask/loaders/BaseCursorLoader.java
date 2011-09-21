@@ -1,7 +1,9 @@
 package com.andorn.powertask.loaders;
 
+import com.andorn.powertask.activities.BaseActivity;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.AsyncTaskLoader;
 
 /**
@@ -16,11 +18,19 @@ import android.support.v4.content.AsyncTaskLoader;
  *  casidiablo 
  * https://gist.github.com/1217628
  */
-public abstract class DbCursorLoader extends AsyncTaskLoader<Cursor> {
+public abstract class BaseCursorLoader extends AsyncTaskLoader<Cursor> {
+	@SuppressWarnings("unused")
+	private static final String TAG = BaseCursorLoader.class.getName();
+	
     private Cursor mCursor;
 
-    public DbCursorLoader(Context context) {
+	protected BaseActivity mActivity;
+	protected Fragment mFragment;	
+	
+    public BaseCursorLoader(Context context, Fragment fragment) {
         super(context);
+    	mActivity = (BaseActivity) context;    
+    	mFragment = fragment;
     }
 
     /* Runs on a worker thread */

@@ -3,6 +3,7 @@ package com.andorn.powertask.database;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.services.TasksAppService;
 import com.google.api.services.tasks.v1.model.TaskList;
@@ -94,9 +95,10 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public List<GooTaskList> query(long accountId, int syncStateFilter) {
-		initialize();
 		List<GooTaskList> list = new ArrayList<GooTaskList>();
 		Cursor c = null;
+		if(!initialize()) return list;
+		
 		try
 		{
 			c = queryCursor(accountId, syncStateFilter);
@@ -122,9 +124,10 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public List<GooTaskList> query(long accountId) {
-		initialize();
 		List<GooTaskList> list = new ArrayList<GooTaskList>();
 		Cursor c = null;
+		if(!initialize()) return list;
+		
 		try
 		{
 			c = queryCursor(accountId);
@@ -150,8 +153,9 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public Cursor queryCursor(long accountId, int syncStateFilter)  {
-		initialize();
 		Cursor c = null;
+		if(!initialize()) return c;
+		
 		try
 		{
 			c = getDbReadOnly().query(
@@ -172,8 +176,9 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public Cursor queryCursor(long accountId) {
-		initialize();
 		Cursor c = null;
+		if(!initialize()) return c;
+		
 		try
 		{
 			c = getDbReadOnly().query(
@@ -213,9 +218,10 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public GooTaskList read(long id) {
-		initialize();
 		GooTaskList tl = null;
 		Cursor c = null;
+		if(!initialize()) return tl;
+		
 		try
 		{
 			c = getDbReadOnly().query(
@@ -244,9 +250,10 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public GooTaskList read(String remoteId) {
-		initialize();
 		GooTaskList tl = null;
 		Cursor c = null;
+		if(!initialize()) return tl;
+		
 		try
 		{
 			c = getDbReadOnly().query(
@@ -276,8 +283,9 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public long create(GooTaskList item) 
 	{
-		initialize();
-		long ret = -1;
+		long ret = GooBase.INVALID_ID;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			 ContentValues values = new ContentValues();
@@ -299,8 +307,9 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 		
 	public boolean update(GooTaskList item) 
 	{
-		initialize();
 		boolean ret = false;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			 ContentValues values = new ContentValues();
@@ -320,8 +329,9 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	 public boolean delete(long rowId) {
-		initialize();
 		boolean ret = false;
+		if(!initialize()) return ret;
+		
 		 try
 		 {
 			 ret = getDbReadWrite().delete(TABLE_NAME, KEY_id + " = " + rowId, null) > 0;				
@@ -335,9 +345,10 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	 
 	public String getTaskListRemoteId(long taskListId)
 	{
-		initialize();
 		String ret = "";
 		GooTaskList list;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			list = read(taskListId);
@@ -352,8 +363,9 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public boolean sync(TasksAppService service, long accountId, TaskLists remoteLists, String eTag) 
 	{
-		initialize();
 		boolean ret = false;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			if(remoteLists != null)

@@ -5,6 +5,7 @@ import com.andorn.powertask.database.GooTaskSortType;
 import com.andorn.powertask.interfaces.IGooTaskHost;
 import com.andorn.powertask.interfaces.IGooTasksFrag;
 import com.andorn.powertask.interfaces.IGooTasksHost;
+import com.andorn.powertask.loaders.GooTasksLoader;
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.models.GooSyncBase;
 import com.andorn.powertask.models.GooTask;
@@ -24,14 +25,17 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 
 public class GooTasksFragment extends BaseListFragment
-	implements IGooTasksFrag { 
+	implements IGooTasksFrag, LoaderManager.LoaderCallbacks<Cursor> { 
 
 	@SuppressWarnings("unused")
 	private static final String TAG = GooTasksFragment.class.getName();
 
-	public static final String EXTRA_TASK_SORT_TYPE = "task_sort_type";		
+	public static final String EXTRA_TASK_SORT_TYPE = "task_sort_type";	
+	public static final int LOADER_TASKS = 0;	
 
 	private View mRoot;
 	private ListView mList;
@@ -83,29 +87,32 @@ public class GooTasksFragment extends BaseListFragment
 		right.setText(null);	
 		
 		mList.addHeaderView(headerContainer);     
+
+		// Prepare the loader.  Either re-connect with an existing one,
+		// or start a new one.
+		getLoaderManager().initLoader(LOADER_TASKS, null, this);		
+ 		  
+ 		mAdapter = new GooTasksCursorAdapter(mActivity, this, null, true);		
+ 		setListAdapter(mAdapter); 
     }
     
     @Override
     public void onResume() {
-    	super.onResume();    	
-		setListAdapter(null);	 
-		 
- 		Cursor c = host().getDbhTasks().queryCursor(host().getActiveTaskListId(), GooSyncBase.SYNC_DELETE, mTaskSortType);  
- 		mAdapter = new GooTasksCursorAdapter(mActivity, this, c, true);		
- 		setListAdapter(mAdapter); 	
-		mAdapter.requery();	
+    	super.onResume();   
+		refresh();
     }
     
     @Override
     public void onPause() {
     	super.onPause();
-		if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().deactivate();
+		//if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().deactivate();
     }
     
     @Override
     public void onDestroy() {
     	super.onDestroy();    	
-		if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();		
+    	if(isAdded()) getLoaderManager().destroyLoader(LOADER_TASKS);
+		//if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();		
     }    
 	
     public static GooTasksFragment create(int sortType) {
@@ -170,7 +177,7 @@ public class GooTasksFragment extends BaseListFragment
 				task.setStatus(status);			
 				task.flagSyncState(GooSyncBase.SYNC_UPDATE);				
 				host().getDbhTasks().update(task);
-				mAdapter.requery();	
+				host().refresh();
 			}
 		}
 	}
@@ -191,5 +198,33 @@ public class GooTasksFragment extends BaseListFragment
 //				mAdapter.requery();			
 //			}
 		}
+	}
+
+    public void refresh()
+    {
+    	if(isAdded()) getLoaderManager().restartLoader(LOADER_TASKS, null, this);
+    }
+    
+    //Instantiate and return a new Loader for the given ID.
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {		
+		return new GooTasksLoader(mActivity, this);
+	}
+
+	// Called when a previously created loader has finished its load.
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {    
+		// Swap the new cursor in.  (The framework will take care of closing the
+	    // old cursor once we return.)
+		mAdapter.swapCursor(data);
+	}
+
+	//Called when a previously created loader is being reset, thus making its data unavailable.
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		// This is called when the last Cursor provided to onLoadFinished()
+	    // above is about to be closed.  We need to make sure we are no
+	    // longer using it.
+	    mAdapter.swapCursor(null);
 	}
 }

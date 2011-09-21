@@ -6,5 +6,5 @@ public interface IGooTaskHost {
 	long getActiveTaskId();
 	void setActiveTaskId(long taskId);
 	GooTasksOpenHelper getDbhTasks();
-	void onDbChange();
+	void refresh();
 }

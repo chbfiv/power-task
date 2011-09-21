@@ -170,11 +170,8 @@ public class GooTaskListsActivity extends BaseActivity implements
 				return true;
 			}
 			case R.id.menu_sync: {
+				getOAuthHelper().resetAuthAttempts();
 				sync();
-				return true;
-			}
-			case R.id.menu_edit_mode: {
-				//composeTaskList();
 				return true;
 			}
 			case R.id.menu_create_task_list: {

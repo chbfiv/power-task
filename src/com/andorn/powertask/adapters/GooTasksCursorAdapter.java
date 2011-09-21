@@ -4,29 +4,27 @@ import com.andorn.powertask.activities.GooTasksActivity;
 import com.andorn.powertask.database.GooTasksOpenHelper;
 import com.andorn.powertask.fragments.GooTasksFragment;
 import com.andorn.powertask.helpers.DateTimeHelper;
-import com.andorn.powertask.models.GooSyncBase;
 import com.andorn.powertask.models.GooTask;
 import com.andorn.powertask.models.TCTag;
 import com.andorn.powertask.R;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.graphics.Paint;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
 public class GooTasksCursorAdapter extends CursorAdapter {
 
-    private static final String TAG = GooTasksCursorAdapter.class.getName();
+    @SuppressWarnings("unused")
+	private static final String TAG = GooTasksCursorAdapter.class.getName();
     
 	private final static class ViewHolder {
     	TextView title;
@@ -55,29 +53,29 @@ public class GooTasksCursorAdapter extends CursorAdapter {
     public boolean requery()
     {
     	boolean ret = false;
-    	try
-    	{
-    		Cursor c = mActivity.getDbhTasks().queryCursor(mActivity.getActiveTaskListId(), 
-    				GooSyncBase.SYNC_DELETE, mFragment.getTaskSortType());   		
-    		
-	    	if(c != null)
-	    	{
-	    		changeCursor(c);
-	    	}
-	    	else
-	    	{
-	    	    Log.e(TAG, "requery null");	
-	    		throw new NullPointerException();
-	    	}
-		}
-		catch(SQLException sqle)
-		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-		}
-		catch(Exception ex)
-		{
-	    	  Log.e(TAG, "exception - " + ex.getMessage());				
-		}
+//    	try
+//    	{
+//    		Cursor c = mActivity.getDbhTasks().queryCursor(mActivity.getActiveTaskListId(), 
+//    				GooSyncBase.SYNC_DELETE, mFragment.getTaskSortType());   		
+//    		
+//	    	if(c != null)
+//	    	{
+//	    		changeCursor(c);
+//	    	}
+//	    	else
+//	    	{
+//	    	    Log.e(TAG, "requery null");	
+//	    		throw new NullPointerException();
+//	    	}
+//		}
+//		catch(SQLException sqle)
+//		{
+//	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+//		}
+//		catch(Exception ex)
+//		{
+//	    	  Log.e(TAG, "exception - " + ex.getMessage());				
+//		}
     	return ret;
     }
     

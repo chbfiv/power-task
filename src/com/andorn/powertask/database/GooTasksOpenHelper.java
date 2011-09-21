@@ -3,6 +3,7 @@ package com.andorn.powertask.database;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.models.GooTask;
 import com.andorn.powertask.services.TasksAppService;
 import com.google.api.services.tasks.v1.model.Task;
@@ -130,9 +131,10 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public List<GooTask> query(long taskListId, int syncStateFilter, int taskSortType) {
-		initialize();
 		List<GooTask> taskList = new ArrayList<GooTask>();
 		Cursor c = null;
+		if(!initialize()) return taskList;
+		
 		try
 		{
 			c = queryCursor(taskListId, syncStateFilter, taskSortType);
@@ -160,9 +162,10 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	}	
 	
 	public List<GooTask> query(long taskListId) {
-		initialize();
 		List<GooTask> taskList = new ArrayList<GooTask>();
 		Cursor c = null;
+		if(!initialize()) return taskList;
+		
 		try
 		{
 			c = queryCursor(taskListId);
@@ -190,8 +193,9 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	}	
 	
 	public Cursor queryCursor(long taskListId, int syncStateFilter, int taskSortType)  {
-		initialize();
 		Cursor c = null;
+		if(!initialize()) return c;
+		
 		try
 		{
 			String sort = buildOrderBySql(taskSortType);
@@ -214,8 +218,9 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public Cursor queryCursor(long taskListId) {
-		initialize();
 		Cursor c = null;
+		if(!initialize()) return c;
+		
 		try
 		{
 			c = getDbReadOnly().query(
@@ -259,9 +264,10 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public GooTask read(long id) {
-		initialize();
 		GooTask task = null;			
 		Cursor c = null;
+		if(!initialize()) return task;
+		
 		try
 		{
 			c = getDbReadOnly().query(
@@ -292,9 +298,9 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public GooTask read(String remoteId) {
-		initialize();
 		GooTask task = null;
 		Cursor c = null;
+		if(!initialize()) return task;
 		
 		try
 		{
@@ -327,8 +333,9 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public long create(long taskListId) 
 	{
-		initialize();
-		long ret = -1;
+		long ret = GooBase.INVALID_ID;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			 ContentValues values = new ContentValues();
@@ -344,8 +351,9 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public long create(GooTask task) 
 	{
-		initialize();
-		long ret = -1;
+		long ret = GooBase.INVALID_ID;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			 ContentValues values = new ContentValues();
@@ -375,8 +383,9 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public boolean update(GooTask task) 
 	{
-		initialize();
 		boolean ret = false;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			 ContentValues values = new ContentValues();
@@ -406,8 +415,9 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public boolean update(long taskId, GooTask.Status status) 
 	{
-		initialize();
 		boolean ret = false;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			 ContentValues values = new ContentValues();
@@ -422,8 +432,9 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	 public boolean delete(long rowId) {
-		initialize();
 		boolean ret = false;
+		if(!initialize()) return ret;
+		
 		 try
 		 {
 			 ret = getDbReadWrite().delete(TABLE_NAME, KEY_id + " = " + rowId, null) > 0;				
@@ -435,108 +446,109 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		 return ret;
      } 
 	 
-	 public boolean sync(TasksAppService service, long taskListId, Tasks remoteTasks, String eTag) 
+	public boolean sync(TasksAppService service, long taskListId, Tasks remoteTasks, String eTag) 
+	{
+		boolean ret = false;
+		if(!initialize()) return ret;
+		
+		try
 		{
-			initialize();
-			boolean ret = false;
-			try
-			{
-				if(remoteTasks != null)
-				{				
-					for (Task remoteTask : remoteTasks.items) {
-						GooTask localTask = read(remoteTask.id);
-						if(localTask != null)
-						{
-							//if already cached etag; skip update
-							if(localTask.remoteSyncRequired(eTag))
-							{
-								GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);
-								newTask.setId(localTask.getId());
-								update(newTask);
-							}		
-						}
-						else
-						{
-							//doesn't exist locally, create
-							GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);					
-							create(newTask);
-						}
-					}	
-				}
-				
-				for (GooTask localTask : query(taskListId)) {
-					Task remoteTask = null;
-
-					if(localTask.isSyncCreate())
+			if(remoteTasks != null)
+			{				
+				for (Task remoteTask : remoteTasks.items) {
+					GooTask localTask = read(remoteTask.id);
+					if(localTask != null)
 					{
-						remoteTask = service.createRemoteTask(localTask);
-						if(remoteTask != null)
-						{
-							GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);	
-							newTask.setId(localTask.getId());
-							update(newTask);
-						}
-					}
-					else if (!localTask.find(remoteTasks)) 
-					{
-						//dont need to create it, thus it was deleted remotely
-						delete(localTask.getId());
-					}
-					else if (localTask.isSyncDelete()) 
-					{
-						if(service.deleteRemoteTask(localTask))
-						{
-							delete(localTask.getId());
-						}
-					}	
-					else if (localTask.isSyncUpdate()) 
-					{
-						remoteTask = service.updateRemoteTask(localTask);							
-						if(remoteTask != null)
+						//if already cached etag; skip update
+						if(localTask.remoteSyncRequired(eTag))
 						{
 							GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);
 							newTask.setId(localTask.getId());
 							update(newTask);
-						}					
-					}		
-				}			
-				ret = true;
-			}
-			catch(SQLException sqle)
-			{
-		    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
-			}
-			return ret;
-		}		
-		
-		public static String buildOrderBySql(int value)
-		{
-			String orderBy = null;
-			if(GooTaskSortType.isCustomPosition(value))
-			{
-				orderBy = KEY_position + " ASC";				
-			}
-			if(GooTaskSortType.isTitleAscending(value))
-			{
-				if(orderBy != null) orderBy += ", ";
-				orderBy = KEY_title + " ASC";	
-			}
-			if(GooTaskSortType.isTitleDescending(value))
-			{
-				if(orderBy != null) orderBy += ", ";
-				orderBy = KEY_title + " DESC";	
-			}
-			if(GooTaskSortType.isDateAscending(value))
-			{
-				if(orderBy != null) orderBy += ", ";
-				orderBy = KEY_due + " ASC";	
-			}
-			if(GooTaskSortType.isDateDescending(value))
-			{
-				if(orderBy != null) orderBy += ", ";
-				orderBy = KEY_due + " DESC";	
+						}		
+					}
+					else
+					{
+						//doesn't exist locally, create
+						GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);					
+						create(newTask);
+					}
+				}	
 			}
 			
-	    	return orderBy;
+			for (GooTask localTask : query(taskListId)) {
+				Task remoteTask = null;
+
+				if(localTask.isSyncCreate())
+				{
+					remoteTask = service.createRemoteTask(localTask);
+					if(remoteTask != null)
+					{
+						GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);	
+						newTask.setId(localTask.getId());
+						update(newTask);
+					}
+				}
+				else if (!localTask.find(remoteTasks)) 
+				{
+					//dont need to create it, thus it was deleted remotely
+					delete(localTask.getId());
+				}
+				else if (localTask.isSyncDelete()) 
+				{
+					if(service.deleteRemoteTask(localTask))
+					{
+						delete(localTask.getId());
+					}
+				}	
+				else if (localTask.isSyncUpdate()) 
+				{
+					remoteTask = service.updateRemoteTask(localTask);							
+					if(remoteTask != null)
+					{
+						GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);
+						newTask.setId(localTask.getId());
+						update(newTask);
+					}					
+				}		
+			}			
+			ret = true;
 		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}
+		return ret;
+	}		
+	
+	public static String buildOrderBySql(int value)
+	{
+		String orderBy = null;
+		if(GooTaskSortType.isCustomPosition(value))
+		{
+			orderBy = KEY_position + " ASC";				
+		}
+		if(GooTaskSortType.isTitleAscending(value))
+		{
+			if(orderBy != null) orderBy += ", ";
+			orderBy = KEY_title + " ASC";	
+		}
+		if(GooTaskSortType.isTitleDescending(value))
+		{
+			if(orderBy != null) orderBy += ", ";
+			orderBy = KEY_title + " DESC";	
+		}
+		if(GooTaskSortType.isDateAscending(value))
+		{
+			if(orderBy != null) orderBy += ", ";
+			orderBy = KEY_due + " ASC";	
+		}
+		if(GooTaskSortType.isDateDescending(value))
+		{
+			if(orderBy != null) orderBy += ", ";
+			orderBy = KEY_due + " DESC";	
+		}
+		
+    	return orderBy;
+	}
 }

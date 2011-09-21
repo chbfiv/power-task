@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class GooTaskViewFragment extends BaseFragment
@@ -87,7 +88,7 @@ public class GooTaskViewFragment extends BaseFragment
     @Override
     public void onResume() {
     	super.onResume();
-    	reload();    	
+    	refresh();    	
     } 
     
     @Override
@@ -100,7 +101,10 @@ public class GooTaskViewFragment extends BaseFragment
     	switch(item.getItemId())
     	{
 			case R.id.menu_edit_mode: {
-				GooTaskEditActivity.go(mActivity, false, host().getActiveTaskId());
+				if(host().getActiveTaskId() != GooBase.INVALID_ID)
+					GooTaskEditActivity.go(mActivity, false, host().getActiveTaskId());
+				else
+				    Toast.makeText(mActivity, "Please select a task", Toast.LENGTH_SHORT).show();
 				return true;
 			}
     	}
@@ -131,7 +135,7 @@ public class GooTaskViewFragment extends BaseFragment
 		}		
 	}
 	
-	public void reload()
+	public void refresh()
     {
     	if(host().getActiveTaskId() == GooBase.INVALID_ID)
     	{
@@ -214,7 +218,7 @@ public class GooTaskViewFragment extends BaseFragment
 				task.setStatus(status);
 				task.flagSyncState(GooSyncBase.SYNC_UPDATE);				
 				host().getDbhTasks().update(task);	
-				host().onDbChange();
+				host().refresh();
 			}
 		}
 	}

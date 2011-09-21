@@ -76,7 +76,7 @@ public class GooTaskEditFragment extends BaseFragment
     @Override
     public void onResume() {
     	super.onResume();
-    	reload();    	
+    	refresh();    	
     } 
     
     @Override
@@ -154,7 +154,7 @@ public class GooTaskEditFragment extends BaseFragment
 	}    
 
 	@Override
-	public void reload() {
+	public void refresh() {
 		long taskId = host().getActiveTaskId();
 		long taskListId = host().getActiveTaskListId();
 		

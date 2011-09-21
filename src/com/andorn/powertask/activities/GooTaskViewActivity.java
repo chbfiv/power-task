@@ -2,6 +2,9 @@ package com.andorn.powertask.activities;
 
 import com.andorn.powertask.base.ActivityHelper;
 import com.andorn.powertask.database.GooTasksOpenHelper;
+import com.andorn.powertask.fragments.BaseFragment;
+import com.andorn.powertask.fragments.GooTaskViewFragment;
+import com.andorn.powertask.interfaces.IGooTaskFrag;
 import com.andorn.powertask.interfaces.IGooTaskHost;
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.R;
@@ -22,7 +25,7 @@ public class GooTaskViewActivity extends BaseActivity
 
 	private final GooTasksOpenHelper dbhTasks = new GooTasksOpenHelper(this);
 	
-//	private GooTaskViewFragment mTaskViewFragment;
+	private GooTaskViewFragment mTaskViewFragment;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +40,15 @@ public class GooTaskViewActivity extends BaseActivity
 		mActiveTaskId = extras.getLong(EXTRA_ACTIVE_TASK_ID, GooBase.INVALID_ID);
 		
         setContentView(R.layout.activity_task_view);
-        getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_VIEW);  
         
-//        mTaskViewFragment = (GooTaskViewFragment) getSupportFragmentManager().findFragmentById(R.id.task_view_fragment);      
+        mTaskViewFragment = (GooTaskViewFragment) getSupportFragmentManager().findFragmentById(R.id.task_view_fragment);
+
+        getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_VIEW);  
     }   
     
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
-		
+		super.onDestroy();		
 		if (dbhTasks != null) dbhTasks.close(); 
 	}
 
@@ -66,9 +69,9 @@ public class GooTaskViewActivity extends BaseActivity
 		return dbhTasks;
 	}
 
-	public void onDbChange()
+	public void refresh()
 	{
-		
+		if(mTaskViewFragment != null) BaseFragment.<IGooTaskFrag>frag(mTaskViewFragment).refresh();
 	}
 	
     public static void go(Activity activity, long taskId) 

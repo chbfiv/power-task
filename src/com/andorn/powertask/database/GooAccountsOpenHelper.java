@@ -82,9 +82,9 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public List<GooAccount> query() {
-		initialize();
 		List<GooAccount> list = new ArrayList<GooAccount>();
 		Cursor c = null;
+		if(!initialize()) return list;
 		
 		try
 		{
@@ -111,8 +111,9 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public Cursor queryCursor() {
-		initialize();
 		Cursor c = null;
+		if(!initialize()) return c;
+		
 		try
 		{
 			c = getDbReadOnly().query(
@@ -153,9 +154,9 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public GooAccount read(long id) {
-		initialize();
 		GooAccount acc = null;
 		Cursor c = null;
+		if(!initialize()) return acc;
 		
 		try
 		{
@@ -186,9 +187,9 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public GooAccount findAccountByName(String name)
 	{
-		initialize();
 		GooAccount acc = null;
 		Cursor c = null;
+		if(!initialize()) return acc;
 		
 		try
 		{
@@ -223,9 +224,10 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	public long create(GooAccount account) 
-	{
-		initialize();
+	{		
 		long rowId = GooBase.INVALID_ID;
+		if(!initialize()) return rowId;
+		
 		try
 		{
 			 ContentValues values = new ContentValues();
@@ -249,8 +251,9 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public boolean update(GooAccount account) 
 	{
-		initialize();
 		boolean ret = false;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			 ContentValues values = new ContentValues();
@@ -269,8 +272,9 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public boolean update(long id, String authToken) 
 	{
-		initialize();
 		boolean ret = false;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			 ContentValues values = new ContentValues();
@@ -286,8 +290,9 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public boolean update(long id, boolean sync) 
 	{
-		initialize();
 		boolean ret = false;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			 ContentValues values = new ContentValues();
@@ -302,8 +307,9 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	}
 	
 	 public boolean delete(long rowId) {
-		initialize();
 		boolean ret = false;
+		if(!initialize()) return ret;
+		
 		try
 		{
 			ret = getDbReadWrite().delete(TABLE_NAME, KEY_id + " = " + rowId, null) > 0;		

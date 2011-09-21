@@ -21,6 +21,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 public class OAuthHelper {
 
@@ -108,10 +109,14 @@ public class OAuthHelper {
 	      }
 	      
 	      if(authAttempts >= MAX_AUTH_ATTEMPTS)	      
-	    	  Log.e(TAG, "Attempted Auth " + authAttempts + " times.");	      
-	      else	      
+	      {
+	    	  Log.e(TAG, "Attempted Auth " + authAttempts + " times.");	 
+	    	  Toast.makeText(mActivity, "Failed to authorize account. \n A manual sync will reset authorization attempts.", Toast.LENGTH_SHORT).show();
+	      }     
+	      else	 
+	      {
 		      authorizeAccount(gooAccount);	    	  
-	      
+	      }
 	      return;
 	    }
 	    //otherwise take them to the accounts page

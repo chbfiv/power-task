@@ -47,12 +47,8 @@ public class OAuthHelper {
 //	protected static final String GOOGLE_TASKS_CLIENT_SECRET = "_rKdUMaS5Ga9xQHeOu3YHSOZ";
     
 //    protected static final String AUTH_COOKIE_NAME = "SACSID";
-	public static final String PREF_SYNC = "sync";
 	public static final String PREF_AUTH_TOKEN = "auth_token";
-//    protected static final String PREF_AUTH_COOKIE = "auth_cookie";
 	public static final int MAX_AUTH_ATTEMPTS = 3;
-
-	public static final String HASH = "#";
 
 	public static final String INTENT_ON_AUTH = OAuthHelper.class.getName() + ".ON_AUTH";
 	public static final String INTENT_EXTRA_AUTH_TOKEN = "auth_token";
@@ -188,39 +184,6 @@ public class OAuthHelper {
 	    prefs.edit().putInt(SharedPrefUtil.PREF_AUTH_ATTEMPTS, 0).commit();		
 	}
 	
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//    	String tmp;
-//		switch (requestCode) {
-//			case REQUEST_ADD_ACCOUNT:
-//				if (resultCode == Activity.RESULT_OK) {
-//					tmp = "asd1";						
-//				}
-//				else
-//				{					
-//					tmp = "asd2";					
-//				}
-//				break;
-//			case REQUEST_SYNC_SETTINGS:
-//				if (resultCode == Activity.RESULT_OK) {
-//					tmp = "asd3";					
-//				}
-//				else
-//				{				
-//					tmp = "asd4";					
-//				}
-//				break;
-//			case REQUEST_AUTHENTICATE:
-//				if (resultCode == Activity.RESULT_OK) {
-//					//gotAuthToken(account);	
-//				}
-//				else
-//				{				
-//					tmp = "asd4";					
-//				}
-//				break;
-//		}
-	}
-
 	public void addAccount() {
 		Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
@@ -259,20 +222,4 @@ public class OAuthHelper {
         Log.w(TAG, "Got Exception " + e);
         Log.e(TAG, Log.getStackTraceString(e));
 	}
-	
-	public static String getSyncPrefField(String accountName)
-	{
-		return accountName + HASH + PREF_SYNC;
-	}    
-	
-	public static String getAuthTokenPrefField(String accountName)
-	{
-		return accountName + HASH + PREF_AUTH_TOKEN;
-	}
-	
-//	public static String getAuthCookiePrefField(String accountName)
-//	{
-//		return accountName + HASH + PREF_AUTH_COOKIE;
-//	}
-
 }

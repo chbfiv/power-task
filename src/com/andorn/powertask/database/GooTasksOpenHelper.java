@@ -457,10 +457,14 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 			// pull - Tasks
 			if(localList == null) return false;    		
 			Tasks remoteTasks = service.queryRemoteTasks(localList.remoteId);
-			if(remoteTasks == null || remoteTasks.items == null) return false;
+			if(remoteTasks == null) return false;
 			
 			// merge - Tasks			
-			for (Task remoteTask : remoteTasks.items) {
+			int count = remoteTasks.items != null ?  remoteTasks.items.size() : 0;
+			for(int i = 0; i < count; i++)
+			{
+				Task remoteTask = remoteTasks.items.get(i);
+				
 				// merge - Task		
 				GooTask localTask = read(remoteTask.id);
 

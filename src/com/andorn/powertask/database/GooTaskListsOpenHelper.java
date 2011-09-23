@@ -7,6 +7,7 @@ import com.andorn.powertask.helpers.GeneralHelper;
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.services.TasksAppService;
+import com.google.api.services.tasks.v1.model.Task;
 import com.google.api.services.tasks.v1.model.TaskList;
 import com.google.api.services.tasks.v1.model.TaskLists;
 
@@ -384,7 +385,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 		{		
 			// pull - Task Lists
 			TaskLists remoteLists = service.queryRemoteTaskLists(); 
-			if(remoteLists == null || remoteLists.items == null) return false;
+			if(remoteLists == null) return false;
 			
 			boolean remoteTaskListChanges = 
 					service.shouldMergeTaskLists(remoteLists.etag, service.getGooAccountETag(accountId));
@@ -392,7 +393,11 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 			if (remoteTaskListChanges)
 			{
 				// merge - Task Lists						
-				for (TaskList remoteList : remoteLists.items) {				
+				int count = remoteLists.items != null ?  remoteLists.items.size() : 0;
+				for(int i = 0; i < count; i++)
+				{
+					TaskList remoteList = remoteLists.items.get(i);
+					
 					// merge - Task List
 					// required to get etag per Task List
 					remoteList = service.readRemoteTaskList(remoteList.id);

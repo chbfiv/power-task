@@ -1,6 +1,6 @@
 package com.andorn.powertask.models;
 
-public class GooAccount extends GooBase {
+public class GooAccount extends GooSyncBase {
 	
 	private String mName;
 	private String mType;

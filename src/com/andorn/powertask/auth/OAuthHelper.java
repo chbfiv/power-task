@@ -166,7 +166,7 @@ public class OAuthHelper {
 	      
 		final SharedPreferences prefs = SharedPrefUtil.getSharedPref(mActivity);	   
 		long accountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, -1);
-		if(dbACCHelper.update(accountId, authToken))
+		if(dbACCHelper.updateAuthToken(accountId, authToken))
 		{	    
 			final Intent intent = new Intent(INTENT_ON_AUTH);
 			intent.putExtra(INTENT_EXTRA_AUTH_TOKEN, authToken);

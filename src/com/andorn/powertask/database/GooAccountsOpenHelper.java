@@ -26,22 +26,26 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
     	KEY_id, // 0
     	KEY_created, // 1
     	KEY_modified, // 2
-    	KEY_name, // 3
-    	KEY_type, // 4
-    	KEY_sync, // 5
-    	KEY_authToken, // 6
+    	KEY_syncState, // 3
+    	KEY_eTag, // 4
+    	KEY_name, // 5
+    	KEY_type, // 6
+    	KEY_sync, // 7
+    	KEY_authToken // 8
     };
 
-    protected static final int INDEX_name = 3;
-    protected static final int INDEX_type = 4;
-    protected static final int INDEX_sync = 5;
-    protected static final int INDEX_authToken = 6;
+    protected static final int INDEX_name = 5;
+    protected static final int INDEX_type = 6;
+    protected static final int INDEX_sync = 7;
+    protected static final int INDEX_authToken = 8;
     
     private static final String TABLE_CREATE =
                 "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                 KEY_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 KEY_created + " NUMERIC, " +
                 KEY_modified + " NUMERIC, " +
+                KEY_syncState + " INTEGER, " +
+                KEY_eTag + " TEXT, " +
                 KEY_name + " TEXT, " +
                 KEY_type + " TEXT, " +
                 KEY_sync + " INTEGER, " +
@@ -74,8 +78,7 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
         // Recreates the database with a new version
         //onCreate(db);
 	}
-	//"\"SR04dT8X4VWULOsDkL4X4Vd0UDQ/1IJzu4yfnShYlBKFS9vA4Irm3Dk\""
-	
+
 	@Override
 	public void onOpen(SQLiteDatabase db) {
 		super.onOpen(db);
@@ -141,6 +144,7 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 			{
 				boolean sync = c.getInt(INDEX_sync) > 0;
 				acc = new GooAccount(c.getLong(INDEX_id), c.getString(INDEX_name), c.getString(INDEX_type), sync);
+				acc.setSync(c.getInt(INDEX_syncState), c.getString(INDEX_eTag));
 				acc.setCreated(c.getLong(INDEX_created));
 				acc.setModified(c.getLong(INDEX_modified));
 				acc.setAuthToken(c.getString(INDEX_authToken));
@@ -231,6 +235,7 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 		try
 		{
 			 ContentValues values = new ContentValues();
+			 values.put(KEY_eTag, account.getETag());
 			 values.put(KEY_name, account.getName());
 			 values.put(KEY_type, account.getType());
 			 values.put(KEY_sync, account.getSync());
@@ -244,11 +249,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 		return rowId;	
 	}
 	
-	public boolean update(long id, String name, String type, boolean sync) 
-	{
-		return update(new GooAccount(id, name, type, sync));
-	}
-	
 	public boolean update(GooAccount account) 
 	{
 		boolean ret = false;
@@ -257,6 +257,7 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 		try
 		{
 			 ContentValues values = new ContentValues();
+			 values.put(KEY_eTag, account.getETag());
 			 values.put(KEY_name, account.getName());
 			 values.put(KEY_type, account.getType());
 			 values.put(KEY_sync, account.getSync());
@@ -270,7 +271,7 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 		return ret;
 	}
 	
-	public boolean update(long id, String authToken) 
+	public boolean updateAuthToken(long id, String authToken) 
 	{
 		boolean ret = false;
 		if(!initialize()) return ret;
@@ -288,7 +289,25 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 		return ret;		
 	}
 	
-	public boolean update(long id, boolean sync) 
+	public boolean updateETag(long id, String eTag) 
+	{
+		boolean ret = false;
+		if(!initialize()) return ret;
+		
+		try
+		{
+			 ContentValues values = new ContentValues();
+			 values.put(KEY_eTag, eTag);
+			 ret = getDbReadWrite().update(TABLE_NAME, values, KEY_id + " = " + id, null) > 0;		
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}	
+		return ret;		
+	}
+	
+	public boolean updateSync(long id, boolean sync) 
 	{
 		boolean ret = false;
 		if(!initialize()) return ret;

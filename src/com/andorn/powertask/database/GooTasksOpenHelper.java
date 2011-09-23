@@ -78,9 +78,9 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
                 KEY_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 KEY_created + " NUMERIC, " +
                 KEY_modified + " NUMERIC, " +
-                KEY_taskListId + " INTEGER, " +
                 KEY_syncState + " INTEGER, " +
                 KEY_eTag + " TEXT, " +
+                KEY_taskListId + " INTEGER, " +
                 KEY_remoteId + " TEXT, " +
     			KEY_kind + " TEXT, " +
     			KEY_title + " TEXT, " +

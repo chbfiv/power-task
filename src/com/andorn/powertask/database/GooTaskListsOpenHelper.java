@@ -3,6 +3,7 @@ package com.andorn.powertask.database;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.andorn.powertask.helpers.GeneralHelper;
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.services.TasksAppService;
@@ -385,34 +386,43 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 			TaskLists remoteLists = service.queryRemoteTaskLists(); 
 			if(remoteLists == null || remoteLists.items == null) return false;
 			
-			// merge - Task Lists						
-			for (TaskList remoteList : remoteLists.items) {				
-				// merge - Task List
-				// required to get etag per Task List
-				remoteList = service.readRemoteTaskList(remoteList.id);
-				GooTaskList localList = read(remoteList.id);
-				
-				if (localList == null)
-				{
-					//doesn't exist locally, create
-					GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);						
-					long id = create(newList);
-					newList = read(id);
+			boolean remoteTaskListChanges = 
+					service.shouldMergeTaskLists(remoteLists.etag, service.getGooAccountETag(accountId));
+			
+			if (remoteTaskListChanges)
+			{
+				// merge - Task Lists						
+				for (TaskList remoteList : remoteLists.items) {				
+					// merge - Task List
+					// required to get etag per Task List
+					remoteList = service.readRemoteTaskList(remoteList.id);
+					GooTaskList localList = read(remoteList.id);
 					
-					// sync - Tasks
-					getDbhTasks().sync(service, newList);	
-				}
-				else if(localList.remoteSyncRequired(remoteList.etag))
-				{		
-					//if already cached etag; skip update	
-					GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);
-					newList.setId(localList.getId());
-					update(newList);	
-
-					// sync - Tasks
-					getDbhTasks().sync(service, newList);	
-				}
-			}	
+					if (localList == null)
+					{
+						//doesn't exist locally, create
+						GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);						
+						long id = create(newList);
+						newList = read(id);
+						
+						// sync - Tasks
+						getDbhTasks().sync(service, newList);	
+					}
+					else if(localList.remoteSyncRequired(remoteList.etag))
+					{		
+						//if already cached etag; skip update	
+						GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);
+						newList.setId(localList.getId());
+						update(newList);	
+	
+						// sync - Tasks
+						getDbhTasks().sync(service, newList);	
+					}
+				}	
+				
+				// merge complete
+				service.setGooAccountETag(accountId, remoteLists.etag);
+			}
 			
 			// push - TaskLists
 			for (GooTaskList localList : query(accountId)) {
@@ -431,7 +441,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 						getDbhTasks().sync(service,  newList);	
 					}
 				}
-				else if (GooTaskList.shouldDelete(localList.remoteId, remoteLists)) 
+				else if (remoteTaskListChanges && GooTaskList.shouldDelete(localList.remoteId, remoteLists)) 
 				{
 					//dont need to create it, thus it was deleted remotely
 					delete(localList.getId());

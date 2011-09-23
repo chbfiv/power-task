@@ -262,6 +262,44 @@ public class TasksAppService extends IntentService {
 	    }
 	}	
 	
+	// Accounts
+	
+	public String getGooAccountETag(long accountId)
+	{
+		String result = null;
+    	try
+    	{   		
+    		GooAccount account = dbhAccounts.read(accountId);
+    		if(account != null) result = account.getETag();
+    	} 
+    	catch(Exception e)
+    	{  		
+            Log.e(TAG, "getGooAccountETag " + e.getMessage());   
+    	}
+    	return result;		
+	}
+	
+	public String setGooAccountETag(long accountId, String eTag)
+	{
+		String result = null;
+    	try
+    	{  
+    		dbhAccounts.updateETag(accountId, eTag);
+    	} 
+    	catch(Exception e)
+    	{  		
+            Log.e(TAG, "getGooAccountETag " + e.getMessage());   
+    	}
+    	return result;		
+	}
+	
+	public boolean shouldMergeTaskLists(String remoteListsETag, String accountETag)
+	{
+		if (GeneralHelper.isNullOrEmpty(remoteListsETag) ||
+			GeneralHelper.isNullOrEmpty(accountETag)) return true;
+		else return !remoteListsETag.equals(accountETag);
+	}
+	
 	// Task Lists
 	
 	public TaskLists queryRemoteTaskLists() throws Exception
@@ -440,7 +478,8 @@ public class TasksAppService extends IntentService {
             throw e;     
     	}
     	return ret;
-	}	
+	}
+	
 	
 	// Helpers
 	

@@ -188,7 +188,7 @@ public class TasksAppService extends IntentService {
     	if(receiver != null) receiver.send(RESULT_SYNC_FAILED, Bundle.EMPTY);	
 	}
 	
-	public static void handleException(Exception e) {
+	public static void handleException(Exception e) throws Exception {
 	    if (e instanceof HttpResponseException) {
 	      HttpResponse response = ((HttpResponseException) e).response;
 	      int statusCode = response.statusCode;
@@ -204,7 +204,7 @@ public class TasksAppService extends IntentService {
 	      }
 	    }
         Log.w(TAG, "Got Exception " + e);
-        Log.e(TAG, Log.getStackTraceString(e));
+        Log.e(TAG, Log.getStackTraceString(e));   
 	}
 	
 	@Override
@@ -264,7 +264,7 @@ public class TasksAppService extends IntentService {
 	
 	// Task Lists
 	
-	public TaskLists queryRemoteTaskLists()
+	public TaskLists queryRemoteTaskLists() throws Exception
 	{
 		TaskLists result = null;
     	try
@@ -274,11 +274,28 @@ public class TasksAppService extends IntentService {
     	catch(Exception e)
     	{
     		handleException(e);    		
+            throw e;     
     	}
     	return result;
 	}
 	
-	public TaskList createRemoteTaskList(GooTaskList local)
+	public TaskList readRemoteTaskList(String taskListRemoteId) throws Exception
+	{
+		TaskList result = null;
+    	try
+    	{
+			if(GeneralHelper.isNullOrEmpty(taskListRemoteId)) return result;
+    		result = taskService.tasklists.get(taskListRemoteId).execute();		
+    	} 
+    	catch(Exception e)
+    	{
+    		handleException(e);   
+            throw e;      		
+    	}
+    	return result;
+	}
+	
+	public TaskList createRemoteTaskList(GooTaskList local) throws Exception
 	{
 		TaskList remote = new TaskList();
 		TaskList result = null;
@@ -289,12 +306,13 @@ public class TasksAppService extends IntentService {
     	} 
     	catch(Exception e)
     	{
-    		handleException(e);    		
+    		handleException(e);    	
+            throw e;     	
     	}
     	return result;
 	}
 	
-	public TaskList updateRemoteTaskList(GooTaskList local)
+	public TaskList updateRemoteTaskList(GooTaskList local) throws Exception
 	{
 		TaskList remote = null;
 		TaskList result = null;
@@ -306,12 +324,13 @@ public class TasksAppService extends IntentService {
     	} 
     	catch(Exception e)
     	{
-    		handleException(e);    		
+    		handleException(e);  
+            throw e;       		
     	}
     	return result;
 	}
 	
-	public boolean deleteRemoteTaskList(GooTaskList local)
+	public boolean deleteRemoteTaskList(GooTaskList local) throws Exception
 	{
 		boolean ret = false;
     	try
@@ -322,29 +341,30 @@ public class TasksAppService extends IntentService {
     	catch(Exception e)
     	{
     		handleException(e);
+            throw e;     
     	}
     	return ret;
 	}	
 	
 	// Tasks
 	
-	public Tasks queryRemoteTasks(String taskListRemoteId)
+	public Tasks queryRemoteTasks(String taskListRemoteId) throws Exception
 	{
 		Tasks result = null;
     	try
     	{   		
-			if(GeneralHelper.isNullOrEmpty(taskListRemoteId)) return result;
-			
+			if(GeneralHelper.isNullOrEmpty(taskListRemoteId)) return result;			
     		result = taskService.tasks.list(taskListRemoteId).execute();
     	} 
     	catch(Exception e)
     	{
-    		handleException(e);    		
+    		handleException(e);   
+            throw e;      		
     	}
     	return result;
 	}
 
-	public Task createRemoteTask(GooTask local)
+	public Task createRemoteTask(GooTask local) throws Exception
 	{
 		Task remote = new Task();
 		Task result = null;
@@ -364,12 +384,13 @@ public class TasksAppService extends IntentService {
     	} 
     	catch(Exception e)
     	{
-    		handleException(e);    		
+    		handleException(e);    	
+            throw e;     	
     	}
     	return result;
 	}
 	
-	public Task updateRemoteTask(GooTask local)
+	public Task updateRemoteTask(GooTask local) throws Exception
 	{
 		Task remote = null;
 		Task result = null;
@@ -393,12 +414,13 @@ public class TasksAppService extends IntentService {
     	} 
     	catch(Exception e)
     	{
-    		handleException(e);    		
+    		handleException(e);  
+            throw e;       		
     	}
     	return result;
 	}
 	
-	public boolean deleteRemoteTask(GooTask local)
+	public boolean deleteRemoteTask(GooTask local) throws Exception
 	{
 		boolean ret = false;
     	try
@@ -415,6 +437,7 @@ public class TasksAppService extends IntentService {
     	catch(Exception e)
     	{
     		handleException(e);
+            throw e;     
     	}
     	return ret;
 	}	

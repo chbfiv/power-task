@@ -447,7 +447,7 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		 return ret;
      } 
 	 
-	public boolean sync(TasksAppService service, GooTaskList localList) 
+	public boolean sync(TasksAppService service, GooTaskList localList) throws Exception 
 	{
 		boolean ret = false;
 		if(!initialize()) return ret;

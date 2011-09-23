@@ -374,7 +374,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 		return ret;
 	}	
 	
-	public boolean sync(TasksAppService service, long accountId) 
+	public boolean sync(TasksAppService service, long accountId) throws Exception 
 	{
 		boolean ret = false;
 		if(!initialize()) return ret;
@@ -388,22 +388,24 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 			// merge - Task Lists						
 			for (TaskList remoteList : remoteLists.items) {				
 				// merge - Task List
+				// required to get etag per Task List
+				remoteList = service.readRemoteTaskList(remoteList.id);
 				GooTaskList localList = read(remoteList.id);
 				
 				if (localList == null)
 				{
 					//doesn't exist locally, create
-					GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteLists.etag);						
+					GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);						
 					long id = create(newList);
 					newList = read(id);
 					
 					// sync - Tasks
 					getDbhTasks().sync(service, newList);	
 				}
-				else if(localList.remoteSyncRequired(remoteLists.etag))
+				else if(localList.remoteSyncRequired(remoteList.etag))
 				{		
 					//if already cached etag; skip update	
-					GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteLists.etag);
+					GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);
 					newList.setId(localList.getId());
 					update(newList);	
 

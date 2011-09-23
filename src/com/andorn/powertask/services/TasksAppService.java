@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.database.GooAccountsOpenHelper;
 import com.andorn.powertask.database.GooTaskListsOpenHelper;
+import com.andorn.powertask.helpers.ConnectivityHelper;
 import com.andorn.powertask.helpers.GeneralHelper;
 import com.andorn.powertask.helpers.SharedPrefUtil;
 import com.andorn.powertask.models.GooAccount;
@@ -71,6 +72,20 @@ public class TasksAppService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 	
+		if (intent.getFlags() != REQUEST_SYNC_ACCOUNTS && ConnectivityHelper.isAirplaneMode(this))
+		{
+	    	TLog(TAG + " currently in airplane mode; no network connectivity.");	    
+		    //Toast.makeText(this, "currently in airplane mode; no network connectivity.", Toast.LENGTH_SHORT).show();		
+	    	return;
+		}
+		
+		if (intent.getFlags() != REQUEST_SYNC_ACCOUNTS && !ConnectivityHelper.hasConnectivity(this))
+		{
+	    	TLog(TAG + " currently no network connectivity.");	    
+		    //Toast.makeText(this, "currently no network connectivity.", Toast.LENGTH_SHORT).show();	
+	    	return;
+		}
+		
 	    long accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, GooBase.INVALID_ID);
 	    if(accountId == GooBase.INVALID_ID)
 	    {
@@ -209,7 +224,7 @@ public class TasksAppService extends IntentService {
 	
 	@Override
 	public void onCreate() {
-		TLog(TAG + " service onCreate.");
+		//TLog(TAG + " service onCreate.");
 		super.onCreate();
 		
 		TaskApplication app = (TaskApplication)getApplication();
@@ -218,7 +233,7 @@ public class TasksAppService extends IntentService {
 	
 	@Override
 	public void onDestroy() {
-		TLog(TAG + " service onDestroy.");
+		//TLog(TAG + " service onDestroy.");
 		super.onDestroy();
 		
 		if (dbhAccounts != null) dbhAccounts.close();
@@ -512,10 +527,7 @@ public class TasksAppService extends IntentService {
 	{
 	    boolean debug = mSharedPref.getSharedPref().getBoolean(SharedPrefUtil.PREF_DEBUG, false);	
 	    
-	    if(debug)
-	    {
-		    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-	        Log.i(TAG, msg);
-	    }
+	    if(debug) Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();	    
+        Log.i(TAG, msg);
 	}		
 }

@@ -301,13 +301,16 @@ public class TasksAppService extends IntentService {
 	}
 	
 	// Task Lists
-	
+
 	public TaskLists queryRemoteTaskLists() throws Exception
 	{
 		TaskLists result = null;
-    	try
-    	{   		
-    		result = taskService.tasklists.list().execute();		
+    	try    	
+    	{  
+    		com.google.api.services.tasks.v1.Tasks.Tasklists.List request = 
+    				taskService.tasklists.list();
+    		request.fields = "etag,items(etag,id,title)"; 
+    		result = request.execute();		
     	} 
     	catch(Exception e)
     	{
@@ -323,7 +326,10 @@ public class TasksAppService extends IntentService {
     	try
     	{
 			if(GeneralHelper.isNullOrEmpty(taskListRemoteId)) return result;
-    		result = taskService.tasklists.get(taskListRemoteId).execute();		
+			com.google.api.services.tasks.v1.Tasks.Tasklists.Get request = 
+					taskService.tasklists.get(taskListRemoteId);
+			request.fields = "etag,id,title";
+    		result = request.execute();		
     	} 
     	catch(Exception e)
     	{
@@ -340,7 +346,10 @@ public class TasksAppService extends IntentService {
     	try
     	{   		
     		remote.title = local.title;
-    		result = taskService.tasklists.insert(remote).execute();			
+    		com.google.api.services.tasks.v1.Tasks.Tasklists.Insert request =
+    				taskService.tasklists.insert(remote);
+    		request.fields = "etag,id,title";
+    		result = request.execute();			
     	} 
     	catch(Exception e)
     	{
@@ -358,7 +367,10 @@ public class TasksAppService extends IntentService {
     	{   		
     		remote = taskService.tasklists.get(local.remoteId).execute();
     		remote.title = local.title;
-    		result = taskService.tasklists.update(remote.id, remote).execute();
+    		com.google.api.services.tasks.v1.Tasks.Tasklists.Update request =
+    				taskService.tasklists.update(remote.id, remote);
+    		request.fields = "etag,id,title";
+    		result = request.execute();
     	} 
     	catch(Exception e)
     	{
@@ -391,8 +403,11 @@ public class TasksAppService extends IntentService {
 		Tasks result = null;
     	try
     	{   		
-			if(GeneralHelper.isNullOrEmpty(taskListRemoteId)) return result;			
-    		result = taskService.tasks.list(taskListRemoteId).execute();
+			if(GeneralHelper.isNullOrEmpty(taskListRemoteId)) return result;
+			com.google.api.services.tasks.v1.Tasks.TasksOperations.List request =
+					taskService.tasks.list(taskListRemoteId);
+    		request.fields = "etag,items(completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated)";
+    		result = request.execute();
     	} 
     	catch(Exception e)
     	{
@@ -417,8 +432,10 @@ public class TasksAppService extends IntentService {
     		remote.status = local.status;
     		remote.due = local.due;
     		remote.completed = local.completed;
-    		
-			result = taskService.tasks.insert(taskListRemoteId, remote).execute();	
+    		com.google.api.services.tasks.v1.Tasks.TasksOperations.Insert request =
+    				taskService.tasks.insert(taskListRemoteId, remote);
+    		request.fields = "completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated";
+			result = request.execute();	
     	} 
     	catch(Exception e)
     	{
@@ -439,8 +456,11 @@ public class TasksAppService extends IntentService {
 
 			if(GeneralHelper.isNullOrEmpty(taskListRemoteId) ||
 					GeneralHelper.isNullOrEmpty(taskRemoteId)) return result;
-			
-    		remote = taskService.tasks.get(taskListRemoteId, taskRemoteId).execute();
+
+    		com.google.api.services.tasks.v1.Tasks.TasksOperations.Get request =
+    				taskService.tasks.get(taskListRemoteId, taskRemoteId);
+    		request.fields = "completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated";
+    		remote = request.execute();
 
     		remote.title = local.title;
     		remote.notes = local.notes;
@@ -448,6 +468,11 @@ public class TasksAppService extends IntentService {
     		remote.due = local.due;
     		remote.completed = local.completed;
 
+    		com.google.api.services.tasks.v1.Tasks.TasksOperations.Update requestUpdate =
+    				taskService.tasks.update(taskListRemoteId, taskRemoteId, remote);
+    		requestUpdate.fields = "completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated";
+    		remote = requestUpdate.execute();
+    		
     		result = taskService.tasks.update(taskListRemoteId, taskRemoteId, remote).execute();
     	} 
     	catch(Exception e)

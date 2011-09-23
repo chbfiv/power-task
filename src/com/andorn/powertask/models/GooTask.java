@@ -9,6 +9,7 @@ import android.util.Log;
 import android.util.TimeFormatException;
 
 import com.andorn.powertask.helpers.DateTimeHelper;
+import com.andorn.powertask.helpers.GeneralHelper;
 import com.google.api.services.tasks.v1.model.Task;
 import com.google.api.services.tasks.v1.model.Tasks;
 
@@ -212,19 +213,27 @@ public class GooTask extends GooSyncBase {
 		return localTask;
 	}
 	
-	public boolean find(Tasks remoteTasks)
-	{
+	public static boolean find(String remoteId, Tasks remoteTasks)
+	{				
+		if(GeneralHelper.isNullOrEmpty(remoteId)) return false;
+		if(remoteTasks == null || remoteTasks.items == null) return false;
+
 		boolean ret = false;
-		if(remoteTasks != null)
-		{				
-			for (Task remoteTask : remoteTasks.items) {
-				if(remoteTask.id.equals(remoteId))
-				{
-					ret = true;
-					break;
-				}
-			}	
-		}
+		
+		for (Task remoteTask : remoteTasks.items) {
+			if(remoteTask.id.equals(remoteId))
+			{
+				ret = true;
+				break;
+			}
+		}			
 		return ret;
+	}	
+	
+	public static boolean shouldDelete(String remoteId, Tasks remoteTasks)
+	{
+		if(GeneralHelper.isNullOrEmpty(remoteId)) return false;
+		if(remoteTasks == null || remoteTasks.items == null) return false;
+		return !find(remoteId, remoteTasks);
 	}
 }

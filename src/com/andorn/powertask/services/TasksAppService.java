@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.database.GooAccountsOpenHelper;
 import com.andorn.powertask.database.GooTaskListsOpenHelper;
-import com.andorn.powertask.database.GooTasksOpenHelper;
+import com.andorn.powertask.helpers.GeneralHelper;
 import com.andorn.powertask.helpers.SharedPrefUtil;
 import com.andorn.powertask.models.GooAccount;
 import com.andorn.powertask.models.GooBase;
@@ -24,9 +24,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.util.Log;
 import android.widget.Toast;
@@ -48,31 +46,20 @@ public class TasksAppService extends IntentService {
 	public static final int REQUEST_SYNC_TASK_LISTS = 30000;
 	public static final int REQUEST_SYNC_TASKS = 30001;
 	public static final int REQUEST_SYNC_ACCOUNTS = 30002;
-	
-	public static final int CREATE_TASK = 30002;
-	public static final int READ_TASK = 30003;
-	public static final int UPDATE_TASK = 30004;
-	public static final int DELETE_TASK = 30005;	
     
-	public static final int RESULT_SYNC_TASK_LISTS_SUCCESS = 40000;
-	public static final int RESULT_SYNC_TASKS_SUCCESS = 40001;
-	public static final int RESULT_SYNC_ACCOUNTS_SUCCESS = 40002;
-	
-	public static final int RESULT_CREATE_TASK_SUCCESS = 40002;
-	public static final int RESULT_READ_TASK_SUCCESS = 40003;
-	public static final int RESULT_UPDATE_TASK_SUCCESS = 40004;
-	public static final int RESULT_DELETE_TASK_SUCCESS = 40005;
+	public static final int RESULT_SYNC_SUCCESS_TASK_LISTS = 40000;
+	public static final int RESULT_SYNC_SUCCESS_TASKS = 40001;
+	public static final int RESULT_SYNC_SUCCESS_ACCOUNTS = 40002;
 
-	public static final int RESULT_FAILED = 49999;
-	public static final int RESULT_LOADING = 49998;
-	public static final int RESULT_LOADING_COMPLETE = 49997;
-    public static final int RESULT_FAILED_UNAUTHORIZED = 49996;
+    public static final int RESULT_SYNC_FAILED = 49999;
+	public static final int RESULT_SYNC_LOADING = 49998;
+	public static final int RESULT_SYNC_LOADING_COMPLETE = 49997;
+    public static final int RESULT_SYNC_FAILED_UNAUTHORIZED = 49996;
     
     public static final String RESULT_TASK_LISTS = "result_task_lists";
 
-    private final GooAccountsOpenHelper dbACCHelper = new GooAccountsOpenHelper(this);
-    private final GooTaskListsOpenHelper dbTLCHelper = new GooTaskListsOpenHelper(this);
-    private final GooTasksOpenHelper dbTLHelper = new GooTasksOpenHelper(this);
+    private final GooAccountsOpenHelper dbhAccounts = new GooAccountsOpenHelper(this);
+    private final GooTaskListsOpenHelper dbhTaskLists = new GooTaskListsOpenHelper(this);
 	
     private com.google.api.services.tasks.v1.Tasks taskService;
     
@@ -98,7 +85,7 @@ public class TasksAppService extends IntentService {
 	    	return;
 	    }
 	    
-	    GooAccount account = dbACCHelper.read(accountId);
+	    GooAccount account = dbhAccounts.read(accountId);
 	    //if still null exit cleanly
 	    if(intent.getFlags() != REQUEST_SYNC_ACCOUNTS && account == null)
 	    {
@@ -115,36 +102,38 @@ public class TasksAppService extends IntentService {
 //	    final long taskId = intent.getLongExtra(EXTRA_TASK_ID, GooBase.INVALID_ID);
 	    
 	    final ResultReceiver receiver = (ResultReceiver)intent.getParcelableExtra(REQUEST_RECEIVER_EXTRA);
-	    
+
+    	boolean success = false;
 	    //final long accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1);
-	    if(receiver != null) receiver.send(RESULT_LOADING, Bundle.EMPTY);
 	    try
-	    {	    	
-		    switch(intent.getFlags())
+	    {	    
+		    if(receiver != null) receiver.send(RESULT_SYNC_LOADING, Bundle.EMPTY);
+		    
+		    int requestType = intent.getFlags();
+		    
+		    if (requestType == REQUEST_SYNC_TASK_LISTS) 
+		    	success = dbhTaskLists.sync(this, accountId);
+		    else if (requestType == REQUEST_SYNC_TASKS) 
 		    {
-			    case REQUEST_SYNC_TASK_LISTS:
-			    {
-			    	processTaskListRequest(accountId, receiver);
-			    	break;
-			    }	  
-			    case REQUEST_SYNC_TASKS:
-			    {
-			    	processTasksRequest(taskListId, receiver);
-			    	break;
-			    }	 
-			    case REQUEST_SYNC_ACCOUNTS:
-			    {
-			    	processAccountsRequest(receiver);
-			    	break;
-			    }	  
-		    }	      
+	    		GooTaskList localList = dbhTaskLists.read(taskListId);
+		    	success = dbhTaskLists.getDbhTasks().sync(this, localList);
+		    }
+		    else if (requestType == REQUEST_SYNC_ACCOUNTS) 
+		    	processAccountsRequest(receiver);    
+		    else success = true; //default
+		    
+		    if(receiver != null) 
+	    	{
+		    	if(!success) receiver.send(RESULT_SYNC_FAILED, Bundle.EMPTY);
+		    	else if (requestType == REQUEST_SYNC_TASK_LISTS) receiver.send(RESULT_SYNC_SUCCESS_TASK_LISTS, Bundle.EMPTY);
+		    	else if (requestType == REQUEST_SYNC_TASKS) receiver.send(RESULT_SYNC_SUCCESS_TASKS, Bundle.EMPTY);		    	
+	    	}
 	    }
 	    catch (Exception e)
 	    {
-    		handleException(e, receiver);
-	    	if(receiver != null) receiver.send(RESULT_FAILED, Bundle.EMPTY);	    	
+    		handleException(e, receiver);    	
 	    }
-	    if(receiver != null) receiver.send(RESULT_LOADING_COMPLETE, Bundle.EMPTY);
+	    if(receiver != null) receiver.send(RESULT_SYNC_LOADING_COMPLETE, Bundle.EMPTY);
 	}
 	
 	private void processAccountsRequest(ResultReceiver receiver)
@@ -155,7 +144,7 @@ public class TasksAppService extends IntentService {
             Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
             
             for (Account account : accounts) {
-            	GooAccount gooAccount = dbACCHelper.findAccountByName(account.name);
+            	GooAccount gooAccount = dbhAccounts.findAccountByName(account.name);
             	if(gooAccount != null)
             	{
             		//Required to know which google accounts have been removed to allow
@@ -166,11 +155,11 @@ public class TasksAppService extends IntentService {
             	{
             		//create a new local cache account (currently unauthorized to sync)
                 	gooAccount = new GooAccount(account.name, account.type, true);  
-                	dbACCHelper.create(gooAccount);
+                	dbhAccounts.create(gooAccount);
             	}
             }  
     		
-	    	if(receiver != null) receiver.send(RESULT_SYNC_ACCOUNTS_SUCCESS, bundle);
+	    	if(receiver != null) receiver.send(RESULT_SYNC_SUCCESS_ACCOUNTS, bundle);
     	} 
     	catch(Exception e)
     	{
@@ -178,41 +167,7 @@ public class TasksAppService extends IntentService {
     	}
 	}
 	
-	private void processTaskListRequest(long accountId, ResultReceiver receiver)
-	{
-		Bundle bundle = new Bundle(); 
-    	try
-    	{   		
-			TaskLists lists = taskService.tasklists.list().execute();
-			dbTLCHelper.sync(this, accountId, lists, lists.etag);
-	    	if(receiver != null) receiver.send(RESULT_SYNC_TASK_LISTS_SUCCESS, bundle);
-    	} 
-    	catch(Exception e)
-    	{
-    		handleException(e, receiver);
-    	}
-	}
-	
-	private void processTasksRequest(long taskListId, ResultReceiver receiver)
-	{
-		Bundle bundle = new Bundle(); 
-    	try
-    	{   		
-    		GooTaskList gooList = dbTLCHelper.read(taskListId);
-    		if(gooList != null)
-    		{
-				Tasks list = taskService.tasks.list(gooList.remoteId).execute();
-				dbTLHelper.sync(this, taskListId, list, list.etag);
-		    	if(receiver != null) receiver.send(RESULT_SYNC_TASKS_SUCCESS, bundle);
-    		}
-    	} 
-    	catch(Exception e)
-    	{
-    		handleException(e, receiver);
-    	}
-	}
-	
-	private void handleException(Exception e, ResultReceiver receiver) {
+	public static void handleException(Exception e, ResultReceiver receiver) {
 	    if (e instanceof HttpResponseException) {
 	      HttpResponse response = ((HttpResponseException) e).response;
 	      int statusCode = response.statusCode;
@@ -224,15 +179,16 @@ public class TasksAppService extends IntentService {
           } 
           
 	      if (statusCode == 401) {
-	    	  if(receiver != null) receiver.send(RESULT_FAILED_UNAUTHORIZED, Bundle.EMPTY);
+	    	  if(receiver != null) receiver.send(RESULT_SYNC_FAILED_UNAUTHORIZED, Bundle.EMPTY);
 	    	  return;
 	      }
 	    }
         Log.w(TAG, "Got Exception " + e);
         Log.e(TAG, Log.getStackTraceString(e));
+    	if(receiver != null) receiver.send(RESULT_SYNC_FAILED, Bundle.EMPTY);	
 	}
 	
-	private void handleException(Exception e) {
+	public static void handleException(Exception e) {
 	    if (e instanceof HttpResponseException) {
 	      HttpResponse response = ((HttpResponseException) e).response;
 	      int statusCode = response.statusCode;
@@ -253,74 +209,21 @@ public class TasksAppService extends IntentService {
 	
 	@Override
 	public void onCreate() {
+		TLog(TAG + " service onCreate.");
 		super.onCreate();
 		
 		TaskApplication app = (TaskApplication)getApplication();
 		taskService = app.getTasksService();
-	}
-	
-	@Override
-	public void onStart(Intent intent, int startId) {
-		//TLog(TAG + " service onStart.");
-		super.onStart(intent, startId);
-	}
-	
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-        TLog(TAG + " service start command.");
-	    return super.onStartCommand(intent,flags,startId);
-	}
-	
-	@Override
-	public IBinder onBind(Intent intent) {
-		//TLog(TAG + " service onBind.");
-		return super.onBind(intent);
-	}
-	
-	@Override
-	public void onRebind(Intent intent) {
-		//TLog(TAG + " service onRebind.");
-		super.onRebind(intent);
-	}
-	
-	@Override
-	public boolean onUnbind(Intent intent) {
-		//TLog(TAG + " service onUnbind.");
-		return super.onUnbind(intent);
-	}
+	}	
 	
 	@Override
 	public void onDestroy() {
 		TLog(TAG + " service onDestroy.");
 		super.onDestroy();
 		
-		if (dbACCHelper != null) dbACCHelper.close();
-		if (dbTLCHelper != null) dbTLCHelper.close();
-		if (dbTLHelper != null) dbTLHelper.close();
+		if (dbhAccounts != null) dbhAccounts.close();
+		if (dbhTaskLists != null) dbhTaskLists.close();
 	}
-	
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		//TLog(TAG + " service onConfigurationChange.");
-		super.onConfigurationChanged(newConfig);
-	}
-	
-	@Override
-	public void onLowMemory() {
-		//TLog(TAG + " service onLowMemory.");
-		super.onLowMemory();
-	}
-	
-	private void TLog(String msg)
-	{
-	    boolean debug = mSharedPref.getSharedPref().getBoolean(SharedPrefUtil.PREF_DEBUG, false);	
-	    
-	    if(debug)
-	    {
-		    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-	        Log.i(TAG, msg);
-	    }
-	}	
 	
 	public static void syncAccounts(Context context, ResultReceiver receiver)
 	{
@@ -359,6 +262,21 @@ public class TasksAppService extends IntentService {
 	    }
 	}	
 	
+	// Task Lists
+	
+	public TaskLists queryRemoteTaskLists()
+	{
+		TaskLists result = null;
+    	try
+    	{   		
+    		result = taskService.tasklists.list().execute();		
+    	} 
+    	catch(Exception e)
+    	{
+    		handleException(e);    		
+    	}
+    	return result;
+	}
 	
 	public TaskList createRemoteTaskList(GooTaskList local)
 	{
@@ -408,13 +326,31 @@ public class TasksAppService extends IntentService {
     	return ret;
 	}	
 	
+	// Tasks
+	
+	public Tasks queryRemoteTasks(String taskListRemoteId)
+	{
+		Tasks result = null;
+    	try
+    	{   		
+			if(GeneralHelper.isNullOrEmpty(taskListRemoteId)) return result;
+			
+    		result = taskService.tasks.list(taskListRemoteId).execute();
+    	} 
+    	catch(Exception e)
+    	{
+    		handleException(e);    		
+    	}
+    	return result;
+	}
+
 	public Task createRemoteTask(GooTask local)
 	{
 		Task remote = new Task();
 		Task result = null;
     	try
     	{
-			String taskListRemoteId = dbTLCHelper.getTaskListRemoteId(local.taskListId);
+			String taskListRemoteId = dbhTaskLists.getTaskListRemoteId(local.taskListId);
 
 			if(taskListRemoteId ==  "") return result;
 			
@@ -439,10 +375,11 @@ public class TasksAppService extends IntentService {
 		Task result = null;
     	try
     	{   
-			String taskListRemoteId = dbTLCHelper.getTaskListRemoteId(local.taskListId);
+			String taskListRemoteId = dbhTaskLists.getTaskListRemoteId(local.taskListId);
 			String taskRemoteId = local.remoteId;
 
-			if(isNullOrEmpty(taskListRemoteId) || isNullOrEmpty(taskRemoteId)) return result;
+			if(GeneralHelper.isNullOrEmpty(taskListRemoteId) ||
+					GeneralHelper.isNullOrEmpty(taskRemoteId)) return result;
 			
     		remote = taskService.tasks.get(taskListRemoteId, taskRemoteId).execute();
 
@@ -466,10 +403,11 @@ public class TasksAppService extends IntentService {
 		boolean ret = false;
     	try
     	{   		
-			String taskListRemoteId = dbTLCHelper.getTaskListRemoteId(local.taskListId);
+			String taskListRemoteId = dbhTaskLists.getTaskListRemoteId(local.taskListId);
 			String taskRemoteId = local.remoteId;
 
-			if(isNullOrEmpty(taskListRemoteId) || isNullOrEmpty(taskRemoteId)) return ret;
+			if(GeneralHelper.isNullOrEmpty(taskListRemoteId) || 
+					GeneralHelper.isNullOrEmpty(taskRemoteId)) return ret;
 			
     		taskService.tasks.delete(taskListRemoteId, taskRemoteId).execute();
     		ret = true;
@@ -481,8 +419,16 @@ public class TasksAppService extends IntentService {
     	return ret;
 	}	
 	
-	public static boolean isNullOrEmpty(String val)
+	// Helpers
+	
+	private void TLog(String msg)
 	{
-		return val == null || val.equals("");
-	}
+	    boolean debug = mSharedPref.getSharedPref().getBoolean(SharedPrefUtil.PREF_DEBUG, false);	
+	    
+	    if(debug)
+	    {
+		    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+	        Log.i(TAG, msg);
+	    }
+	}		
 }

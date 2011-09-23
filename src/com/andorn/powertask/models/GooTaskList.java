@@ -1,5 +1,6 @@
 package com.andorn.powertask.models;
 
+import com.andorn.powertask.helpers.GeneralHelper;
 import com.google.api.services.tasks.v1.model.TaskList;
 import com.google.api.services.tasks.v1.model.TaskLists;
 
@@ -36,19 +37,26 @@ public class GooTaskList extends GooSyncBase {
 		return localList;
 	}
 	
-	public boolean find(TaskLists remoteLists)
-	{
+	public static boolean find(String remoteId, TaskLists remoteLists)
+	{				
+		if(GeneralHelper.isNullOrEmpty(remoteId)) return false;
+		if(remoteLists == null || remoteLists.items == null) return false;
+
 		boolean ret = false;
-		if(remoteLists != null)
-		{				
-			for (TaskList remoteList : remoteLists.items) {
-				if(remoteList.id.equals(remoteId))
-				{
-					ret = true;
-					break;
-				}
-			}	
-		}
+		for (TaskList remoteList : remoteLists.items) {
+			if(remoteList.id.equals(remoteId))
+			{
+				ret = true;
+				break;
+			}
+		}			
 		return ret;
+	}	
+	
+	public static boolean shouldDelete(String remoteId, TaskLists remoteLists)
+	{
+		if(GeneralHelper.isNullOrEmpty(remoteId)) return false;
+		if(remoteLists == null || remoteLists.items == null) return false;
+		return !find(remoteId, remoteLists);
 	}
 }

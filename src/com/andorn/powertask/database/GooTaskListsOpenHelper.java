@@ -20,6 +20,8 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	
     private static final String TAG = GooTaskListsOpenHelper.class.getName();
 
+    private final GooTasksOpenHelper dbhTasks;
+    
     protected static final String TABLE_NAME = "goo_tasklists";
     protected static final String KEY_accountId = "accountId";
     protected static final String KEY_remoteId = "remoteId";
@@ -66,6 +68,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
     
     public GooTaskListsOpenHelper(Context context) {
         super(context);
+        dbhTasks = new GooTasksOpenHelper(context);
     }
 
     @Override
@@ -92,6 +95,16 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	@Override
 	public void onOpen(SQLiteDatabase db) {
 		super.onOpen(db);
+	}
+	
+	@Override
+	public synchronized void close() {
+		if(dbhTasks != null) dbhTasks.close();
+		super.close();
+	}
+	
+	public GooTasksOpenHelper getDbhTasks() {
+		return dbhTasks;
 	}
 	
 	public List<GooTaskList> query(long accountId, int syncStateFilter) {
@@ -361,36 +374,45 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 		return ret;
 	}	
 	
-	public boolean sync(TasksAppService service, long accountId, TaskLists remoteLists, String eTag) 
+	public boolean sync(TasksAppService service, long accountId) 
 	{
 		boolean ret = false;
 		if(!initialize()) return ret;
 		
 		try
-		{
-			if(remoteLists != null)
-			{				
-				for (TaskList remoteList : remoteLists.items) {
-					GooTaskList localList = read(remoteList.id);
-					if(localList != null)
-					{
-						//if already cached etag; skip update
-						if(localList.remoteSyncRequired(eTag))
-						{
-							GooTaskList newList = GooTaskList.Convert(accountId, remoteList, eTag);
-							newList.setId(localList.getId());
-							update(newList);
-						}		
-					}
-					else
-					{
-						//doesn't exist locally, create
-						GooTaskList newList = GooTaskList.Convert(accountId, remoteList, eTag);						
-						create(newList);
-					}
-				}	
-			}
+		{		
+			// pull - Task Lists
+			TaskLists remoteLists = service.queryRemoteTaskLists(); 
+			if(remoteLists == null || remoteLists.items == null) return false;
 			
+			// merge - Task Lists						
+			for (TaskList remoteList : remoteLists.items) {				
+				// merge - Task List
+				GooTaskList localList = read(remoteList.id);
+				
+				if (localList == null)
+				{
+					//doesn't exist locally, create
+					GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteLists.etag);						
+					long id = create(newList);
+					newList = read(id);
+					
+					// sync - Tasks
+					getDbhTasks().sync(service, newList);	
+				}
+				else if(localList.remoteSyncRequired(remoteLists.etag))
+				{		
+					//if already cached etag; skip update	
+					GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteLists.etag);
+					newList.setId(localList.getId());
+					update(newList);	
+
+					// sync - Tasks
+					getDbhTasks().sync(service, newList);	
+				}
+			}	
+			
+			// push - TaskLists
 			for (GooTaskList localList : query(accountId)) {
 				TaskList remoteList = null;
 
@@ -402,9 +424,12 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 						GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);
 						newList.setId(localList.getId());
 						update(newList);
+						
+						// sync - Tasks
+						getDbhTasks().sync(service,  newList);	
 					}
 				}
-				else if (!localList.find(remoteLists)) 
+				else if (GooTaskList.shouldDelete(localList.remoteId, remoteLists)) 
 				{
 					//dont need to create it, thus it was deleted remotely
 					delete(localList.getId());
@@ -426,8 +451,9 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 						update(newList);
 					}					
 				}		
-			}			
-			ret = true;
+			}	
+	    	
+	    	ret = true;
 		}
 		catch(SQLException sqle)
 		{

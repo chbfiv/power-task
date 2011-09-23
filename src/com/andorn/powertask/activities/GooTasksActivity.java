@@ -37,8 +37,7 @@ public class GooTasksActivity extends BaseActivity
 	private long mActiveTaskListId = GooBase.INVALID_ID;	
 	private long mActiveTaskId = GooBase.INVALID_ID;
 
-	public GooTasksOpenHelper dbhTasks = new GooTasksOpenHelper(this);
-	public GooTaskListsOpenHelper dbhTaskLists = new GooTaskListsOpenHelper(this);
+	private GooTaskListsOpenHelper dbhTaskLists = new GooTaskListsOpenHelper(this);
 
 	private GooTaskViewFragment mTaskViewFragment;
 	
@@ -86,7 +85,6 @@ public class GooTasksActivity extends BaseActivity
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (dbhTasks != null) dbhTasks.close(); 
 		if (dbhTaskLists != null) dbhTaskLists.close(); 		
 	}
 
@@ -136,12 +134,12 @@ public class GooTasksActivity extends BaseActivity
 		else GooTaskViewActivity.go(this, false, taskId);
 	}
 	
-	public GooTasksOpenHelper getDbhTasks() {
-		return dbhTasks;
-	}
-
 	public GooTaskListsOpenHelper getDbhTaskLists() {
 		return dbhTaskLists;
+	}
+	
+	public GooTasksOpenHelper getDbhTasks() {
+		return dbhTaskLists.getDbhTasks();
 	}
 	
     public static void go(Activity activity, long taskListId) 
@@ -190,20 +188,21 @@ public class GooTasksActivity extends BaseActivity
 	    protected void onReceiveResult(final int resultCode, final Bundle resultData) {			    	
 	    	runOnUiThread(new Runnable() {
 				public void run() {					
-					if (resultCode == TasksAppService.RESULT_SYNC_TASKS_SUCCESS) {
+					if (resultCode == TasksAppService.RESULT_SYNC_SUCCESS_TASKS) {
 						getOAuthHelper().resetAuthAttempts();	
 						refresh();
 			        }
-					else if (resultCode == TasksAppService.RESULT_FAILED_UNAUTHORIZED) {
-						getOAuthHelper().updateTokenExpiration(true);
-					}
-					else if (resultCode == TasksAppService.RESULT_LOADING)
+					else if (resultCode == TasksAppService.RESULT_SYNC_LOADING)
 					{
 						getActivityHelper().setSyncing(true);
 					}
-					else if (resultCode == TasksAppService.RESULT_LOADING_COMPLETE)
+					else if (resultCode == TasksAppService.RESULT_SYNC_LOADING_COMPLETE)
 					{
 						getActivityHelper().setSyncing(false);
+					}
+					else if (resultCode == TasksAppService.RESULT_SYNC_FAILED_UNAUTHORIZED)
+					{
+						getOAuthHelper().updateTokenExpiration(true);						
 					}
 				}							
 			});

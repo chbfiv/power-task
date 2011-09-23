@@ -125,17 +125,17 @@ public class GooAccountsActivity extends BaseActivity
 	    protected void onReceiveResult(final int resultCode, final Bundle resultData) {			    	
 			runOnUiThread(new Runnable() {
 				public void run() {			
-					if (resultCode == TasksAppService.RESULT_SYNC_ACCOUNTS_SUCCESS) {							  		 
+					if (resultCode == TasksAppService.RESULT_SYNC_SUCCESS_ACCOUNTS) {							  		 
 		        		if(mAdapter != null) mAdapter.requery();
 			        }
-					else if (resultCode == TasksAppService.RESULT_FAILED_UNAUTHORIZED) {
+					else if (resultCode == TasksAppService.RESULT_SYNC_FAILED_UNAUTHORIZED) {
 						
 					}
-					else if (resultCode == TasksAppService.RESULT_LOADING)
+					else if (resultCode == TasksAppService.RESULT_SYNC_LOADING)
 					{
 						
 					}
-					else if (resultCode == TasksAppService.RESULT_LOADING_COMPLETE)
+					else if (resultCode == TasksAppService.RESULT_SYNC_LOADING_COMPLETE)
 					{
 						
 					}

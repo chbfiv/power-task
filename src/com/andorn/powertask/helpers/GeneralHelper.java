@@ -1,6 +1,7 @@
 package com.andorn.powertask.helpers;
 
 public class GeneralHelper {
+	
     public static boolean isValueEqual(String x, String y)
     {
     	boolean ret = false;
@@ -14,4 +15,9 @@ public class GeneralHelper {
     	}    	
     	return ret;    
     }
+	
+	public static boolean isNullOrEmpty(String val)
+	{
+		return val == null || val.equals("");
+	}
 }

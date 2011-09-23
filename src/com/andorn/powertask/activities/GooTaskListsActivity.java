@@ -471,20 +471,21 @@ public class GooTaskListsActivity extends BaseActivity implements
 	    protected void onReceiveResult(final int resultCode, final Bundle resultData) {			    	
 			runOnUiThread(new Runnable() {
 				public void run() {			
-					if (resultCode == TasksAppService.RESULT_SYNC_TASK_LISTS_SUCCESS) {
+					if (resultCode == TasksAppService.RESULT_SYNC_SUCCESS_TASK_LISTS) {
 						getOAuthHelper().resetAuthAttempts();   		 
 		        		mAdapter.requery();
 			        }
-					else if (resultCode == TasksAppService.RESULT_FAILED_UNAUTHORIZED) {
-						getOAuthHelper().updateTokenExpiration(true);
-					}
-					else if (resultCode == TasksAppService.RESULT_LOADING)
+					else if (resultCode == TasksAppService.RESULT_SYNC_LOADING)
 					{
 						getActivityHelper().setSyncing(true);
 					}
-					else if (resultCode == TasksAppService.RESULT_LOADING_COMPLETE)
+					else if (resultCode == TasksAppService.RESULT_SYNC_LOADING_COMPLETE)
 					{
 						getActivityHelper().setSyncing(false);
+					}
+					else if (resultCode == TasksAppService.RESULT_SYNC_FAILED_UNAUTHORIZED)
+					{
+						getOAuthHelper().updateTokenExpiration(true);						
 					}
 				}							
 			});

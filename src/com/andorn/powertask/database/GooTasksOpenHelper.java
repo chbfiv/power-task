@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.models.GooTask;
+import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.services.TasksAppService;
 import com.google.api.services.tasks.v1.model.Task;
 import com.google.api.services.tasks.v1.model.Tasks;
@@ -446,37 +447,40 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		 return ret;
      } 
 	 
-	public boolean sync(TasksAppService service, long taskListId, Tasks remoteTasks, String eTag) 
+	public boolean sync(TasksAppService service, GooTaskList localList) 
 	{
 		boolean ret = false;
 		if(!initialize()) return ret;
 		
 		try
 		{
-			if(remoteTasks != null)
-			{				
-				for (Task remoteTask : remoteTasks.items) {
-					GooTask localTask = read(remoteTask.id);
-					if(localTask != null)
-					{
-						//if already cached etag; skip update
-						if(localTask.remoteSyncRequired(eTag))
-						{
-							GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);
-							newTask.setId(localTask.getId());
-							update(newTask);
-						}		
-					}
-					else
-					{
-						//doesn't exist locally, create
-						GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);					
-						create(newTask);
-					}
-				}	
-			}
+			// pull - Tasks
+			if(localList == null) return false;    		
+			Tasks remoteTasks = service.queryRemoteTasks(localList.remoteId);
+			if(remoteTasks == null || remoteTasks.items == null) return false;
 			
-			for (GooTask localTask : query(taskListId)) {
+			// merge - Tasks			
+			for (Task remoteTask : remoteTasks.items) {
+				// merge - Task		
+				GooTask localTask = read(remoteTask.id);
+
+				if(localTask == null)
+				{
+					//doesn't exist locally, create
+					GooTask newTask = GooTask.Convert(localList.getId(), remoteTask, remoteTasks.etag);					
+					create(newTask);
+				}
+				else if(localTask.remoteSyncRequired(remoteTasks.etag))
+				{
+					//if already cached etag; skip update
+					GooTask newTask = GooTask.Convert(localList.getId(), remoteTask, remoteTasks.etag);
+					newTask.setId(localTask.getId());
+					update(newTask);	
+				}
+			}	
+
+			// push - TaskLists			
+			for (GooTask localTask : query(localList.getId())) {
 				Task remoteTask = null;
 
 				if(localTask.isSyncCreate())
@@ -484,12 +488,12 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 					remoteTask = service.createRemoteTask(localTask);
 					if(remoteTask != null)
 					{
-						GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);	
+						GooTask newTask = GooTask.Convert(localList.getId(), remoteTask, remoteTasks.etag);	
 						newTask.setId(localTask.getId());
 						update(newTask);
 					}
 				}
-				else if (!localTask.find(remoteTasks)) 
+				else if (GooTask.shouldDelete(localTask.remoteId, remoteTasks)) 
 				{
 					//dont need to create it, thus it was deleted remotely
 					delete(localTask.getId());
@@ -506,7 +510,7 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 					remoteTask = service.updateRemoteTask(localTask);							
 					if(remoteTask != null)
 					{
-						GooTask newTask = GooTask.Convert(taskListId, remoteTask, eTag);
+						GooTask newTask = GooTask.Convert(localList.getId(), remoteTask, remoteTasks.etag);
 						newTask.setId(localTask.getId());
 						update(newTask);
 					}					

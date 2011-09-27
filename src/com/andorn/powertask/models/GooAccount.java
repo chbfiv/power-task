@@ -4,9 +4,8 @@ public class GooAccount extends GooSyncBase {
 	
 	private String mName;
 	private String mType;
-	private boolean mSync = Boolean.FALSE;
+	private boolean mSync = false;
 	private String mAuthToken;
-	public boolean localAccountFound = Boolean.FALSE;
   
 	public GooAccount(String name, String type, boolean sync) {
 		this.mName = name;

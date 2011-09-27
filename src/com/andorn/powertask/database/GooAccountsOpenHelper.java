@@ -16,13 +16,13 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	
     private static final String TAG = GooAccountsOpenHelper.class.getName();
 
-    private static final String TABLE_NAME = "goo_accounts";
-    private static final String KEY_name = "name";
-    private static final String KEY_type = "type";
-    private static final String KEY_sync = "sync";
-    private static final String KEY_authToken = "authToken";
+    protected static final String TABLE_NAME = "goo_accounts";
+    protected static final String KEY_name = "name";
+    protected static final String KEY_type = "type";
+    protected static final String KEY_sync = "sync";
+    protected static final String KEY_authToken = "authToken";
     
-    private static final String[] PROJECTION = new String[] {
+    protected static final String[] PROJECTION = new String[] {
     	KEY_id, // 0
     	KEY_created, // 1
     	KEY_modified, // 2

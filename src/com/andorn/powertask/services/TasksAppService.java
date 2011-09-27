@@ -1,6 +1,7 @@
 package com.andorn.powertask.services;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.database.GooAccountsOpenHelper;
@@ -153,28 +154,40 @@ public class TasksAppService extends IntentService {
 	
 	private void processAccountsRequest(ResultReceiver receiver)
 	{
-		Bundle bundle = new Bundle(); 
     	try
-    	{   		
-            Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
-            
-            for (Account account : accounts) {
-            	GooAccount gooAccount = dbhAccounts.findAccountByName(account.name);
-            	if(gooAccount != null)
-            	{
-            		//Required to know which google accounts have been removed to allow
-            		//for removal from local cache.
-            		gooAccount.localAccountFound = Boolean.TRUE;
-            	}
-            	else
+    	{   					
+            Account[] localAccounts = AccountManager.get(this).getAccountsByType("com.google");
+
+            // add missing accounts
+            for (Account localAccount : localAccounts) {
+            	GooAccount gooAccount = dbhAccounts.findAccountByName(localAccount.name);
+            	if(gooAccount == null)
             	{
             		//create a new local cache account (currently unauthorized to sync)
-                	gooAccount = new GooAccount(account.name, account.type, true);  
+                	gooAccount = new GooAccount(localAccount.name, localAccount.type, true);  
                 	dbhAccounts.create(gooAccount);
             	}
             }  
+            
+            // purge missing accounts
+    		List<GooAccount> cacheAccounts = dbhAccounts.query();
+			for (GooAccount cacheAccount : cacheAccounts) {
+				boolean missing = true;
+				for (Account localAccount : localAccounts) {
+					if(localAccount.name != null && localAccount.name.equals(cacheAccount.getName()))
+					{
+						missing = false;
+						break;
+					}
+				}
+				
+				if(missing)
+				{
+					dbhAccounts.delete(cacheAccount.getId());
+				}
+			}
     		
-	    	if(receiver != null) receiver.send(RESULT_SYNC_SUCCESS_ACCOUNTS, bundle);
+	    	if(receiver != null) receiver.send(RESULT_SYNC_SUCCESS_ACCOUNTS, Bundle.EMPTY);
     	} 
     	catch(Exception e)
     	{

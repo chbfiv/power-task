@@ -93,7 +93,7 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
     			KEY_completed + " NUMERIC, " +
     			KEY_deleted + " INTEGER, " +
     			KEY_hidden + " INTEGER, " +
-			    "FOREIGN KEY(" + KEY_taskListId + ") " + 
+			    "FOREIGN KEY (" + KEY_taskListId + ") " + 
 			    "REFERENCES " + GooTaskListsOpenHelper.TABLE_NAME + "("+ GooTaskListsOpenHelper.KEY_id + ") ON DELETE CASCADE ON UPDATE CASCADE);"; 
 
     @Override

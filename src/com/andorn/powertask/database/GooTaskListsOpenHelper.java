@@ -61,7 +61,10 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
                 KEY_remoteId + " TEXT, " +
     			KEY_kind + " TEXT, " +
     			KEY_title + " TEXT, " +
-    			KEY_selfLink + " TEXT);"; 
+    			KEY_selfLink + " TEXT, " +
+			    "FOREIGN KEY (" + KEY_accountId + ") " + 
+			    "REFERENCES " + GooAccountsOpenHelper.TABLE_NAME + "("+ GooAccountsOpenHelper.KEY_id + ") ON DELETE CASCADE ON UPDATE CASCADE);"; 
+
     
     @Override
     public String getTableCreate() {

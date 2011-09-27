@@ -55,7 +55,8 @@ public abstract class GooBaseOpenHelper extends SQLiteOpenHelper {
 	    	{
 	    		dbro = getReadableDatabase();
 	    		dbrw = getWritableDatabase();
-	    		getDbReadWrite().execSQL(getTableCreate());
+	    		dbrw.execSQL("PRAGMA foreign_keys=ON;");
+    			dbrw.execSQL(getTableCreate());
 	    		initialized = true;
 			}
 			catch(SQLException sqle)

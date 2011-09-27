@@ -38,8 +38,6 @@ public class GooAccountsActivity extends BaseActivity
 		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_ACCOUNT_LIST);
         
 		mListView = (ListView) findViewById(R.id.accountsList);
-		
-		sync();		
     }
 
     @Override
@@ -50,12 +48,15 @@ public class GooAccountsActivity extends BaseActivity
     
     @Override
     protected void onResume() {
-        super.onResume();
+        super.onResume();        
 
+		if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();
 		mListView.setAdapter(null);	
 		Cursor c = dbACCHelper.queryCursor();
 		mAdapter = new GooAccountsCursorAdapter(this, c, true);
-		mListView.setAdapter(mAdapter);	        
+		mListView.setAdapter(mAdapter);	   
+		
+		sync();		     
     }    
     
 	@Override

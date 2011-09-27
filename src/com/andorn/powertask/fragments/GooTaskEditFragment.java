@@ -71,13 +71,9 @@ public class GooTaskEditFragment extends BaseFragment
         
         mDate.setOnClickListener(new DueDateClick());
         mDateClear.setOnClickListener(new DueDateClearClick());
-    }	
-
-    @Override
-    public void onResume() {
-    	super.onResume();
+        
     	refresh();    	
-    } 
+    }	
     
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

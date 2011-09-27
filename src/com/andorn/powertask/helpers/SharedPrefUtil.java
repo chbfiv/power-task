@@ -11,7 +11,10 @@ public class SharedPrefUtil {
     private static final String TAG = SharedPrefUtil.class.getName();
 
 	public static final String PREF_ACTIVE_ACCOUNT_ID = "active_account_id";
+	public static final String PREF_ACTIVE_TASKS_PAGE_POSITION = "active_tasks_page_position";
+	public static final String PREF_TASKS_PAGE_SORT_TYPE = "tasks_page_sort_type";
 	public static final String PREF_AUTH_ATTEMPTS = "auth_attempts";
+	
 	public static final String PREF_DEBUG = "debug";
 	public static final String PREF_OFFLINE_MODE = "offline_mode";
 	

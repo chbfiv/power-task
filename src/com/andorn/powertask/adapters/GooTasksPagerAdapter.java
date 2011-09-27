@@ -1,7 +1,12 @@
 package com.andorn.powertask.adapters;
 
+import com.andorn.powertask.activities.GooTasksActivity;
 import com.andorn.powertask.database.GooTaskSortType;
 import com.andorn.powertask.fragments.GooTasksFragment;
+import com.andorn.powertask.helpers.SharedPrefUtil;
+
+import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -16,14 +21,17 @@ public class GooTasksPagerAdapter extends FragmentStatePagerAdapter
 	
 	private GooTasksFragment[] mFragments = new GooTasksFragment[GooTaskSortType.COUNT];
 	private int mCurrentPosition = POSITION_NONE;
+
+	private final GooTasksActivity mActivity;
 	
-    public GooTasksPagerAdapter(FragmentManager fm) {
+    public GooTasksPagerAdapter(Context context, FragmentManager fm) {
 		super(fm);		
+		mActivity = (GooTasksActivity) context;
 	}
 
 	@Override
 	public Fragment getItem(int position) {		
-		return GooTasksFragment.create(GooTaskSortType.getSortTypeFromPosition(position));
+		return GooTasksFragment.create(position);
 	}
 
 	@Override
@@ -85,5 +93,11 @@ public class GooTasksPagerAdapter extends FragmentStatePagerAdapter
 	@Override
 	public void onPageSelected(int position) {
 		mCurrentPosition = position;
+	    final Editor editor = SharedPrefUtil.createInstance(mActivity).getEditor();
+	    if(editor != null)
+	    {
+		    editor.putInt(SharedPrefUtil.PREF_ACTIVE_TASKS_PAGE_POSITION, position);
+		    editor.commit();
+	    }
 	}
 }

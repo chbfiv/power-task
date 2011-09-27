@@ -6,14 +6,15 @@ public class GooTaskSortType {
     private static final String TAG = GooTaskSortType.class.getName();
 
     public static final int COUNT = 5;
-    
+
+    public static final int INVALID = -1;
     public static final int CUSTOM_POSITION = 1;
     public static final int TITLE_ASCENDING = 2;
     public static final int TITLE_DESCENDING = 4;
     public static final int DATE_ASCENDING = 8;
     public static final int DATE_DESCENDING = 16;
     
-    public static String getSortType(int taskSortType)
+    public static String getTitle(int taskSortType)
     {
     	String label = null;
 		if(GooTaskSortType.isCustomPosition(taskSortType))
@@ -43,7 +44,7 @@ public class GooTaskSortType {
 		return label;
     }
     
-	public static int getSortTypeFromPosition(int position)
+	public static int getDefaultFromPosition(int position)
 	{
 		int sortType;
 		if(position == 0) sortType = CUSTOM_POSITION;

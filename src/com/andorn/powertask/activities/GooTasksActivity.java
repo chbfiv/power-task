@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.support.v4.view.ViewPager;
@@ -21,6 +22,7 @@ import com.andorn.powertask.database.GooTasksOpenHelper;
 import com.andorn.powertask.fragments.BaseFragment;
 import com.andorn.powertask.fragments.GooTaskViewFragment;
 import com.andorn.powertask.fragments.GooTasksFragment;
+import com.andorn.powertask.helpers.SharedPrefUtil;
 import com.andorn.powertask.interfaces.IGooTaskFrag;
 import com.andorn.powertask.interfaces.IGooTaskHost;
 import com.andorn.powertask.interfaces.IGooTasksHost;
@@ -52,8 +54,8 @@ public class GooTasksActivity extends BaseActivity
 		if (extras == null) {
 			Log.e(TAG, "onCreate - failed to get intent bundle.");
     		finish();
-		}
-    	
+		} 	
+	    
 		mActiveTaskListId = extras.getLong(EXTRA_ACTIVE_TASK_LIST_ID, GooBase.INVALID_ID);		    	
 	
 		setContentView(R.layout.activity_tasks);
@@ -61,9 +63,15 @@ public class GooTasksActivity extends BaseActivity
     	mTaskViewFragment = (GooTaskViewFragment) getSupportFragmentManager().findFragmentById(R.id.task_view_fragment);
 	
     	mViewPager = (ViewPager) findViewById(R.id.tasks_viewPager);
-		mAdapter = new GooTasksPagerAdapter(getSupportFragmentManager());
+		mAdapter = new GooTasksPagerAdapter(this, getSupportFragmentManager());
 		mViewPager.setAdapter(mAdapter);		
 		mViewPager.setOnPageChangeListener(mAdapter);
+
+		int initialPage = mAdapter.getCount() / 2 ;
+	    SharedPreferences prefs = getSharedPrefUtil().getSharedPref();
+	    initialPage = prefs.getInt(SharedPrefUtil.PREF_ACTIVE_TASKS_PAGE_POSITION, initialPage);   
+	    
+		mViewPager.setCurrentItem(initialPage);
 		
 		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_LIST);
 	}	

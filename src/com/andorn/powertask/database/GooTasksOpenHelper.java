@@ -529,32 +529,40 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		return ret;
 	}		
 	
+	@SuppressWarnings("unused")
 	public static String buildOrderBySql(int value)
 	{
 		String orderBy = null;
+		
 		if(GooTaskSortType.isCustomPosition(value))
 		{
 			orderBy = KEY_position + " ASC";				
 		}
+		
+		if(orderBy == null)
+		{
+			orderBy = KEY_status + " DESC";
+		}
+		
 		if(GooTaskSortType.isTitleAscending(value))
 		{
-			if(orderBy != null) orderBy += ", ";
-			orderBy = KEY_title + " ASC";	
+			if(orderBy != null) orderBy += ", " + KEY_title + " ASC";
+			else orderBy = KEY_title + " ASC";	
 		}
 		if(GooTaskSortType.isTitleDescending(value))
 		{
-			if(orderBy != null) orderBy += ", ";
-			orderBy = KEY_title + " DESC";	
+			if(orderBy != null) orderBy += ", " + KEY_title + " DESC";
+			else orderBy = KEY_title + " DESC";	
 		}
 		if(GooTaskSortType.isDateAscending(value))
 		{
-			if(orderBy != null) orderBy += ", ";
-			orderBy = KEY_due + " ASC";	
+			if(orderBy != null) orderBy += ", " + KEY_due + " ASC";
+			else orderBy = KEY_due + " ASC";	
 		}
 		if(GooTaskSortType.isDateDescending(value))
 		{
-			if(orderBy != null) orderBy += ", ";
-			orderBy = KEY_due + " DESC";	
+			if(orderBy != null) orderBy += ", " + KEY_due + " DESC";
+			else orderBy = KEY_due + " DESC";	
 		}
 		
     	return orderBy;

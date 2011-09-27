@@ -210,14 +210,14 @@ public class GooTaskListsActivity extends BaseActivity implements
 		intent.putExtra(EXTRA_ACTIVE_ACCOUNT_ID, accountId);
 		activity.startActivity(intent);
 		activity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
-		if(finishActivity) activity.finish();
+		if (finishActivity) activity.finish();
 	}
 	
 	public static void go(Activity activity, boolean finishActivity) {
 		final Intent intent = new Intent(activity, GooTaskListsActivity.class);
 		activity.startActivity(intent);
 		activity.overridePendingTransition(R.anim.home_enter, R.anim.home_exit);
-		if(finishActivity) activity.finish();
+		if (finishActivity) activity.finish();
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package com.andorn.powertask.fragments;
 
 import com.andorn.powertask.adapters.GooTasksCursorAdapter;
 import com.andorn.powertask.database.GooTaskSortType;
+import com.andorn.powertask.helpers.SharedPrefUtil;
 import com.andorn.powertask.interfaces.IGooTaskHost;
 import com.andorn.powertask.interfaces.IGooTasksFrag;
 import com.andorn.powertask.interfaces.IGooTasksHost;
@@ -13,6 +14,7 @@ import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.R;
 
 import android.content.Context;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,18 +24,21 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewPager;
 
 public class GooTasksFragment extends BaseListFragment
 	implements IGooTasksFrag, LoaderManager.LoaderCallbacks<Cursor> { 
 
 	@SuppressWarnings("unused")
 	private static final String TAG = GooTasksFragment.class.getName();
-
+	
+	public static final String EXTRA_TASK_PAGE_POSITION = "task_page_position";	
 	public static final String EXTRA_TASK_SORT_TYPE = "task_sort_type";	
 	public static final int LOADER_TASKS = 0;	
 
@@ -43,7 +48,8 @@ public class GooTasksFragment extends BaseListFragment
 	
 	private GooTasksCursorAdapter mAdapter;
     private LayoutInflater inflater;
-	
+
+    private int mPagePos;
     private int mTaskSortType;
     
     @Override
@@ -55,8 +61,8 @@ public class GooTasksFragment extends BaseListFragment
     public void onCreate(Bundle savedInstanceState) {
     	super.onCreate(savedInstanceState);
     	//setHasOptionsMenu(true);
-    	
-    	mTaskSortType = getArguments() != null ? getArguments().getInt(EXTRA_TASK_SORT_TYPE) : GooTaskSortType.CUSTOM_POSITION;
+
+    	mPagePos = getArguments() != null ? getArguments().getInt(EXTRA_TASK_PAGE_POSITION) : 0;    	 
     }
     
     @Override
@@ -78,16 +84,60 @@ public class GooTasksFragment extends BaseListFragment
 		
     	View headerContainer = inflater.inflate(R.layout.tasks_sort_header, null);
 		headerContainer.setEnabled(false);
+    	ImageView previous = (ImageView) headerContainer.findViewById(R.id.tasks_sort_header_prevArrow);
+    	ImageView next = (ImageView) headerContainer.findViewById(R.id.tasks_sort_header_nextArrow);
     	TextView left = (TextView) headerContainer.findViewById(R.id.tasks_sort_header_left);
     	TextView center = (TextView) headerContainer.findViewById(R.id.tasks_sort_header_center);
-    	TextView right = (TextView) headerContainer.findViewById(R.id.tasks_sort_header_right);
+    	TextView right = (TextView) headerContainer.findViewById(R.id.tasks_sort_header_right);  
+
+		int defaultTaskSortType = GooTaskSortType.getDefaultFromPosition(mPagePos);
     	
+	    final SharedPrefUtil prefs = SharedPrefUtil.createInstance(mActivity);
+	    mTaskSortType = prefs.getSharedPref().getInt(SharedPrefUtil.PREF_TASKS_PAGE_SORT_TYPE + ":" + mPagePos, GooTaskSortType.INVALID);
+	    
+	    //save if invalid
+	    if(mTaskSortType == GooTaskSortType.INVALID)
+	    {
+	    	mTaskSortType = defaultTaskSortType;
+	    	
+	    	Editor editor = prefs.getEditor();
+		    if(editor != null)
+		    {
+			    editor.putInt(SharedPrefUtil.PREF_TASKS_PAGE_SORT_TYPE + ":" + mPagePos, mTaskSortType);
+			    editor.commit();
+		    }
+	    }	   
+
 		left.setText(null);
-		center.setText(GooTaskSortType.getSortType(mTaskSortType));
 		right.setText(null);	
 		
-		mList.addHeaderView(headerContainer);     
-
+	    if(mPagePos == 0) 
+    	{
+    		previous.setVisibility(View.GONE);
+    		left.setVisibility(View.GONE);
+    	}    	
+    	if(mPagePos == GooTaskSortType.COUNT - 1) 
+    	{
+    		next.setVisibility(View.GONE);
+    		right.setVisibility(View.GONE);
+    	}    	
+    	if(mPagePos > 0)
+    	{
+    		int defaultLeftSortType = GooTaskSortType.getDefaultFromPosition(mPagePos - 1);
+    		int leftSortType = prefs.getSharedPref().getInt(SharedPrefUtil.PREF_TASKS_PAGE_SORT_TYPE + ":" + (mPagePos - 1), defaultLeftSortType);
+    		left.setText(GooTaskSortType.getTitle(leftSortType));
+    	}
+    	if(mPagePos < GooTaskSortType.COUNT - 1)
+    	{
+    		int defaultRightSortType = GooTaskSortType.getDefaultFromPosition(mPagePos + 1);
+    		int rightSortType = prefs.getSharedPref().getInt(SharedPrefUtil.PREF_TASKS_PAGE_SORT_TYPE + ":" + (mPagePos + 1), defaultRightSortType);
+    		right.setText(GooTaskSortType.getTitle(rightSortType));
+    	}
+    	
+		center.setText(GooTaskSortType.getTitle(mTaskSortType));
+		
+		mList.addHeaderView(headerContainer);   
+		
 		// Prepare the loader.  Either re-connect with an existing one,
 		// or start a new one.
 		getLoaderManager().initLoader(LOADER_TASKS, null, this);		
@@ -115,12 +165,12 @@ public class GooTasksFragment extends BaseListFragment
 		//if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();		
     }    
 	
-    public static GooTasksFragment create(int sortType) {
+    public static GooTasksFragment create(int pagePosition) {    	
     	GooTasksFragment f = new GooTasksFragment();
 
         // Supply index input as an argument.
         Bundle args = new Bundle();
-        args.putInt(EXTRA_TASK_SORT_TYPE, sortType);
+        args.putInt(EXTRA_TASK_PAGE_POSITION, pagePosition);
         f.setArguments(args);
         return f;
     }

@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="/home/chbfiv/dev/google-api-java-client/google-api-client-googleapis-extensions-android2-1.4.1-beta.jar"/>
 	<classpathentry kind="lib" path="lib/CWAC-Parcel.jar"/>
 	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
+	<classpathentry kind="lib" path="libs/libGoogleAnalytics.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

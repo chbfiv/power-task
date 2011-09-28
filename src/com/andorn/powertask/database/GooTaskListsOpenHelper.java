@@ -3,11 +3,9 @@ package com.andorn.powertask.database;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.andorn.powertask.helpers.GeneralHelper;
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.services.TasksAppService;
-import com.google.api.services.tasks.v1.model.Task;
 import com.google.api.services.tasks.v1.model.TaskList;
 import com.google.api.services.tasks.v1.model.TaskLists;
 

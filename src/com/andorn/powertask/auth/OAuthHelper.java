@@ -40,13 +40,10 @@ public class OAuthHelper {
     
     private static final String TAG = OAuthHelper.class.getName();
     
-	public static final String GOOGLE_API_KEY = "AIzaSyA_VcWSjcbbagRI8DW2jr1Iliy1D9P6IUg";
+	//public static final String GOOGLE_API_KEY = "AIzaSyA_VcWSjcbbagRI8DW2jr1Iliy1D9P6IUg"; //chbfiv@gmail.com
+    public static final String GOOGLE_API_KEY = "AIzaSyBK2Xe1teznQckJpZSGuFc51PIUGA0zZ_s"; //chbfiv@andornsoftware.com 
 	public static final String GOOGLE_TASKS_AUTH_TOKEN_TYPE = "oauth2:https://www.googleapis.com/auth/tasks";
-//	protected static final String GOOGLE_TASKS_REDIRECT_URL = "urn:ietf:wg:oauth:2.0:oob";
-//	protected static final String GOOGLE_TASKS_CLIENT_ID = "1069291121197.apps.googleusercontent.com";
-//	protected static final String GOOGLE_TASKS_CLIENT_SECRET = "_rKdUMaS5Ga9xQHeOu3YHSOZ";
     
-//    protected static final String AUTH_COOKIE_NAME = "SACSID";
 	public static final String PREF_AUTH_TOKEN = "auth_token";
 	public static final int MAX_AUTH_ATTEMPTS = 3;
 

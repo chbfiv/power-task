@@ -30,7 +30,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ViewPager;
 
 public class GooTasksFragment extends BaseListFragment
 	implements IGooTasksFrag, LoaderManager.LoaderCallbacks<Cursor> { 

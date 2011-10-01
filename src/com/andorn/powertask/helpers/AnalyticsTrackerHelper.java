@@ -37,14 +37,14 @@ public class AnalyticsTrackerHelper {
     }
     
     public void onResume()
-    {
-    	refresh();
-    	
+    {    	
     	if(sActivityCount == 0)
     		mTracker.startNewSession(GOOGLE_ANALYTICS_WEB_PROPERTY_ID, mContext);
     	
     	sActivityCount = sActivityCount < 0 ? 0 : sActivityCount; //reset to 0
     	sActivityCount++;
+    	
+    	refresh();
     }
     
     public void onStart()
@@ -61,12 +61,11 @@ public class AnalyticsTrackerHelper {
 		//TasksAppService.dispatchAnalytics(mContext, null);  
     	
     	sActivityCount--;
-		
-    	if(sActivityCount <= 0) mTracker.stopSession(); 
     	
 		//try to upload analytics via service
-		if (mGoogleAnalytics && sActivityCount <= 0)
-			mTracker.dispatch();   	  
+		if (mGoogleAnalytics && sActivityCount <= 0) mTracker.dispatch();   
+		
+    	if(sActivityCount <= 0) mTracker.stopSession();     		  
     }
     
     public void onDestroy() 

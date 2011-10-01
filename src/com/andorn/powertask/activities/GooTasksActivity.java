@@ -22,6 +22,7 @@ import com.andorn.powertask.database.GooTasksOpenHelper;
 import com.andorn.powertask.fragments.BaseFragment;
 import com.andorn.powertask.fragments.GooTaskViewFragment;
 import com.andorn.powertask.fragments.GooTasksFragment;
+import com.andorn.powertask.helpers.AnalyticsTrackerHelper;
 import com.andorn.powertask.helpers.SharedPrefUtil;
 import com.andorn.powertask.interfaces.IGooTaskFrag;
 import com.andorn.powertask.interfaces.IGooTaskHost;
@@ -118,6 +119,8 @@ public class GooTasksActivity extends BaseActivity
 			case R.id.menu_sync: {
 				getOAuthHelper().resetAuthAttempts();
 				sync();
+				getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+						AnalyticsTrackerHelper.ACTION_SYNC, TAG, 0);
 				return true;
 			}
 			case R.id.menu_compose_task: {
@@ -174,6 +177,9 @@ public class GooTasksActivity extends BaseActivity
 	public void sync(boolean withRefresh) {		
 		if(withRefresh) refresh();
 		TasksAppService.syncTasks(this, getActiveTaskListId(), mSyncReceiver);
+
+		getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_BACKGROUND_PROCESS, 
+				AnalyticsTrackerHelper.ACTION_SYNC, TAG, 0);
 	}
 	
 	public void refresh()

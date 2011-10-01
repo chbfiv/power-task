@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.andorn.powertask.activities.BaseActivity;
 import com.andorn.powertask.activities.GooAccountsActivity;
-import com.andorn.powertask.activities.GooTaskListsActivity;
 import com.andorn.powertask.helpers.AnalyticsTrackerHelper;
 import com.andorn.powertask.helpers.FontHelper;
 import com.andorn.powertask.helpers.SimpleMenu;

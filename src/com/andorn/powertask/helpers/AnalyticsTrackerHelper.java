@@ -51,6 +51,13 @@ public class AnalyticsTrackerHelper {
 	public static final String CATEGORY_BACKGROUND_PROCESS = "background_process";
 	
 	public static final String ACTION_SYNC = "sync";	
+	public static final String ACTION_UP = "up";	
+	public static final String ACTION_APP_RATE = "app_rate";	
+	public static final String ACTION_APP_RATE_REMIND_ME_LATER = "app_rate_remind_me_later";
+	public static final String ACTION_APP_RATE_NO_THANKS = "app_rate_no_thanks";	
+	public static final String ACTION_CREATE_TASK_LIST = "create_task_list";	
+	public static final String ACTION_RENAME_TASK_LIST = "rename_task_list";	
+	public static final String ACTION_DELETE_TASK_LIST = "delete_task_list";	
 	
     public static AnalyticsTrackerHelper create(Activity activity, Context context) {
         return new AnalyticsTrackerHelper(activity, context);                

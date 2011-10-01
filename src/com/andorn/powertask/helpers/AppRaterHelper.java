@@ -12,13 +12,15 @@ import android.net.Uri;
 //http://www.androidsnippets.com/prompt-engaged-users-to-rate-your-app-in-the-android-market-appirater
 public class AppRaterHelper {
 	
+	private static final String TAG = AppRaterHelper.class.getName();
+	
     private final static String APP_TITLE = "Power Task";
     private final static String APP_PNAME = "com.andorn.powertask";
     
     private final static int DAYS_UNTIL_PROMPT = 15;
     private final static int LAUNCHES_UNTIL_PROMPT = 10;
     
-    public static void app_launched(Context context) {
+    public static void app_launched(Context context, final AnalyticsTrackerHelper tracker) {
         SharedPreferences prefs = SharedPrefUtil.getSharedPref(context);
         if (prefs.getBoolean(SharedPrefUtil.PREF_APP_RATING_NO_PROMPT, false)) { return ; }
         
@@ -39,14 +41,14 @@ public class AppRaterHelper {
         if (launch_count >= LAUNCHES_UNTIL_PROMPT) {
             if (System.currentTimeMillis() >= date_firstLaunch + 
                     (DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000)) {
-                showRateDialog(context, editor);
+                showRateDialog(context, editor, tracker);
             }
         }
         
         editor.commit();
     }   
     
-    public static void showRateDialog(final Context context, final SharedPreferences.Editor editor) {
+    public static void showRateDialog(final Context context, final SharedPreferences.Editor editor, final AnalyticsTrackerHelper tracker) {
     	
     	new AlertDialog.Builder(context)
     	.setTitle("Rate " + APP_TITLE)
@@ -57,6 +59,8 @@ public class AppRaterHelper {
                    editor.putBoolean(SharedPrefUtil.PREF_APP_RATING_NO_PROMPT, true);
                    editor.commit();
                }
+				tracker.trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+						AnalyticsTrackerHelper.ACTION_APP_RATE, TAG, 0);
            	   context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + APP_PNAME)));
            }
         })
@@ -67,6 +71,8 @@ public class AppRaterHelper {
                    editor.putLong(SharedPrefUtil.PREF_APP_RATING_FIRST_LAUNCH_DATE, date_firstLaunch);
                    editor.commit();
                }
+				tracker.trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+						AnalyticsTrackerHelper.ACTION_APP_RATE_REMIND_ME_LATER, TAG, 0);
            }
         })
         .setNegativeButton("No, thanks",  new OnClickListener() {
@@ -75,6 +81,8 @@ public class AppRaterHelper {
                    editor.putBoolean(SharedPrefUtil.PREF_APP_RATING_NO_PROMPT, true);
                    editor.commit();
                }
+				tracker.trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+						AnalyticsTrackerHelper.ACTION_APP_RATE_NO_THANKS, TAG, 0);
            }
         })
         .setOnCancelListener(new OnCancelListener() {
@@ -84,6 +92,8 @@ public class AppRaterHelper {
                   editor.putLong(SharedPrefUtil.PREF_APP_RATING_FIRST_LAUNCH_DATE, date_firstLaunch);
                   editor.commit();
               }
+				tracker.trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+						AnalyticsTrackerHelper.ACTION_APP_RATE_NO_THANKS, TAG, 0);
           }
         })
         .show();   

@@ -1,6 +1,5 @@
 package com.andorn.powertask.base;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
@@ -14,12 +13,17 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.andorn.powertask.activities.BaseActivity;
 import com.andorn.powertask.activities.GooAccountsActivity;
+import com.andorn.powertask.activities.GooTaskListsActivity;
+import com.andorn.powertask.helpers.AnalyticsTrackerHelper;
 import com.andorn.powertask.helpers.FontHelper;
 import com.andorn.powertask.helpers.SimpleMenu;
 import com.andorn.powertask.R;
 
 public class ActivityHelper {
+	private static final String TAG = ActivityHelper.class.getName();
+	
 	public static final int ACTIONBAR_TASK_LIST = 1;
 	public static final int ACTIONBAR_TASK_COMPOSE = 2;
 	public static final int ACTIONBAR_ACCOUNTS = 3;
@@ -28,18 +32,18 @@ public class ActivityHelper {
 	public static final int ACTIONBAR_TASK_EDIT = 6;
 	public static final int ACTIONBAR_ACCOUNT_LIST = 7;
 	
-    protected Activity mActivity;
+    protected BaseActivity mActivity;
     protected float displayDensity;
     protected int height;
     protected int width;
     protected int scaledHeight;
     protected int scaledWidth;
     
-    public static ActivityHelper create(Activity activity) {
+    public static ActivityHelper create(BaseActivity activity) {
         return new ActivityHelper(activity);                
     }
 
-    protected ActivityHelper(Activity activity) {
+    protected ActivityHelper(BaseActivity activity) {
         mActivity = activity;
     }
 
@@ -95,8 +99,14 @@ public class ActivityHelper {
         return false;
     }
     
-    public void goBack() {
-		mActivity.finish();
+    public void goUp() {
+    	if(mActivity.isTaskRoot())
+    		GooAccountsActivity.go(mActivity, true);
+    	else
+    		mActivity.finish();
+
+    	mActivity.getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+				AnalyticsTrackerHelper.ACTION_UP, TAG, 0);
     }
     
     public void setupActionBar(int actionBarId) {
@@ -106,32 +116,15 @@ public class ActivityHelper {
             return;
         }
         
-        LinearLayout.LayoutParams springLayoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.FILL_PARENT);
-        springLayoutParams.weight = 1;
+        LinearLayout.LayoutParams normalLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.FILL_PARENT);
         
-        View.OnClickListener accountsClickListener = new View.OnClickListener() {
+        View.OnClickListener goUpClickListener = new View.OnClickListener() {
             public void onClick(View view) {
-            	if(mActivity.isTaskRoot())
-            		GooAccountsActivity.go(mActivity, true);
-            	else
-            		mActivity.finish();
-            }
-        };
-        
-        View.OnClickListener taskListCollectionClickListener = new View.OnClickListener() {
-            public void onClick(View view) {
-            	goBack();
-            }
-        };
-        
-        View.OnClickListener taskListClickListener = new View.OnClickListener() {
-            public void onClick(View view) {
-                goBack();
+            	goUp();
             }
         };
         
         TextView titleText;
-//        View spring;
         ImageButton logo;
         
         switch (actionBarId) {	         
@@ -141,15 +134,16 @@ public class ActivityHelper {
             actionBarCompat.addView(logo);
 
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
-            titleText.setLayoutParams(springLayoutParams);
+            titleText.setLayoutParams(normalLayoutParams);
             titleText.setText("Accounts");
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
+            
 			break;     
         case ACTIONBAR_TASK_LIST_COLLECTION:
         	// Add logo
             logo = new ImageButton(mActivity, null, R.attr.actionbarCompatLogoStyle);
-            logo.setOnClickListener(accountsClickListener);
+            logo.setOnClickListener(goUpClickListener);
             actionBarCompat.addView(logo);
             
             // Add spring (dummy view to align future children to the right)
@@ -159,8 +153,8 @@ public class ActivityHelper {
             //visiblility = View.VISIBLE;
 
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
-            titleText.setOnClickListener(accountsClickListener);
-            titleText.setLayoutParams(springLayoutParams);
+            titleText.setOnClickListener(goUpClickListener);
+            titleText.setLayoutParams(normalLayoutParams);
             titleText.setText("Task Lists");
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
@@ -168,13 +162,13 @@ public class ActivityHelper {
         case ACTIONBAR_TASK_LIST:
         	// Add logo
             logo = new ImageButton(mActivity, null, R.attr.actionbarCompatLogoStyle);
-            logo.setOnClickListener(taskListCollectionClickListener);
+            logo.setOnClickListener(goUpClickListener);
             actionBarCompat.addView(logo);
             
             // Add spring (dummy view to align future children to the right)
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
-            titleText.setOnClickListener(taskListCollectionClickListener);
-            titleText.setLayoutParams(springLayoutParams);
+            titleText.setOnClickListener(goUpClickListener);
+            titleText.setLayoutParams(normalLayoutParams);
             titleText.setText("Tasks");
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
@@ -182,13 +176,13 @@ public class ActivityHelper {
         case ACTIONBAR_TASK_COMPOSE:
         	// Add Home button
             logo = new ImageButton(mActivity, null, R.attr.actionbarCompatLogoStyle);
-            logo.setOnClickListener(taskListClickListener);
+            logo.setOnClickListener(goUpClickListener);
             actionBarCompat.addView(logo);
             
         	// Add title text
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
-            titleText.setOnClickListener(taskListClickListener);
-            titleText.setLayoutParams(springLayoutParams);
+            titleText.setOnClickListener(goUpClickListener);
+            titleText.setLayoutParams(normalLayoutParams);
             titleText.setText("Compose Task");
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
@@ -196,13 +190,13 @@ public class ActivityHelper {
         case ACTIONBAR_TASK_EDIT:
         	// Add Home button
             logo = new ImageButton(mActivity, null, R.attr.actionbarCompatLogoStyle);
-            logo.setOnClickListener(taskListClickListener);
+            logo.setOnClickListener(goUpClickListener);
             actionBarCompat.addView(logo);
             
         	// Add title text
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
-            titleText.setOnClickListener(taskListClickListener);
-            titleText.setLayoutParams(springLayoutParams);
+            titleText.setOnClickListener(goUpClickListener);
+            titleText.setLayoutParams(normalLayoutParams);
             titleText.setText("Edit Task");
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
@@ -210,13 +204,13 @@ public class ActivityHelper {
         case ACTIONBAR_TASK_VIEW:
         	// Add Home button
             logo = new ImageButton(mActivity, null, R.attr.actionbarCompatLogoStyle);
-            logo.setOnClickListener(taskListClickListener);
+            logo.setOnClickListener(goUpClickListener);
             actionBarCompat.addView(logo);
             
         	// Add title text
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
-            titleText.setOnClickListener(taskListClickListener);
-            titleText.setLayoutParams(springLayoutParams);
+            titleText.setOnClickListener(goUpClickListener);
+            titleText.setLayoutParams(normalLayoutParams);
             titleText.setText("Task");
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
@@ -227,6 +221,12 @@ public class ActivityHelper {
         default:
         	return;
         }      
+        
+        LinearLayout.LayoutParams springLayoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.FILL_PARENT);
+        springLayoutParams.weight = 1;
+        View springView = new View(mActivity);
+        springView.setLayoutParams(springLayoutParams);
+        actionBarCompat.addView(springView);
     }
 
     /**

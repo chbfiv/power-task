@@ -110,7 +110,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 		
 		listView.addHeaderView(headerContainer);
 		
-		AppRaterHelper.app_launched(this);
+		AppRaterHelper.app_launched(this, getTrackerHelper());
 		getTrackerHelper().setScreenOrientationCustomVar(this);
 	}	
 	
@@ -316,7 +316,8 @@ public class GooTaskListsActivity extends BaseActivity implements
     	builder.setMessage("Do you want to delete the list: \"" + taskList.title + "\"?\nThe list will be permanently deleted.")
     	       .setCancelable(false)
     	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-    	           public void onClick(DialogInterface dialog, int id) {
+    	           public void onClick(DialogInterface dialog, int id) {    	      
+  					 
     	        	   new DeleteTaskList().execute(taskListId);
     	        	   dialog.dismiss();
     	           }
@@ -348,6 +349,7 @@ public class GooTaskListsActivity extends BaseActivity implements
     	       .setCancelable(false)
     	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
     	           public void onClick(DialogInterface dialog, int id) {
+  					 
     	           	   new RenameTaskList().execute(new RenameParam(taskListId, input.getText().toString()));
     	        	   input.getText().clear();
     	        	   dialog.dismiss();
@@ -371,6 +373,7 @@ public class GooTaskListsActivity extends BaseActivity implements
     	       .setCancelable(false)
     	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
     	           public void onClick(DialogInterface dialog, int id) {
+  					 
     	           	   new CreateTaskList().execute(input.getText().toString());
     	        	   input.getText().clear();
     	        	   dialog.dismiss();
@@ -404,7 +407,10 @@ public class GooTaskListsActivity extends BaseActivity implements
 		    		 GooTaskList taskList = dbTLCHelper.read(param.taskListId);
 		    		 taskList.title = param.title;
 		    		 taskList.flagSyncState(GooSyncBase.SYNC_UPDATE);	
-	        		 dbTLCHelper.update(taskList);
+	        		 dbTLCHelper.update(taskList);  	   
+
+ 					 getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+ 								AnalyticsTrackerHelper.ACTION_RENAME_TASK_LIST, TAG, 0);
 		    	 }
 	    	 }
 	    	 catch(Exception ex)
@@ -429,6 +435,9 @@ public class GooTaskListsActivity extends BaseActivity implements
 		    		 GooTaskList taskList = new GooTaskList(mActiveAccountId, title);
 		    		 taskList.flagSyncState(GooSyncBase.SYNC_CREATE);
 		    		 dbTLCHelper.create(taskList);
+		    		 
+ 					 getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+								AnalyticsTrackerHelper.ACTION_CREATE_TASK_LIST, TAG, 0);
 		    	 }
 	    	 }
 	    	 catch(Exception ex)
@@ -453,6 +462,9 @@ public class GooTaskListsActivity extends BaseActivity implements
 		    		 GooTaskList taskList = dbTLCHelper.read(id);
 		    		 taskList.setSyncState(GooSyncBase.SYNC_DELETE);
 		    		 dbTLCHelper.update(taskList);
+		    		 
+ 					 getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+								AnalyticsTrackerHelper.ACTION_DELETE_TASK_LIST, TAG, 0);
 		    	 }   		 
 	    	 }
 	    	 catch(Exception ex)

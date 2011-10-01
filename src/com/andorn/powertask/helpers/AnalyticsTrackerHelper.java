@@ -1,22 +1,29 @@
 package com.andorn.powertask.helpers;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
+import com.andorn.powertask.R;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 public class AnalyticsTrackerHelper {
 
     public static final String GOOGLE_ANALYTICS_WEB_PROPERTY_ID = "UA-25987520-1"; //chbfiv@andornsoftware.com
-    
+
+    protected Activity mActivity;  
     protected Context mContext;   
     protected GoogleAnalyticsTracker mTracker;
     protected SharedPrefUtil mSharedPrefUtil;
     private boolean mDebug = false;
     private boolean mGoogleAnalytics = false;
+    private boolean mTermsOfService = false;
     
     private static volatile int sActivityCount = 0;
 
@@ -42,11 +49,12 @@ public class AnalyticsTrackerHelper {
 	
 	public static final String ACTION_SYNC = "sync";	
 	
-    public static AnalyticsTrackerHelper create(Context context) {
-        return new AnalyticsTrackerHelper(context);                
+    public static AnalyticsTrackerHelper create(Activity activity, Context context) {
+        return new AnalyticsTrackerHelper(activity, context);                
     }
 
-    protected AnalyticsTrackerHelper(Context context) {
+    protected AnalyticsTrackerHelper(Activity activity, Context context) {
+    	mActivity = activity;
     	mContext = context;
     }
     
@@ -57,13 +65,13 @@ public class AnalyticsTrackerHelper {
     
     public void onResume()
     {    	
+    	refresh();
+    	
     	if(sActivityCount == 0)
     		mTracker.startNewSession(GOOGLE_ANALYTICS_WEB_PROPERTY_ID, mContext);
     	
     	sActivityCount = sActivityCount < 0 ? 0 : sActivityCount; //reset to 0
-    	sActivityCount++;
-    	
-    	refresh();
+    	sActivityCount++;    	
     }
     
     public void onStart()
@@ -106,9 +114,12 @@ public class AnalyticsTrackerHelper {
 	    SharedPreferences prefs = mSharedPrefUtil.getSharedPref();	
 	    mDebug = prefs.getBoolean(SharedPrefUtil.PREF_DEBUG, false);   
 	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, false);    
-
+	    mTermsOfService = prefs.getBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, false);    
+	    
     	mTracker.setDebug(mDebug);
     	mTracker.setDryRun(mDebug);    	
+    	
+    	if(!mTermsOfService) ShowTermsOfServiceDialog();
     }
     
     public void trackPageView(String opt_pageURL)
@@ -143,5 +154,57 @@ public class AnalyticsTrackerHelper {
     	}
     	
     	setCustomVar(CUSTOM_INDEX_1, CUSTOM_NAME_SCREEN_ORIENTATION, orientation, CUSTOM_SCOPE_SESSION);
+    }    
+    
+    public void ShowTermsOfServiceDialog()
+    {
+    	String terms = mActivity.getString(R.string.terms_of_service_part_1);
+    	
+    	new AlertDialog.Builder(mActivity)
+    	.setTitle("Terms of Service - part 1")
+        .setMessage(terms)
+        .setPositiveButton("Accept - More",  new OnClickListener() {
+           public void onClick(DialogInterface dialog, int id) {
+        	   ShowTermsOfServiceDialogPart2();	
+           }
+        })
+        .setNegativeButton("Cancel",  new OnClickListener() {
+           public void onClick(DialogInterface dialog, int id) {
+         	  mActivity.finish();
+           }
+        })
+        .setOnCancelListener(new OnCancelListener() {
+          public void onCancel(DialogInterface dialog) {
+        	  mActivity.finish();
+          }
+        })
+        .show();	
+    }    
+    
+    public void ShowTermsOfServiceDialogPart2()
+    {
+    	String terms = mActivity.getString(R.string.terms_of_service_part_2);
+    	
+    	new AlertDialog.Builder(mActivity)
+    	.setTitle("Terms of Service - part 2")
+        .setMessage(terms)
+        .setPositiveButton("Accept",  new OnClickListener() {
+           public void onClick(DialogInterface dialog, int id) {
+       	    	SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();
+	       	    editor.putBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, true);
+	       	    editor.commit();	
+           }
+        })
+        .setNegativeButton("Cancel",  new OnClickListener() {
+           public void onClick(DialogInterface dialog, int id) {
+         	  mActivity.finish();
+           }
+        })
+        .setOnCancelListener(new OnCancelListener() {
+          public void onCancel(DialogInterface dialog) {
+        	  mActivity.finish();
+          }
+        })
+        .show();	
     }    
 }

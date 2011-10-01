@@ -18,6 +18,7 @@ public class SharedPrefUtil {
 	public static final String PREF_DEBUG = "debug";
 	public static final String PREF_OFFLINE_MODE = "offline_mode";
 	public static final String PREF_GOOGLE_ANALYTICS = "google_analytics";
+	public static final String PREF_TERMS_OF_SERVICE = "terms_of_service";
 	
     protected Context mContext;
 

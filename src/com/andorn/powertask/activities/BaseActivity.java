@@ -24,7 +24,7 @@ public abstract class BaseActivity extends FragmentActivity {
         getActivityHelper().onCreate(savedInstanceState);
 		getOAuthHelper().onCreate(savedInstanceState);	
 		
-		mTrackerHelper = AnalyticsTrackerHelper.create(getApplication());
+		mTrackerHelper = AnalyticsTrackerHelper.create(this, getApplication());
 		mTrackerHelper.onCreate(savedInstanceState);		
 		mTrackerHelper.setSharedPrefUtil(mSharedPref);
 		

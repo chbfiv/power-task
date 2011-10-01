@@ -554,7 +554,7 @@ public class TasksAppService extends IntentService {
 	
 	private void TLog(String msg)
 	{
-	    boolean debug = mSharedPref.getSharedPref().getBoolean(SharedPrefUtil.PREF_DEBUG, false);	
+	    boolean debug = mSharedPref.getSharedPref().getBoolean(SharedPrefUtil.PREF_DEBUG, TaskApplication.DEBUG);	
 	    
 	    if(debug) Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();	    
         Log.i(TAG, msg);

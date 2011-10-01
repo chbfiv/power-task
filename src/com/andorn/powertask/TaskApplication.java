@@ -16,6 +16,9 @@ import android.content.Context;
 
 public class TaskApplication extends Application {
 
+    public static final boolean RELEASE = true;
+    public static final boolean DEBUG = !RELEASE;
+    
     interface TaskListener {
         void onTaskUpdated(String message, long id);
     }

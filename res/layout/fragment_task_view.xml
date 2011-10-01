@@ -99,13 +99,7 @@
 					android:textColor="@color/task_textfield_color" 
 					android:singleLine="true"
 					android:textSize="@dimen/text_size_medium"
-					/>	
-			    <Button
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-		        	android:text="Example Task List"
-					android:singleLine="true"
-			        android:background="@drawable/btn_erase_pressed" /> 
+					/>				     
 		    </LinearLayout>
 	    </TableRow>
 	     <View

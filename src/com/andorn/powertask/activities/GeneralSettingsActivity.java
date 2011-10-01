@@ -4,10 +4,12 @@ import java.util.List;
 
 import com.andorn.powertask.adapters.GooAccountsCursorAdapter;
 import com.andorn.powertask.database.GooAccountsOpenHelper;
+import com.andorn.powertask.helpers.AnalyticsTrackerHelper;
 import com.andorn.powertask.helpers.SharedPrefUtil;
 import com.andorn.powertask.models.GooAccount;
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.R;
+import com.andorn.powertask.TaskApplication;
 
 import android.app.Activity;
 import android.content.Context;
@@ -46,7 +48,7 @@ public class GeneralSettingsActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     	
-        setContentView(R.layout.general_settings);	        
+        setContentView(R.layout.activity_general_settings);	        
         
         mInflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    debugModeCheckbox = (CheckBox) findViewById(R.id.generalSettings_debugCheckbox);
@@ -54,6 +56,11 @@ public class GeneralSettingsActivity extends BaseActivity {
 	    googleAnalyticsCheckbox = (CheckBox) findViewById(R.id.generalSettings_googleAnalyticsCheckbox);
 	    accountsLayout = (LinearLayout) findViewById(R.id.generalSettings_accounts);	    
 
+	    View debug = findViewById(R.id.generalSettings_debug);
+	    
+	    if(TaskApplication.RELEASE) debug.setVisibility(View.GONE);
+	    else debug.setVisibility(View.VISIBLE);
+	    
 		getTrackerHelper().setScreenOrientationCustomVar(this);
     }
 
@@ -62,9 +69,9 @@ public class GeneralSettingsActivity extends BaseActivity {
         super.onResume();     
         
 	    SharedPreferences prefs = getSharedPrefUtil().getSharedPref();
-	    mDebug = prefs.getBoolean(SharedPrefUtil.PREF_DEBUG, false);	
+	    mDebug = prefs.getBoolean(SharedPrefUtil.PREF_DEBUG, TaskApplication.DEBUG);	
 	    mOfflineMode = prefs.getBoolean(SharedPrefUtil.PREF_OFFLINE_MODE, false);	
-	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, false);	
+	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, AnalyticsTrackerHelper.DEFAULT_GOOGLE_ANALYTICS);	
 	    
 	    debugModeCheckbox.setOnCheckedChangeListener(null);
 	    debugModeCheckbox.setChecked(mDebug);

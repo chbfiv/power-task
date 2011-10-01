@@ -11,6 +11,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 
 import com.andorn.powertask.R;
+import com.andorn.powertask.TaskApplication;
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 public class AnalyticsTrackerHelper {
@@ -24,6 +25,8 @@ public class AnalyticsTrackerHelper {
     private boolean mDebug = false;
     private boolean mGoogleAnalytics = false;
     private boolean mTermsOfService = false;
+    
+	public static final boolean DEFAULT_GOOGLE_ANALYTICS = true;
     
     private static volatile int sActivityCount = 0;
 
@@ -112,8 +115,8 @@ public class AnalyticsTrackerHelper {
     public void refresh()
     {
 	    SharedPreferences prefs = mSharedPrefUtil.getSharedPref();	
-	    mDebug = prefs.getBoolean(SharedPrefUtil.PREF_DEBUG, false);   
-	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, false);    
+	    mDebug = prefs.getBoolean(SharedPrefUtil.PREF_DEBUG, TaskApplication.DEBUG);   
+	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, DEFAULT_GOOGLE_ANALYTICS);    
 	    mTermsOfService = prefs.getBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, false);    
 	    
     	mTracker.setDebug(mDebug);

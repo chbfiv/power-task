@@ -9,6 +9,7 @@ import com.andorn.powertask.models.GooSyncBase;
 import com.andorn.powertask.models.GooTask;
 import com.andorn.powertask.R;
 
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -160,6 +161,11 @@ public class GooTaskViewFragment extends BaseFragment
         mStatusCheckBox.setOnCheckedChangeListener(null);
         mStatusCheckBox.setChecked(task.isCompleted());   
         mStatusCheckBox.setOnCheckedChangeListener(new TaskStatusCheckedChanged());        
+
+        if(task.isCompleted())
+        	mTitle.setPaintFlags(mTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+    	else
+    		mTitle.setPaintFlags(mTitle.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);  
         
         mDetials.setVisibility(View.GONE);  
         mDetialsCollapsed.setVisibility(View.GONE);   

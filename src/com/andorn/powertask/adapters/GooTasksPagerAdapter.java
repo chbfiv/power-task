@@ -93,7 +93,7 @@ public class GooTasksPagerAdapter extends FragmentStatePagerAdapter
 	@Override
 	public void onPageSelected(int position) {
 		mCurrentPosition = position;
-	    final Editor editor = SharedPrefUtil.createInstance(mActivity).getEditor();
+	    final Editor editor = SharedPrefUtil.create(mActivity).getEditor();
 	    if(editor != null)
 	    {
 		    editor.putInt(SharedPrefUtil.PREF_ACTIVE_TASKS_PAGE_POSITION, position);

@@ -25,7 +25,6 @@ import android.widget.LinearLayout;
 
 public class GeneralSettingsActivity extends BaseActivity {
 	
-	@SuppressWarnings("unused")
 	private static final String TAG = GeneralSettingsActivity.class.getName();
 
 	private final GooAccountsOpenHelper dbACCHelper = new GooAccountsOpenHelper(this);
@@ -33,10 +32,12 @@ public class GeneralSettingsActivity extends BaseActivity {
     private GooAccountsCursorAdapter mAdapter;
 
     private boolean mDebug;
-    private boolean mOfflineMode;    
+    private boolean mOfflineMode;   
+    private boolean mGoogleAnalytics;  
     
     private CheckBox debugModeCheckbox;
     private CheckBox offlineModeCheckbox;
+    private CheckBox googleAnalyticsCheckbox;
     private LinearLayout accountsLayout;
     
     private LayoutInflater mInflater;
@@ -50,7 +51,8 @@ public class GeneralSettingsActivity extends BaseActivity {
         mInflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	    debugModeCheckbox = (CheckBox) findViewById(R.id.generalSettings_debugCheckbox);
 	    offlineModeCheckbox = (CheckBox) findViewById(R.id.generalSettings_offlineModeCheckbox);
-	    accountsLayout = (LinearLayout) findViewById(R.id.generalSettings_accounts);
+	    googleAnalyticsCheckbox = (CheckBox) findViewById(R.id.generalSettings_googleAnalyticsCheckbox);
+	    accountsLayout = (LinearLayout) findViewById(R.id.generalSettings_accounts);	    
     }
 
     @Override
@@ -60,6 +62,7 @@ public class GeneralSettingsActivity extends BaseActivity {
 	    SharedPreferences prefs = getSharedPrefUtil().getSharedPref();
 	    mDebug = prefs.getBoolean(SharedPrefUtil.PREF_DEBUG, false);	
 	    mOfflineMode = prefs.getBoolean(SharedPrefUtil.PREF_OFFLINE_MODE, false);	
+	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, false);	
 	    
 	    debugModeCheckbox.setOnCheckedChangeListener(null);
 	    debugModeCheckbox.setChecked(mDebug);
@@ -79,6 +82,17 @@ public class GeneralSettingsActivity extends BaseActivity {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         	    SharedPreferences.Editor editor = getSharedPrefUtil().getEditor();
         	    editor.putBoolean(SharedPrefUtil.PREF_OFFLINE_MODE, isChecked);
+        	    editor.commit();	
+			}
+		});
+	    
+	    googleAnalyticsCheckbox.setOnCheckedChangeListener(null);
+	    googleAnalyticsCheckbox.setChecked(mGoogleAnalytics);
+	    googleAnalyticsCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        	    SharedPreferences.Editor editor = getSharedPrefUtil().getEditor();
+        	    editor.putBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, isChecked);
         	    editor.commit();	
 			}
 		});
@@ -113,6 +127,8 @@ public class GeneralSettingsActivity extends BaseActivity {
 	    	
 	    	accountsLayout.addView(accountView);
 	    }
+		
+		getTrackerHelper().trackPageView("/" + TAG);
     }    
     
 	@Override

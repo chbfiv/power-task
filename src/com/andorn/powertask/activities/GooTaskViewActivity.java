@@ -46,6 +46,13 @@ public class GooTaskViewActivity extends BaseActivity
         getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_VIEW);  
     }   
     
+    @Override
+    protected void onResume() {
+    	super.onResume();
+		
+		getTrackerHelper().trackPageView("/" + TAG);
+    }
+    
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();		

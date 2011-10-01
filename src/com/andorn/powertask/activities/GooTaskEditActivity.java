@@ -53,6 +53,13 @@ public class GooTaskEditActivity extends BaseActivity
         	getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_EDIT);   
     }
     
+    @Override
+    protected void onResume() {
+    	super.onResume();
+		
+		getTrackerHelper().trackPageView("/" + TAG);
+    }
+    
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();		

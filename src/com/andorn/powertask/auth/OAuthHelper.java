@@ -29,7 +29,7 @@ public class OAuthHelper {
     
 	private final GooAccountsOpenHelper dbACCHelper;
     
-    public static OAuthHelper createInstance(Activity activity) {
+    public static OAuthHelper create(Activity activity) {
         return new OAuthHelper(activity);                
     }
 

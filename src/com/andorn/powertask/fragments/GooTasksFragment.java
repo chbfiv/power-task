@@ -91,7 +91,7 @@ public class GooTasksFragment extends BaseListFragment
 
 		int defaultTaskSortType = GooTaskSortType.getDefaultFromPosition(mPagePos);
     	
-	    final SharedPrefUtil prefs = SharedPrefUtil.createInstance(mActivity);
+	    final SharedPrefUtil prefs = SharedPrefUtil.create(mActivity);
 	    mTaskSortType = prefs.getSharedPref().getInt(SharedPrefUtil.PREF_TASKS_PAGE_SORT_TYPE + ":" + mPagePos, GooTaskSortType.INVALID);
 	    
 	    //save if invalid

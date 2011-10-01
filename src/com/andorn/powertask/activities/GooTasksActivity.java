@@ -82,6 +82,8 @@ public class GooTasksActivity extends BaseActivity
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(OAuthHelper.INTENT_ON_AUTH);
 		registerReceiver(mOAuthReceiver, filter);		
+		
+		getTrackerHelper().trackPageView("/" + TAG);
 	}
 	
 	@Override

@@ -17,10 +17,11 @@ public class SharedPrefUtil {
 	
 	public static final String PREF_DEBUG = "debug";
 	public static final String PREF_OFFLINE_MODE = "offline_mode";
+	public static final String PREF_GOOGLE_ANALYTICS = "google_analytics";
 	
     protected Context mContext;
 
-    public static SharedPrefUtil createInstance(Context context) {
+    public static SharedPrefUtil create(Context context) {
         return new SharedPrefUtil(context);                
     }
 
@@ -42,7 +43,4 @@ public class SharedPrefUtil {
     public SharedPreferences.Editor getEditor() {
         return mContext.getSharedPreferences(SHARED_PREFS, 0).edit();
     }
-    
-
-  
 }

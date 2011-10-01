@@ -56,7 +56,6 @@
 		    <View
 		        android:layout_width="fill_parent"
 		        android:layout_height="1dip"
-		        android:layout_below="@+id/manageAccounts_title"
 		        android:background="#808080" />
 		    <LinearLayout 
 			    android:layout_width="fill_parent"
@@ -83,7 +82,6 @@
 		    <View
 		        android:layout_width="fill_parent"
 		        android:layout_height="1dip"
-		        android:layout_below="@+id/manageAccounts_title"
 		        android:background="#808080" />
 		    <TextView
 		        android:layout_width="fill_parent"
@@ -113,7 +111,40 @@
 		    <View
 		        android:layout_width="fill_parent"
 		        android:layout_height="1dip"
-		        android:layout_below="@+id/manageAccounts_title"
+		        android:background="#808080" />
+	        <TextView
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:background="#484848"
+		        android:textColor="#e1e1e1"
+		        android:textStyle="bold"     
+		        android:padding="2dip"
+		        android:text="Privacy settings"
+		        android:textSize="@dimen/text_size_small" />
+		    <LinearLayout 
+			    android:layout_width="fill_parent"
+			    android:layout_height="60dip"
+			    android:orientation="horizontal">
+				<TextView
+				    android:layout_width="match_parent"
+				    android:layout_height="match_parent"
+				    android:background="@android:color/black"
+					android:layout_weight="1"
+				    android:gravity="center_vertical|left"
+				    android:paddingLeft="12dip"
+				    android:textColor="@android:color/white"
+				    android:text="Anonymous (Google) Analytics"
+				    android:textSize="@dimen/text_size_large" />   
+				 <CheckBox
+				    android:id="@+id/generalSettings_googleAnalyticsCheckbox"
+				    android:layout_width="wrap_content"
+				    android:layout_height="match_parent"
+		        	android:layout_marginRight="6dip"
+				    android:button="@drawable/btn_check_holo_dark"  /> 
+		    </LinearLayout>
+		    <View
+		        android:layout_width="fill_parent"
+		        android:layout_height="1dip"
 		        android:background="#808080" />
         </LinearLayout>
     </ScrollView>

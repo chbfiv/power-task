@@ -31,6 +31,7 @@ import com.andorn.powertask.base.ActivityHelper;
 import com.andorn.powertask.database.GooAccountsOpenHelper;
 import com.andorn.powertask.database.GooTaskListsOpenHelper;
 import com.andorn.powertask.dialogs.TaskListActionsDialog;
+import com.andorn.powertask.helpers.AnalyticsTrackerHelper;
 import com.andorn.powertask.helpers.SharedPrefUtil;
 import com.andorn.powertask.models.GooAccount;
 import com.andorn.powertask.models.GooBase;
@@ -115,6 +116,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 		
 		synchronized(this)
 		{
+			if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();
 			listView.setAdapter(null);	 
 			Cursor c = dbTLCHelper.queryCursor(mActiveAccountId, GooSyncBase.SYNC_DELETE);
 			mAdapter = new GooTaskListsCursorAdapter(this, c, true);		
@@ -125,6 +127,8 @@ public class GooTaskListsActivity extends BaseActivity implements
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(OAuthHelper.INTENT_ON_AUTH);
 		registerReceiver(mOAuthReceiver, filter);		
+		
+		getTrackerHelper().trackPageView("/" + TAG);
 	}
 
     @Override
@@ -137,9 +141,8 @@ public class GooTaskListsActivity extends BaseActivity implements
     }
     
 	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		
+	protected void onDestroy() {		
+		super.onDestroy();		
 		synchronized(this)
 		{
 			if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();
@@ -172,6 +175,8 @@ public class GooTaskListsActivity extends BaseActivity implements
 			case R.id.menu_sync: {
 				getOAuthHelper().resetAuthAttempts();
 				sync();
+				getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+						AnalyticsTrackerHelper.ACTION_SYNC, TAG, 0);
 				return true;
 			}
 			case R.id.menu_create_task_list: {
@@ -247,6 +252,9 @@ public class GooTaskListsActivity extends BaseActivity implements
 	public void sync(boolean withRefresh) {
 		if(mAdapter != null && withRefresh) mAdapter.requery();
 		TasksAppService.syncTaskLists(this, mSyncReceiver);
+
+		getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_BACKGROUND_PROCESS,
+				AnalyticsTrackerHelper.ACTION_SYNC, TAG, 0);
 	}
 	
 	public void showTaskListActionsDialog(long taskListId)

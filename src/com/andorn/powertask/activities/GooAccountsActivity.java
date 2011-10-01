@@ -21,7 +21,6 @@ import android.widget.ListView;
 public class GooAccountsActivity extends BaseActivity 
 	implements OnClickListener {
 
-	@SuppressWarnings("unused")
 	private static final String TAG = GooAccountsActivity.class.getName();
 
 	private final GooAccountsOpenHelper dbACCHelper = new GooAccountsOpenHelper(this);
@@ -56,7 +55,9 @@ public class GooAccountsActivity extends BaseActivity
 		mAdapter = new GooAccountsCursorAdapter(this, c, true);
 		mListView.setAdapter(mAdapter);	   
 		
-		sync();		     
+		sync();
+		
+		getTrackerHelper().trackPageView("/" + TAG);
     }    
     
 	@Override

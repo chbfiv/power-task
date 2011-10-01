@@ -74,6 +74,8 @@ public class GooTasksActivity extends BaseActivity
 		mViewPager.setCurrentItem(initialPage);
 		
 		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_LIST);
+
+		getTrackerHelper().setScreenOrientationCustomVar(this);
 	}	
 	
 	@Override

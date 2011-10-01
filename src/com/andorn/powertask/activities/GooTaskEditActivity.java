@@ -50,7 +50,9 @@ public class GooTaskEditActivity extends BaseActivity
         if(mActiveTaskId == GooBase.INVALID_ID)        
         	getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_COMPOSE);
         else
-        	getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_EDIT);   
+        	getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_EDIT);  
+        
+		getTrackerHelper().setScreenOrientationCustomVar(this); 
     }
     
     @Override

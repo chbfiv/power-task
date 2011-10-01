@@ -53,6 +53,8 @@ public class GeneralSettingsActivity extends BaseActivity {
 	    offlineModeCheckbox = (CheckBox) findViewById(R.id.generalSettings_offlineModeCheckbox);
 	    googleAnalyticsCheckbox = (CheckBox) findViewById(R.id.generalSettings_googleAnalyticsCheckbox);
 	    accountsLayout = (LinearLayout) findViewById(R.id.generalSettings_accounts);	    
+
+		getTrackerHelper().setScreenOrientationCustomVar(this);
     }
 
     @Override

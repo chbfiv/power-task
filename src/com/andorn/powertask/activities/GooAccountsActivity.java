@@ -88,7 +88,7 @@ public class GooAccountsActivity extends BaseActivity
 				return true;
 			}
 			case R.id.menu_add_account: {
-				GeneralSettingsActivity.addAccount(this, false);
+				GeneralSettingsActivity.addAccount(this);
 				return true;
 			}
 		}

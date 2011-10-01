@@ -32,6 +32,7 @@ import com.andorn.powertask.database.GooAccountsOpenHelper;
 import com.andorn.powertask.database.GooTaskListsOpenHelper;
 import com.andorn.powertask.dialogs.TaskListActionsDialog;
 import com.andorn.powertask.helpers.AnalyticsTrackerHelper;
+import com.andorn.powertask.helpers.AppRaterHelper;
 import com.andorn.powertask.helpers.SharedPrefUtil;
 import com.andorn.powertask.models.GooAccount;
 import com.andorn.powertask.models.GooBase;
@@ -109,6 +110,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 		
 		listView.addHeaderView(headerContainer);
 		
+		AppRaterHelper.app_launched(this);
 		getTrackerHelper().setScreenOrientationCustomVar(this);
 	}	
 	

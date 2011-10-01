@@ -160,14 +160,13 @@ public class GeneralSettingsActivity extends BaseActivity {
 		if(finishActivity) activity.finish();
 	}
     
-	public static void addAccount(Activity activity, boolean finishActivity) {
+	public static void addAccount(Activity activity) {
 		Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 		intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {
 			    "com.android.contacts"
 		});
 		activity.startActivity(intent);		
-		if(finishActivity) activity.finish();
 	}
 	
 	protected void syncSettings(Activity activity, boolean finishActivity) {
@@ -182,6 +181,6 @@ public class GeneralSettingsActivity extends BaseActivity {
 	
 	public void addAcount_onClick(View v)
 	{
-		addAccount(this, false);
+		addAccount(this);
 	}	
 }

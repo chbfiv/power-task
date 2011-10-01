@@ -19,6 +19,9 @@ public class SharedPrefUtil {
 	public static final String PREF_OFFLINE_MODE = "offline_mode";
 	public static final String PREF_GOOGLE_ANALYTICS = "google_analytics";
 	public static final String PREF_TERMS_OF_SERVICE = "terms_of_service";
+	public static final String PREF_APP_RATING_NO_PROMPT = "app_rating_no_prompt";
+	public static final String PREF_APP_RATING_LAUNCH_COUNT = "app_rating_launch_count";
+	public static final String PREF_APP_RATING_FIRST_LAUNCH_DATE = "app_rating_first_launch_date";
 	
     protected Context mContext;
 

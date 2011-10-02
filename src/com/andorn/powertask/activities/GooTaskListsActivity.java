@@ -163,9 +163,9 @@ public class GooTaskListsActivity extends BaseActivity implements
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.general_settings_menu_item, menu);
-		getMenuInflater().inflate(R.menu.sync_menu_items, menu);
-		getMenuInflater().inflate(R.menu.create_task_list_menu_item, menu);
+		getMenuInflater().inflate(R.menu.menu_item_general_settings, menu);
+		getMenuInflater().inflate(R.menu.menu_item_sync, menu);
+		getMenuInflater().inflate(R.menu.menu_item_create_task_list, menu);
 		return true;
 	}
 

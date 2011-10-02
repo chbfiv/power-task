@@ -49,7 +49,6 @@ public class TasksAppService extends IntentService {
 	public static final int REQUEST_SYNC_TASK_LISTS = 30000;
 	public static final int REQUEST_SYNC_TASKS = 30001;
 	public static final int REQUEST_SYNC_ACCOUNTS = 30002;
-	public static final int REQUEST_DISPATCH_ANALYTICS = 30003;
 	
 	public static final int RESULT_SYNC_SUCCESS_TASK_LISTS = 40000;
 	public static final int RESULT_SYNC_SUCCESS_TASKS = 40001;
@@ -75,12 +74,6 @@ public class TasksAppService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
-		if (intent.getFlags() == REQUEST_DISPATCH_ANALYTICS)
-		{
-			//mTracker.dispatch();
-			return;
-		}		
-	
 		if (intent.getFlags() != REQUEST_SYNC_ACCOUNTS && ConnectivityHelper.isAirplaneMode(this))
 		{
 	    	TLog(TAG + " currently in airplane mode; no network connectivity.");	    
@@ -260,14 +253,6 @@ public class TasksAppService extends IntentService {
 		if (dbhAccounts != null) dbhAccounts.close();
 		if (dbhTaskLists != null) dbhTaskLists.close();
 	}
-	
-	public static void dispatchAnalytics(Context context, ResultReceiver receiver)
-	{
-		Intent intent = new Intent(context, TasksAppService.class);
-		intent.setFlags(REQUEST_DISPATCH_ANALYTICS);
-		intent.putExtra(REQUEST_RECEIVER_EXTRA, receiver);
-		context.startService(intent);
-	}	
 	
 	public static void syncAccounts(Context context, ResultReceiver receiver)
 	{

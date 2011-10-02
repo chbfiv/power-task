@@ -77,8 +77,8 @@ public class GooTaskEditFragment extends BaseFragment
     
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    	inflater.inflate(R.menu.save_menu_items, menu);
-    	inflater.inflate(R.menu.discard_menu_items, menu);
+    	inflater.inflate(R.menu.menu_item_save, menu);
+    	inflater.inflate(R.menu.menu_item_discard, menu);
     }
     
 	@Override

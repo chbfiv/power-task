@@ -55,6 +55,8 @@ public class AnalyticsTrackerHelper {
 	public static final String ACTION_APP_RATE = "app_rate";	
 	public static final String ACTION_APP_RATE_REMIND_ME_LATER = "app_rate_remind_me_later";
 	public static final String ACTION_APP_RATE_NO_THANKS = "app_rate_no_thanks";	
+	public static final String ACTION_AGREE_TERMS_OF_SERVICE = "agree_terms_of_service";	
+	public static final String ACTION_DISAGREE_TERMS_OF_SERVICE = "disagree_terms_of_service";		
 	public static final String ACTION_CREATE_TASK_LIST = "create_task_list";	
 	public static final String ACTION_RENAME_TASK_LIST = "rename_task_list";	
 	public static final String ACTION_DELETE_TASK_LIST = "delete_task_list";	
@@ -181,11 +183,17 @@ public class AnalyticsTrackerHelper {
         .setNegativeButton("Cancel",  new OnClickListener() {
            public void onClick(DialogInterface dialog, int id) {
          	  mActivity.finish();
+
+          	  trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+      				AnalyticsTrackerHelper.ACTION_DISAGREE_TERMS_OF_SERVICE, mActivity.getClass().getName(), 0);
            }
         })
         .setOnCancelListener(new OnCancelListener() {
           public void onCancel(DialogInterface dialog) {
         	  mActivity.finish();
+        	  
+          	  trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+      				AnalyticsTrackerHelper.ACTION_DISAGREE_TERMS_OF_SERVICE, mActivity.getClass().getName(), 0);
           }
         })
         .show();	
@@ -203,16 +211,25 @@ public class AnalyticsTrackerHelper {
        	    	SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();
 	       	    editor.putBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, true);
 	       	    editor.commit();	
+	       	    
+          	    trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+        				AnalyticsTrackerHelper.ACTION_AGREE_TERMS_OF_SERVICE, mActivity.getClass().getName(), 0);
            }
         })
         .setNegativeButton("Cancel",  new OnClickListener() {
            public void onClick(DialogInterface dialog, int id) {
          	  mActivity.finish();
+         	  
+          	  trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+      				AnalyticsTrackerHelper.ACTION_DISAGREE_TERMS_OF_SERVICE, mActivity.getClass().getName(), 0);
            }
         })
         .setOnCancelListener(new OnCancelListener() {
           public void onCancel(DialogInterface dialog) {
         	  mActivity.finish();
+        	  
+          	  trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+      				AnalyticsTrackerHelper.ACTION_DISAGREE_TERMS_OF_SERVICE, mActivity.getClass().getName(), 0);
           }
         })
         .show();	

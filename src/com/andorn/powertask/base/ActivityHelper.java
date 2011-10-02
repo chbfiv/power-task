@@ -21,6 +21,7 @@ import com.andorn.powertask.helpers.SimpleMenu;
 import com.andorn.powertask.R;
 
 public class ActivityHelper {
+	@SuppressWarnings("unused")
 	private static final String TAG = ActivityHelper.class.getName();
 	
 	public static final int ACTIONBAR_TASK_LIST = 1;
@@ -94,7 +95,7 @@ public class ActivityHelper {
     }
     
     public boolean onCreateOptionsMenu(Menu menu) {
-        mActivity.getMenuInflater().inflate(R.menu.search_menu_items, menu);
+        mActivity.getMenuInflater().inflate(R.menu.menu_item_search, menu);
         return false;
     }
     
@@ -105,7 +106,7 @@ public class ActivityHelper {
     		mActivity.finish();
 
     	mActivity.getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
-				AnalyticsTrackerHelper.ACTION_UP, TAG, 0);
+				AnalyticsTrackerHelper.ACTION_UP, mActivity.getClass().getName(), 0);
     }
     
     public void setupActionBar(int actionBarId) {

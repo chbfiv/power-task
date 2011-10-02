@@ -103,9 +103,9 @@ public class GooTasksActivity extends BaseActivity
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.general_settings_menu_item, menu);
-		getMenuInflater().inflate(R.menu.sync_menu_items, menu);
-		getMenuInflater().inflate(R.menu.compose_task_menu_items, menu);
+		getMenuInflater().inflate(R.menu.menu_item_general_settings, menu);
+		getMenuInflater().inflate(R.menu.menu_item_sync, menu);
+		getMenuInflater().inflate(R.menu.menu_item_compose_task, menu);
 		return true;
 	}
 

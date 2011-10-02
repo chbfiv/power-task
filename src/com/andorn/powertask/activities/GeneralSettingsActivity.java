@@ -33,11 +33,9 @@ public class GeneralSettingsActivity extends BaseActivity {
 
     private GooAccountsCursorAdapter mAdapter;
 
-    private boolean mDebug;
     private boolean mOfflineMode;   
     private boolean mGoogleAnalytics;  
     
-    private CheckBox debugModeCheckbox;
     private CheckBox offlineModeCheckbox;
     private CheckBox googleAnalyticsCheckbox;
     private LinearLayout accountsLayout;
@@ -51,7 +49,6 @@ public class GeneralSettingsActivity extends BaseActivity {
         setContentView(R.layout.activity_general_settings);	        
         
         mInflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	    debugModeCheckbox = (CheckBox) findViewById(R.id.generalSettings_debugCheckbox);
 	    offlineModeCheckbox = (CheckBox) findViewById(R.id.generalSettings_offlineModeCheckbox);
 	    googleAnalyticsCheckbox = (CheckBox) findViewById(R.id.generalSettings_googleAnalyticsCheckbox);
 	    accountsLayout = (LinearLayout) findViewById(R.id.generalSettings_accounts);	    
@@ -69,21 +66,9 @@ public class GeneralSettingsActivity extends BaseActivity {
         super.onResume();     
         
 	    SharedPreferences prefs = getSharedPrefUtil().getSharedPref();
-	    mDebug = prefs.getBoolean(SharedPrefUtil.PREF_DEBUG, TaskApplication.DEBUG);	
 	    mOfflineMode = prefs.getBoolean(SharedPrefUtil.PREF_OFFLINE_MODE, false);	
 	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, AnalyticsTrackerHelper.DEFAULT_GOOGLE_ANALYTICS);	
 	    
-	    debugModeCheckbox.setOnCheckedChangeListener(null);
-	    debugModeCheckbox.setChecked(mDebug);
-	    debugModeCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {			
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        	    SharedPreferences.Editor editor = getSharedPrefUtil().getEditor();
-        	    editor.putBoolean(SharedPrefUtil.PREF_DEBUG, isChecked);
-        	    editor.commit();	
-			}
-		});
-		
 	    offlineModeCheckbox.setOnCheckedChangeListener(null);
 	    offlineModeCheckbox.setChecked(mOfflineMode);
 	    offlineModeCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {			
@@ -164,7 +149,7 @@ public class GeneralSettingsActivity extends BaseActivity {
 		Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 		intent.putExtra(Settings.EXTRA_AUTHORITIES, new String[] {
-			    "com.android.contacts"
+			    "com.android.calendar"
 		});
 		activity.startActivity(intent);		
 	}

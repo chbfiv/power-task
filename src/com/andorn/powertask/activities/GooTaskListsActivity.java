@@ -104,7 +104,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 		
 		setContentView(R.layout.activity_task_lists);
 		
-		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_LIST_COLLECTION);
+		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_LISTS);
 
 		listView = (ListView) findViewById(R.id.task_lists);
 		
@@ -310,19 +310,24 @@ public class GooTaskListsActivity extends BaseActivity implements
 			return;
 		}
 
+        String messagePre = getString(R.string.dialog_task_list_delete_message_pre);
+        String messagePost = getString(R.string.dialog_task_list_delete_message_post);
+        String ok = getString(R.string.description_ok);
+        String cancel = getString(R.string.description_cancel);
+        
 		GooTaskList taskList = dbTLCHelper.read(taskListId);
 		
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	builder.setMessage("Do you want to delete the list: \"" + taskList.title + "\"?\nThe list will be permanently deleted.")
+    	builder.setMessage(messagePre + ": \"" + taskList.title + "\"?\n" + messagePost + ".")
     	       .setCancelable(false)
-    	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    	       .setPositiveButton(ok, new DialogInterface.OnClickListener() {
     	           public void onClick(DialogInterface dialog, int id) {    	      
   					 
     	        	   new DeleteTaskList().execute(taskListId);
     	        	   dialog.dismiss();
     	           }
     	       })
-    	       .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    	       .setNegativeButton(cancel, new DialogInterface.OnClickListener() {
     	           public void onClick(DialogInterface dialog, int id) {
     	                dialog.cancel();
     	           }
@@ -338,16 +343,22 @@ public class GooTaskListsActivity extends BaseActivity implements
     		return;
     	}
 
+        String messagePre = getString(R.string.dialog_task_list_rename_message_pre);
+        String messagePost = getString(R.string.dialog_task_list_rename_message_post);
+        String hint = getString(R.string.task_list_title_hint);
+        String ok = getString(R.string.description_ok);
+        String cancel = getString(R.string.description_cancel);
+        
 		GooTaskList taskList = dbTLCHelper.read(taskListId);
 		 
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	final EditText input = new EditText(this); 
-    	input.setHint("Task list title");
+    	input.setHint(hint);
     	input.setText(taskList.title);
-    	builder.setMessage("Rename list \"" + taskList.title + "\" to:")
+    	builder.setMessage(messagePre + " \"" + taskList.title + "\" " + messagePost + ":")
     		   .setView(input)
     	       .setCancelable(false)
-    	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    	       .setPositiveButton(ok, new DialogInterface.OnClickListener() {
     	           public void onClick(DialogInterface dialog, int id) {
   					 
     	           	   new RenameTaskList().execute(new RenameParam(taskListId, input.getText().toString()));
@@ -355,7 +366,7 @@ public class GooTaskListsActivity extends BaseActivity implements
     	        	   dialog.dismiss();
     	           }
     	       })
-    	       .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    	       .setNegativeButton(cancel, new DialogInterface.OnClickListener() {
     	           public void onClick(DialogInterface dialog, int id) {
     	                dialog.cancel();
     	           }
@@ -365,13 +376,18 @@ public class GooTaskListsActivity extends BaseActivity implements
 	
 	public void createTaskList()
 	{				 
+        String message = getString(R.string.dialog_task_list_create_message);
+        String hint = getString(R.string.task_list_title_hint);
+        String ok = getString(R.string.description_ok);
+        String cancel = getString(R.string.description_cancel);
+        
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	final EditText input = new EditText(this); 
-    	input.setHint("Task list title");
-    	builder.setMessage("Create a new list named:")
+    	input.setHint(hint);
+    	builder.setMessage(message)
     		   .setView(input)
     	       .setCancelable(false)
-    	       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    	       .setPositiveButton(ok, new DialogInterface.OnClickListener() {
     	           public void onClick(DialogInterface dialog, int id) {
   					 
     	           	   new CreateTaskList().execute(input.getText().toString());
@@ -379,7 +395,7 @@ public class GooTaskListsActivity extends BaseActivity implements
     	        	   dialog.dismiss();
     	           }
     	       })
-    	       .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    	       .setNegativeButton(cancel, new DialogInterface.OnClickListener() {
     	           public void onClick(DialogInterface dialog, int id) {
     	                dialog.cancel();
     	           }

@@ -2,6 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_general_settings"
         android:icon="@drawable/ic_menu_manage"
-        android:title="Settings"
+        android:title="@string/description_settings"
         android:orderInCategory="199" />
 </menu>

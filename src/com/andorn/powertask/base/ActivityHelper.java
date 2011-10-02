@@ -24,10 +24,10 @@ public class ActivityHelper {
 	@SuppressWarnings("unused")
 	private static final String TAG = ActivityHelper.class.getName();
 	
-	public static final int ACTIONBAR_TASK_LIST = 1;
+	public static final int ACTIONBAR_TASKS = 1;
 	public static final int ACTIONBAR_TASK_COMPOSE = 2;
 	public static final int ACTIONBAR_ACCOUNTS = 3;
-	public static final int ACTIONBAR_TASK_LIST_COLLECTION = 4;
+	public static final int ACTIONBAR_TASK_LISTS = 4;
 	public static final int ACTIONBAR_TASK_VIEW = 5;
 	public static final int ACTIONBAR_TASK_EDIT = 6;
 	public static final int ACTIONBAR_ACCOUNT_LIST = 7;
@@ -126,6 +126,7 @@ public class ActivityHelper {
         
         TextView titleText;
         ImageButton logo;
+        String title;
         
         switch (actionBarId) {	         
         case ACTIONBAR_ACCOUNT_LIST:
@@ -133,14 +134,15 @@ public class ActivityHelper {
             logo = new ImageButton(mActivity, null, R.attr.actionbarCompatLogoStyle);
             actionBarCompat.addView(logo);
 
+            title = mActivity.getString(R.string.description_accounts);
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
             titleText.setLayoutParams(normalLayoutParams);
-            titleText.setText("Accounts");
+            titleText.setText(title);
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
             
 			break;     
-        case ACTIONBAR_TASK_LIST_COLLECTION:
+        case ACTIONBAR_TASK_LISTS:
         	// Add logo
             logo = new ImageButton(mActivity, null, R.attr.actionbarCompatLogoStyle);
             logo.setOnClickListener(goUpClickListener);
@@ -152,24 +154,26 @@ public class ActivityHelper {
 //            actionBarCompat.addView(spring);
             //visiblility = View.VISIBLE;
 
+            title = mActivity.getString(R.string.description_task_lists);
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
             titleText.setOnClickListener(goUpClickListener);
             titleText.setLayoutParams(normalLayoutParams);
-            titleText.setText("Task Lists");
+            titleText.setText(title);
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
 			break;
-        case ACTIONBAR_TASK_LIST:
+        case ACTIONBAR_TASKS:
         	// Add logo
             logo = new ImageButton(mActivity, null, R.attr.actionbarCompatLogoStyle);
             logo.setOnClickListener(goUpClickListener);
             actionBarCompat.addView(logo);
             
             // Add spring (dummy view to align future children to the right)
+            title = mActivity.getString(R.string.description_tasks);
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
             titleText.setOnClickListener(goUpClickListener);
             titleText.setLayoutParams(normalLayoutParams);
-            titleText.setText("Tasks");
+            titleText.setText(title);
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
 			break;
@@ -180,10 +184,11 @@ public class ActivityHelper {
             actionBarCompat.addView(logo);
             
         	// Add title text
+            title = mActivity.getString(R.string.description_task_compose);
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
             titleText.setOnClickListener(goUpClickListener);
             titleText.setLayoutParams(normalLayoutParams);
-            titleText.setText("Compose Task");
+            titleText.setText(title);
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
             break;
@@ -194,10 +199,11 @@ public class ActivityHelper {
             actionBarCompat.addView(logo);
             
         	// Add title text
+            title = mActivity.getString(R.string.description_task_edit);
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
             titleText.setOnClickListener(goUpClickListener);
             titleText.setLayoutParams(normalLayoutParams);
-            titleText.setText("Edit Task");
+            titleText.setText(title);
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
             break;
@@ -208,16 +214,14 @@ public class ActivityHelper {
             actionBarCompat.addView(logo);
             
         	// Add title text
+            title = mActivity.getString(R.string.description_task);
             titleText = new TextView(mActivity, null, R.attr.actionbarCompatTextStyle);
             titleText.setOnClickListener(goUpClickListener);
             titleText.setLayoutParams(normalLayoutParams);
-            titleText.setText("Task");
+            titleText.setText(title);
             titleText.setTypeface(FontHelper.getInstance().CuprumRegular);
             actionBarCompat.addView(titleText);
             break;
-        case ACTIONBAR_ACCOUNTS:
-        	
-        	break;
         default:
         	return;
         }      

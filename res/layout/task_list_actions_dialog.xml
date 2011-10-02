@@ -30,7 +30,7 @@
 		        android:singleLine="true"
 		        android:ellipsize="end"
 		        android:gravity="center_vertical"
-                android:text="Actions" />
+                android:text="@string/description_actions" />
         </LinearLayout>
         <ImageView 
             android:layout_width="match_parent"
@@ -64,7 +64,7 @@
 			        android:singleLine="true"
 			        android:ellipsize="end"
 			        android:gravity="center_vertical"
-	                android:text="Open list" 
+	                android:text="@string/description_task_list_open" 
 	                android:onClick="openAction" 
 	                android:clickable="true"  />
 		        <ImageView 
@@ -86,7 +86,7 @@
 			        android:singleLine="true"
 			        android:ellipsize="end"
 			        android:gravity="center_vertical"
-	                android:text="Rename list" 
+	                android:text="@string/description_task_list_rename" 
 	                android:onClick="renameAction" 
 	                android:clickable="true"  />
 		        <ImageView 
@@ -108,7 +108,7 @@
 			        android:singleLine="true"
 			        android:ellipsize="end"
 			        android:gravity="center_vertical"
-	                android:text="Delete list" 
+	                android:text="@string/description_task_list_delete" 
 	                android:onClick="deleteAction" 
 	                android:clickable="true"  />
 		        <ImageView 
@@ -119,28 +119,6 @@
 		            android:layout_marginLeft="16dip"
 		            android:layout_marginRight="16dip"
 		            android:src="@drawable/divider_horizontal_holo_light" />	  
-	            <TextView 
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:textSize="@dimen/text_size_large"
-    				android:minHeight="64dip"
-		            android:layout_marginLeft="32dip"
-		            android:layout_marginRight="32dip"
-                	android:textColor="@android:color/white"
-			        android:singleLine="true"
-			        android:ellipsize="end"
-			        android:gravity="center_vertical"
-	                android:text="Help" 
-	                android:onClick="helpAction" 
-	                android:clickable="true"  />
-		        <ImageView 
-		            android:layout_width="match_parent"
-		            android:layout_height="1dip"
-		            android:scaleType="fitXY"
-		            android:gravity="fill_horizontal"
-		            android:layout_marginLeft="16dip"
-		            android:layout_marginRight="16dip"
-		            android:src="@drawable/divider_horizontal_holo_light" />
                </LinearLayout>
         </ScrollView>
     </LinearLayout>

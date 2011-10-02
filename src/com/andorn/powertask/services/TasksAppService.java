@@ -29,14 +29,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
-import android.widget.Toast;
 
 public class TasksAppService extends IntentService {
 
 	private static final String TAG = TasksAppService.class.getName();
-
-	//private final GoogleAnalyticsTracker mTracker = GoogleAnalyticsTracker.getInstance();    
-	private final SharedPrefUtil mSharedPref = SharedPrefUtil.create(this);
 	
 	public static final String REQUEST_RECEIVER_EXTRA = TasksAppService.class + ".extra";
 	
@@ -539,9 +535,7 @@ public class TasksAppService extends IntentService {
 	
 	private void TLog(String msg)
 	{
-	    boolean debug = mSharedPref.getSharedPref().getBoolean(SharedPrefUtil.PREF_DEBUG, TaskApplication.DEBUG);	
-	    
-	    if(debug) Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();	    
+	    //if(TaskApplication.DEBUG) Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();	    
         Log.i(TAG, msg);
 	}		
 }

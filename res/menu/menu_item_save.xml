@@ -2,6 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_save"
         android:icon="@drawable/ic_menu_save"
-        android:title="Save"
+        android:title="@string/description_save"
         android:orderInCategory="100"  />
 </menu>

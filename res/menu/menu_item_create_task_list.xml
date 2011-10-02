@@ -2,6 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_create_task_list"
         android:icon="@drawable/ic_menu_btn_add"
-        android:title="Create task list"
+        android:title="@string/description_task_list_create"
         android:orderInCategory="100" />
 </menu>

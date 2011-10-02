@@ -15,7 +15,6 @@ public class SharedPrefUtil {
 	public static final String PREF_TASKS_PAGE_SORT_TYPE = "tasks_page_sort_type";
 	public static final String PREF_AUTH_ATTEMPTS = "auth_attempts";
 	
-	public static final String PREF_DEBUG = "debug";
 	public static final String PREF_OFFLINE_MODE = "offline_mode";
 	public static final String PREF_GOOGLE_ANALYTICS = "google_analytics";
 	public static final String PREF_TERMS_OF_SERVICE = "terms_of_service";

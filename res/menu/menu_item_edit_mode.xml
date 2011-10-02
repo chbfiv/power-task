@@ -2,6 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_edit_mode"
         android:icon="@drawable/ic_menu_edit"
-        android:title="Edit Mode"
+        android:title="@string/description_task_edit"
         android:orderInCategory="100" />
 </menu>

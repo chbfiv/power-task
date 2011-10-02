@@ -2,6 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_compose_task"
         android:icon="@drawable/ic_menu_task_compose"
-        android:title="Compose task"
+        android:title="@string/description_task_compose"
         android:orderInCategory="100" />
 </menu>

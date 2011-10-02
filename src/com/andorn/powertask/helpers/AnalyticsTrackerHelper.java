@@ -22,7 +22,6 @@ public class AnalyticsTrackerHelper {
     protected Context mContext;   
     protected GoogleAnalyticsTracker mTracker;
     protected SharedPrefUtil mSharedPrefUtil;
-    private boolean mDebug = false;
     private boolean mGoogleAnalytics = false;
     private boolean mTermsOfService = false;
     
@@ -123,13 +122,12 @@ public class AnalyticsTrackerHelper {
     
     public void refresh()
     {
-	    SharedPreferences prefs = mSharedPrefUtil.getSharedPref();	
-	    mDebug = prefs.getBoolean(SharedPrefUtil.PREF_DEBUG, TaskApplication.DEBUG);   
+	    SharedPreferences prefs = mSharedPrefUtil.getSharedPref();	  
 	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, DEFAULT_GOOGLE_ANALYTICS);    
 	    mTermsOfService = prefs.getBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, false);    
 	    
-    	mTracker.setDebug(mDebug);
-    	mTracker.setDryRun(mDebug);    	
+    	mTracker.setDebug(TaskApplication.DEBUG);
+    	mTracker.setDryRun(TaskApplication.DEBUG);    	
     	
     	if(!mTermsOfService) ShowTermsOfServiceDialog();
     }

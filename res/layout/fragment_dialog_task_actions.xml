@@ -30,7 +30,7 @@
 		        android:singleLine="true"
 		        android:ellipsize="end"
 		        android:gravity="center_vertical"
-                android:text="Actions" />
+                android:text="@string/description_actions" />
         </LinearLayout>
         <ImageView 
             android:layout_width="match_parent"
@@ -59,7 +59,7 @@
 	                android:id="@+id/taskAction_read"
 	                android:textSize="@dimen/text_size_large"
     				android:minHeight="64dip"
-	                android:text="Read" 
+	                android:text="@string/description_task_read" 
 		            android:layout_marginLeft="32dip"
 		            android:layout_marginRight="32dip"
                 	android:textColor="@android:color/white"
@@ -87,7 +87,7 @@
 			        android:singleLine="true"
 			        android:ellipsize="end"
 			        android:gravity="center_vertical"
-	                android:text="Edit" 
+	                android:text="@string/description_task_edit" 
 	                android:clickable="true"  />
 		        <ImageView 
 		            android:layout_width="match_parent"
@@ -109,7 +109,7 @@
 			        android:singleLine="true"
 			        android:ellipsize="end"
 			        android:gravity="center_vertical"
-	                android:text="Delete" 
+	                android:text="@string/description_task_delete" 
 	                android:clickable="true"  />
 		        <ImageView 
 		            android:layout_width="match_parent"

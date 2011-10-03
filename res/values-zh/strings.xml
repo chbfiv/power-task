@@ -1,6 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Application -->
-    <string name="application_name">电源工作</string>
-    <string name="description_accounts">帐户</string>
+    <string name="description_search">搜索</string>
+    <string name="description_save">保存</string>    
+    <string name="description_sync">同步</string>    
+    <string name="description_ok">确定</string>    
+    <string name="description_cancel">取消</string>    
+    <string name="description_actions">行动</string>   
+
+	<!-- Settings -->
+    <string name="description_settings">设置</string>
+    <string name="description_general_settings">通用设置</string>
+	
+	<!-- Account(s) -->
+    <string name="description_accounts">账户</string>
+    <string name="description_add_account">添加 Google Gmail 账户</string>
+    <string name="description_debug">寻找错误</string>
+    <string name="description_offline_mode">脱机操作</string>
+    <string name="description_accounts_authorized_to_sync">用于同步的账户</string>
+    <string name="description_privacy_settings">隐私设置</string>
+    <string name="description_anonymous_usage_analytics">匿名操作分析</string>	
+
+	<!-- Task List(s) -->
+    <string name="description_task_lists">任务单</string>
+    <string name="description_task_list_create">创建任务单</string>
+    <string name="description_task_list_open">打开任务单</string>
+    <string name="description_task_list_rename">任务单重命名</string>
+    <string name="description_task_list_delete">删除任务单</string>
+    <string name="task_list_title_hint">任务单名称</string>
+    <string name="dialog_task_list_create_message">创建新任务单名</string>
+    <string name="dialog_task_list_rename_message_pre">任务单重命名为</string>
+    <string name="dialog_task_list_rename_message_post"></string>
+    <string name="dialog_task_list_delete_message_pre">您要删除该任务单吗</string>
+    <string name="dialog_task_list_delete_message_post">此任务单将被永久删除</string>
+
+	<!-- Task(s) -->
+    <string name="description_tasks">任务</string>
+    <string name="description_task">查看任务</string>
+    <string name="description_task_compose">创建任务</string>   
+    <string name="description_task_edit">编辑任务</string>  
+    <string name="description_task_read">打开任务</string>
+    <string name="description_task_discard">还原任务</string>   
+    <string name="description_task_delete">删除任务</string>
+
+    <string name="task_title_hint">名称:</string>
+    <string name="task_date_hint">截至日期:</string>
+    <string name="task_notes_hint">备忘录</string>
+	<string name="task_unselected">请选择一个任务</string>
 </resources>

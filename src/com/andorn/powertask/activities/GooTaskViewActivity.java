@@ -46,6 +46,7 @@ public class GooTaskViewActivity extends BaseActivity
         getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_VIEW);  
         
 		getTrackerHelper().setScreenOrientationCustomVar(this);
+		getTrackerHelper().verifyTermsOfService();
     }   
     
     @Override

@@ -38,10 +38,8 @@ public class GooAccountsActivity extends BaseActivity
         
 		mListView = (ListView) findViewById(R.id.accountsList);
 		
-
-		getTrackerHelper().trackPageView("/" + TAG);
-		
 		getTrackerHelper().setScreenOrientationCustomVar(this);
+		getTrackerHelper().verifyTermsOfService();
     }
 
     @Override

@@ -77,6 +77,7 @@ public class GooTasksActivity extends BaseActivity
 		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASKS);
 
 		getTrackerHelper().setScreenOrientationCustomVar(this);
+		getTrackerHelper().verifyTermsOfService();
 	}	
 	
 	@Override

@@ -121,15 +121,18 @@ public class AnalyticsTrackerHelper {
     }    
     
     public void refresh()
+    {  
+    	mTracker.setDebug(TaskApplication.DEBUG);
+    	mTracker.setDryRun(TaskApplication.DEBUG);    	
+    }
+    
+    public void verifyTermsOfService()
     {
 	    SharedPreferences prefs = mSharedPrefUtil.getSharedPref();	  
 	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, DEFAULT_GOOGLE_ANALYTICS);    
-	    mTermsOfService = prefs.getBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, false);    
+	    mTermsOfService = prefs.getBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, false); 
 	    
-    	mTracker.setDebug(TaskApplication.DEBUG);
-    	mTracker.setDryRun(TaskApplication.DEBUG);    	
-    	
-    	if(!mTermsOfService) ShowTermsOfServiceDialog();
+    	if(!mTermsOfService) ShowTermsOfServiceDialog();    	
     }
     
     public void trackPageView(String opt_pageURL)

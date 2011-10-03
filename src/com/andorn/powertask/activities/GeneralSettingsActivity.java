@@ -59,6 +59,7 @@ public class GeneralSettingsActivity extends BaseActivity {
 	    else debug.setVisibility(View.VISIBLE);
 	    
 		getTrackerHelper().setScreenOrientationCustomVar(this);
+		getTrackerHelper().verifyTermsOfService();
     }
 
     @Override

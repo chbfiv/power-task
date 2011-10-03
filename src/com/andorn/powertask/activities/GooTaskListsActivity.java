@@ -110,8 +110,10 @@ public class GooTaskListsActivity extends BaseActivity implements
 		
 		listView.addHeaderView(headerContainer);
 		
-		AppRaterHelper.app_launched(this, getTrackerHelper());
+		getTrackerHelper().verifyTermsOfService();
 		getTrackerHelper().setScreenOrientationCustomVar(this);
+		
+		AppRaterHelper.app_launched(this, getTrackerHelper());
 	}	
 	
 	@Override
@@ -384,7 +386,7 @@ public class GooTaskListsActivity extends BaseActivity implements
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	final EditText input = new EditText(this); 
     	input.setHint(hint);
-    	builder.setMessage(message)
+    	builder.setMessage(message + ":")
     		   .setView(input)
     	       .setCancelable(false)
     	       .setPositiveButton(ok, new DialogInterface.OnClickListener() {

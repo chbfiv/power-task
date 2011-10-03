@@ -53,6 +53,7 @@ public class GooTaskEditActivity extends BaseActivity
         	getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_EDIT);  
         
 		getTrackerHelper().setScreenOrientationCustomVar(this); 
+		getTrackerHelper().verifyTermsOfService();
     }
     
     @Override

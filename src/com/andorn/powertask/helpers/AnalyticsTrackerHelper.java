@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.andorn.powertask.R;
 import com.andorn.powertask.TaskApplication;
@@ -23,7 +26,6 @@ public class AnalyticsTrackerHelper {
     protected GoogleAnalyticsTracker mTracker;
     protected SharedPrefUtil mSharedPrefUtil;
     private boolean mGoogleAnalytics = false;
-    private boolean mTermsOfService = false;
     
 	public static final boolean DEFAULT_GOOGLE_ANALYTICS = true;
     
@@ -48,6 +50,7 @@ public class AnalyticsTrackerHelper {
     
 	public static final String CATEGORY_UI_INTERACTION = "ui_interaction";
 	public static final String CATEGORY_BACKGROUND_PROCESS = "background_process";
+	public static final String CATEGORY_ALERT = "alert";
 	
 	public static final String ACTION_SYNC = "sync";	
 	public static final String ACTION_UP = "up";	
@@ -59,7 +62,13 @@ public class AnalyticsTrackerHelper {
 	public static final String ACTION_CREATE_TASK_LIST = "create_task_list";	
 	public static final String ACTION_RENAME_TASK_LIST = "rename_task_list";	
 	public static final String ACTION_DELETE_TASK_LIST = "delete_task_list";	
-	
+	public static final String ACTION_TRIAL_ENDED = "trial_ended";
+	public static final String ACTION_TRIAL_ENDED_PURCHASE_APP = "trial_ended_purchase_app";	
+	public static final String ACTION_TRIAL_ENDED_NO_THANKS = "trial_ended_no_thanks";	
+
+    private final static int TRIAL_END_DAYS_UNTIL_PROMPT = 10;
+    private final static int TRIAL_END_NUMBER_OF_DAYS_EXTENTION = 1;
+    
     public static AnalyticsTrackerHelper create(Activity activity, Context context) {
         return new AnalyticsTrackerHelper(activity, context);                
     }
@@ -79,10 +88,16 @@ public class AnalyticsTrackerHelper {
     	refresh();
     	
     	if(sActivityCount == 0)
+    	{
     		mTracker.startNewSession(GOOGLE_ANALYTICS_WEB_PROPERTY_ID, mContext);
+    		setScreenOrientationCustomVar(mContext);
+    		
+    	}
     	
     	sActivityCount = sActivityCount < 0 ? 0 : sActivityCount; //reset to 0
     	sActivityCount++;    	
+    	
+		verifyTermsOfServiceAndTrial();
     }
     
     public void onStart()
@@ -122,17 +137,36 @@ public class AnalyticsTrackerHelper {
     
     public void refresh()
     {  
+	    final SharedPreferences prefs = mSharedPrefUtil.getSharedPref();	  
+	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, DEFAULT_GOOGLE_ANALYTICS); 
+	    
     	mTracker.setDebug(TaskApplication.DEBUG);
     	mTracker.setDryRun(TaskApplication.DEBUG);    	
     }
     
-    public void verifyTermsOfService()
+    private void verifyTermsOfServiceAndTrial()
     {
-	    SharedPreferences prefs = mSharedPrefUtil.getSharedPref();	  
-	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, DEFAULT_GOOGLE_ANALYTICS);    
-	    mTermsOfService = prefs.getBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, false); 
+	    final SharedPreferences prefs = mSharedPrefUtil.getSharedPref();	
 	    
-    	if(!mTermsOfService) ShowTermsOfServiceDialog();    	
+	    // Terms of Service
+	    boolean termsOfService = prefs.getBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, false); 	    
+    	if(!termsOfService) showTermsOfServiceDialog();    	
+    	
+    	// Trial Period
+    	if (TaskApplication.TRIAL)
+	    	{
+	        Long trialEndDate = prefs.getLong(SharedPrefUtil.PREF_TRIAL_END_DATE, 0);
+	        if (trialEndDate == 0) {
+	    	    final SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();
+	            trialEndDate = System.currentTimeMillis() + 
+	            		(TRIAL_END_DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000);
+	            editor.putLong(SharedPrefUtil.PREF_TRIAL_END_DATE, trialEndDate);
+	            editor.commit();
+	        }
+	        
+	        boolean trialEnded = System.currentTimeMillis() >= trialEndDate;
+	        if (trialEnded) showTrialEndedDialog();
+    	}
     }
     
     public void trackPageView(String opt_pageURL)
@@ -150,7 +184,7 @@ public class AnalyticsTrackerHelper {
     	if (mGoogleAnalytics) mTracker.setCustomVar(index, name, value, opt_scope);
     }
     
-    public void setScreenOrientationCustomVar(Context context)
+    private void setScreenOrientationCustomVar(Context context)
     {
     	String orientation = CUSTOM_VALUE_SCREEN_ORIENTATION_UNDEFINED;
     	switch(context.getResources().getConfiguration().orientation)
@@ -169,7 +203,7 @@ public class AnalyticsTrackerHelper {
     	setCustomVar(CUSTOM_INDEX_1, CUSTOM_NAME_SCREEN_ORIENTATION, orientation, CUSTOM_SCOPE_SESSION);
     }    
     
-    public void ShowTermsOfServiceDialog()
+    private void showTermsOfServiceDialog()
     {
     	String terms = mActivity.getString(R.string.terms_of_service_part_1);
     	
@@ -178,7 +212,7 @@ public class AnalyticsTrackerHelper {
         .setMessage(terms)
         .setPositiveButton("Accept - More",  new OnClickListener() {
            public void onClick(DialogInterface dialog, int id) {
-        	   ShowTermsOfServiceDialogPart2();	
+        	   showTermsOfServiceDialogPart2();	
            }
         })
         .setNegativeButton("Cancel",  new OnClickListener() {
@@ -200,7 +234,7 @@ public class AnalyticsTrackerHelper {
         .show();	
     }    
     
-    public void ShowTermsOfServiceDialogPart2()
+    private void showTermsOfServiceDialogPart2()
     {
     	String terms = mActivity.getString(R.string.terms_of_service_part_2);
     	
@@ -235,4 +269,44 @@ public class AnalyticsTrackerHelper {
         })
         .show();	
     }    
+
+    private void showTrialEndedDialog() {
+    	
+	    final SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();
+    	final String tag = mActivity.getClass().getName();    	
+
+        Long trialEndDate = System.currentTimeMillis() + 
+        		(TRIAL_END_NUMBER_OF_DAYS_EXTENTION * 24 * 60 * 60 * 1000);
+        editor.putLong(SharedPrefUtil.PREF_TRIAL_END_DATE, trialEndDate);
+        editor.commit();
+
+		mTracker.trackEvent(AnalyticsTrackerHelper.CATEGORY_ALERT, 
+				AnalyticsTrackerHelper.ACTION_TRIAL_ENDED, tag, 0);
+    	
+    	new AlertDialog.Builder(mActivity)
+    	.setTitle("Purchase " + TaskApplication.APP_TITLE)
+        .setMessage("If you enjoy using " + TaskApplication.APP_TITLE + ", please take a moment to purchase it.\n\n Thanks for your support!")
+        .setPositiveButton("Purchase " + TaskApplication.APP_TITLE,  new OnClickListener() {
+           public void onClick(DialogInterface dialog, int id) {
+				mTracker.trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+						AnalyticsTrackerHelper.ACTION_TRIAL_ENDED_PURCHASE_APP, tag, 0);
+           	   mActivity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + TaskApplication.APP_PNAME)));
+           }
+        })
+        .setNegativeButton("No, thanks. (1 day extention)",  new OnClickListener() {
+           public void onClick(DialogInterface dialog, int id) {
+               mTracker.trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+						AnalyticsTrackerHelper.ACTION_TRIAL_ENDED_NO_THANKS, tag, 0);
+               Toast.makeText(mContext, "No problem! Your trial has been extended " + " day(s). We hope you enjoy using " + TaskApplication.APP_TITLE + "!", 5);
+           }
+        })
+        .setOnCancelListener(new OnCancelListener() {
+          public void onCancel(DialogInterface dialog) {
+              mTracker.trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+						AnalyticsTrackerHelper.ACTION_TRIAL_ENDED_NO_THANKS, tag, 0);
+              Toast.makeText(mContext, "No problem! Your trial has been extended " + " day(s). We hope you enjoy using " + TaskApplication.APP_TITLE + "!", 5);
+          }
+        })
+        .show();   
+    }
 }

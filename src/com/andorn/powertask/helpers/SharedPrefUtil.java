@@ -21,6 +21,7 @@ public class SharedPrefUtil {
 	public static final String PREF_APP_RATING_NO_PROMPT = "app_rating_no_prompt";
 	public static final String PREF_APP_RATING_LAUNCH_COUNT = "app_rating_launch_count";
 	public static final String PREF_APP_RATING_FIRST_LAUNCH_DATE = "app_rating_first_launch_date";
+	public static final String PREF_TRIAL_END_DATE = "trial_end_date";
 	
     protected Context mContext;
 

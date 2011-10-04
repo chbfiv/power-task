@@ -18,6 +18,10 @@ public class TaskApplication extends Application {
 
     public static final boolean RELEASE = true;
     public static final boolean DEBUG = !RELEASE;
+    public static final boolean TRIAL = true;
+    
+    public final static String APP_TITLE = "Power Task";
+    public final static String APP_PNAME = "com.andorn.powertask";
     
     interface TaskListener {
         void onTaskUpdated(String message, long id);
@@ -25,7 +29,7 @@ public class TaskApplication extends Application {
 
     public final HttpTransport transport = AndroidHttp.newCompatibleTransport();
     public final JacksonFactory jsonFactory = new JacksonFactory();
-    public final Tasks service = new Tasks("7ask-7ags/1.0", transport, jsonFactory);
+    public final Tasks service = new Tasks(APP_PNAME, transport, jsonFactory);
     
     private TCTagListAdapter mTagListAdapter;
     

@@ -1,5 +1,7 @@
 package com.andorn.powertask.helpers;
 
+import com.andorn.powertask.TaskApplication;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,8 +16,6 @@ public class AppRaterHelper {
 	
 	private static final String TAG = AppRaterHelper.class.getName();
 	
-    private final static String APP_TITLE = "Power Task";
-    private final static String APP_PNAME = "com.andorn.powertask";
     
     private final static int DAYS_UNTIL_PROMPT = 15;
     private final static int LAUNCHES_UNTIL_PROMPT = 10;
@@ -51,9 +51,9 @@ public class AppRaterHelper {
     public static void showRateDialog(final Context context, final SharedPreferences.Editor editor, final AnalyticsTrackerHelper tracker) {
     	
     	new AlertDialog.Builder(context)
-    	.setTitle("Rate " + APP_TITLE)
-        .setMessage("If you enjoy using " + APP_TITLE + ", please take a moment to rate it.\n\n Thanks for your support!")
-        .setPositiveButton("Rate " + APP_TITLE,  new OnClickListener() {
+    	.setTitle("Rate " + TaskApplication.APP_TITLE)
+        .setMessage("If you enjoy using " + TaskApplication.APP_TITLE + ", please take a moment to rate it.\n\n Thanks for your support!")
+        .setPositiveButton("Rate " + TaskApplication.APP_TITLE,  new OnClickListener() {
            public void onClick(DialogInterface dialog, int id) {
                if (editor != null) {
                    editor.putBoolean(SharedPrefUtil.PREF_APP_RATING_NO_PROMPT, true);
@@ -61,7 +61,7 @@ public class AppRaterHelper {
                }
 				tracker.trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
 						AnalyticsTrackerHelper.ACTION_APP_RATE, TAG, 0);
-           	   context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + APP_PNAME)));
+           	   context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + TaskApplication.APP_PNAME)));
            }
         })
         .setNeutralButton("Remind me later",  new OnClickListener() {

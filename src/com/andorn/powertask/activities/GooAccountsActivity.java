@@ -37,9 +37,6 @@ public class GooAccountsActivity extends BaseActivity
 		getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_ACCOUNT_LIST);
         
 		mListView = (ListView) findViewById(R.id.accountsList);
-		
-		getTrackerHelper().setScreenOrientationCustomVar(this);
-		getTrackerHelper().verifyTermsOfService();
     }
 
     @Override

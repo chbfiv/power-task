@@ -44,9 +44,6 @@ public class GooTaskViewActivity extends BaseActivity
         mTaskViewFragment = (GooTaskViewFragment) getSupportFragmentManager().findFragmentById(R.id.task_view_fragment);
 
         getActivityHelper().setupActionBar(ActivityHelper.ACTIONBAR_TASK_VIEW);  
-        
-		getTrackerHelper().setScreenOrientationCustomVar(this);
-		getTrackerHelper().verifyTermsOfService();
     }   
     
     @Override

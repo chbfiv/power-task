@@ -109,10 +109,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 		listView = (ListView) findViewById(R.id.task_lists);
 		
 		listView.addHeaderView(headerContainer);
-		
-		getTrackerHelper().verifyTermsOfService();
-		getTrackerHelper().setScreenOrientationCustomVar(this);
-		
+				
 		AppRaterHelper.app_launched(this, getTrackerHelper());
 	}	
 	

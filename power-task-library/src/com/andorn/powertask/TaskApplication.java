@@ -16,9 +16,9 @@ import android.content.Context;
 
 public class TaskApplication extends Application {
 
-    public static final boolean RELEASE = true;
+    public static final boolean RELEASE = false;
     public static final boolean DEBUG = !RELEASE;
-    public static final boolean TRIAL = true;
+    public static final boolean TRIAL = false;
     
     public final static String APP_TITLE = "Power Task";
     public final static String APP_PNAME = "com.andorn.powertask";

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.andorn.powertask.trial" 
+    android:versionCode="9" 
+    android:versionName="0.8.2.0">
+    <!-- Add Account doesn't work in 7 or below at this point. -->
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8"  />
+	<uses-library android:name="com.andorn.powertask" />
+	
+	<!-- Allows applications to access information about networks -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- Permission for internet access -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Permission to keep the processor from sleeping -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Permission to retrieve the list of accounts in the Accounts Service -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.ACCOUNT_MANAGER" />
+
+    <!-- Permission to request authtokens from the AccountManager -->
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
+    <application 
+	    android:icon="@drawable/launcher" 
+	    android:label="@string/application_name"
+        android:name="com.andorn.powertask.trial.PowerTaskTrialApplication" 
+        android:debuggable="true"
+        android:theme="@style/Theme.IOSched">
+		
+		<service android:name="com.andorn.powertask.services.TasksAppService" />
+        <activity 
+        	android:name="com.andorn.powertask.activities.GooTaskListsActivity"
+            android:launchMode="singleTop" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>         
+        </activity>        
+        <activity android:name="com.andorn.powertask.activities.GooTasksActivity" />
+        <activity android:name="com.andorn.powertask.activities.GooTaskEditActivity" />
+        <activity android:name="com.andorn.powertask.activities.GooTaskViewActivity" />
+        <activity android:name="com.andorn.powertask.activities.GooAccountsActivity" />    
+        <activity android:name="com.andorn.powertask.activities.TCTagListActivity" />      
+        <activity android:name="com.andorn.powertask.activities.GeneralSettingsActivity" />           
+    </application>
+</manifest>

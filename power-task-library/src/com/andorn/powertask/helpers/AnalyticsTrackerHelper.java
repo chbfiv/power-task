@@ -66,8 +66,11 @@ public class AnalyticsTrackerHelper {
 	public static final String ACTION_TRIAL_ENDED_PURCHASE_APP = "trial_ended_purchase_app";	
 	public static final String ACTION_TRIAL_ENDED_NO_THANKS = "trial_ended_no_thanks";	
 
-    private final static int TRIAL_END_DAYS_UNTIL_PROMPT = 10;
+    private final static int TRIAL_END_DAYS_UNTIL_PROMPT = 0;
+    private final static int TRIAL_END_DAYS_UNTIL_PROMPT_MS = (TRIAL_END_DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000);
+    
     private final static int TRIAL_END_NUMBER_OF_DAYS_EXTENTION = 1;
+    private final static int TRIAL_END_NUMBER_OF_DAYS_EXTENTION_MS = (TRIAL_END_NUMBER_OF_DAYS_EXTENTION * 24 * 60 * 60 * 1000);
     
     public static AnalyticsTrackerHelper create(Activity activity, Context context) {
         return new AnalyticsTrackerHelper(activity, context);                
@@ -140,8 +143,8 @@ public class AnalyticsTrackerHelper {
 	    final SharedPreferences prefs = mSharedPrefUtil.getSharedPref();	  
 	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, DEFAULT_GOOGLE_ANALYTICS); 
 	    
-    	mTracker.setDebug(TaskApplication.DEBUG);
-    	mTracker.setDryRun(TaskApplication.DEBUG);    	
+    	mTracker.setDebug(TaskApplication.get(mContext).isDebug());
+    	mTracker.setDryRun(TaskApplication.get(mContext).isDebug());    	
     }
     
     private void verifyTermsOfServiceAndTrial()
@@ -153,13 +156,22 @@ public class AnalyticsTrackerHelper {
     	if(!termsOfService) showTermsOfServiceDialog();    	
     	
     	// Trial Period
-    	if (TaskApplication.TRIAL)
-	    	{
+    	if (TaskApplication.get(mContext).isTrial())
+	    {
+    	    final SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();
+    	    
 	        Long trialEndDate = prefs.getLong(SharedPrefUtil.PREF_TRIAL_END_DATE, 0);
+	        // never set, set now
 	        if (trialEndDate == 0) {
-	    	    final SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();
-	            trialEndDate = System.currentTimeMillis() + 
-	            		(TRIAL_END_DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000);
+	            trialEndDate = System.currentTimeMillis() + TRIAL_END_DAYS_UNTIL_PROMPT_MS;
+	            editor.putLong(SharedPrefUtil.PREF_TRIAL_END_DATE, trialEndDate);
+	            editor.commit();
+	        }
+	        
+	        // too far out, maybe tampering? reset to normal end date
+	        if (System.currentTimeMillis() + TRIAL_END_DAYS_UNTIL_PROMPT_MS +
+	        		TRIAL_END_NUMBER_OF_DAYS_EXTENTION_MS  < trialEndDate) {
+	            trialEndDate = System.currentTimeMillis() + TRIAL_END_DAYS_UNTIL_PROMPT_MS;
 	            editor.putLong(SharedPrefUtil.PREF_TRIAL_END_DATE, trialEndDate);
 	            editor.commit();
 	        }
@@ -275,8 +287,7 @@ public class AnalyticsTrackerHelper {
 	    final SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();
     	final String tag = mActivity.getClass().getName();    	
 
-        Long trialEndDate = System.currentTimeMillis() + 
-        		(TRIAL_END_NUMBER_OF_DAYS_EXTENTION * 24 * 60 * 60 * 1000);
+        Long trialEndDate = System.currentTimeMillis() + TRIAL_END_NUMBER_OF_DAYS_EXTENTION_MS;
         editor.putLong(SharedPrefUtil.PREF_TRIAL_END_DATE, trialEndDate);
         editor.commit();
 

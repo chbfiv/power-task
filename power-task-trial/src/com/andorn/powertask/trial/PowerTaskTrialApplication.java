@@ -3,6 +3,25 @@ package com.andorn.powertask.trial;
 import com.andorn.powertask.TaskApplication;
 
 public class PowerTaskTrialApplication extends TaskApplication {
-    public static final boolean RELEASE = false;
-    public static final boolean TRIAL = true;
+	
+	private static final boolean RELEASE = false;
+	private static final boolean TRIAL = true;
+    
+    @Override
+    public boolean isRelease()
+    {
+    	return RELEASE;
+    }
+    
+    @Override
+    public boolean isDebug()
+    {
+    	return !RELEASE;
+    }
+    
+    @Override
+    public boolean isTrial()
+    {
+    	return TRIAL;
+    }
 }

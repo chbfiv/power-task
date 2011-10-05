@@ -1,5 +1,17 @@
 package com.andorn.powertask;
 
 public class PowerTaskApplication extends TaskApplication {
-    public static final boolean RELEASE = false;
+    private static final boolean RELEASE = false;
+    
+    @Override
+    public boolean isRelease()
+    {
+    	return RELEASE;
+    }
+    
+    @Override
+    public boolean isDebug()
+    {
+    	return !RELEASE;
+    }
 }

@@ -16,22 +16,46 @@ import android.content.Context;
 
 public class TaskApplication extends Application {
 
-    public static final boolean RELEASE = false;
-    public static final boolean DEBUG = !RELEASE;
-    public static final boolean TRIAL = false;
+    private static final boolean RELEASE = false;
+    private static final boolean TRIAL = false;
     
     public final static String APP_TITLE = "Power Task";
     public final static String APP_PNAME = "com.andorn.powertask";
-    
-    interface TaskListener {
-        void onTaskUpdated(String message, long id);
-    }
 
     public final HttpTransport transport = AndroidHttp.newCompatibleTransport();
     public final JacksonFactory jsonFactory = new JacksonFactory();
     public final Tasks service = new Tasks(APP_PNAME, transport, jsonFactory);
     
     private TCTagListAdapter mTagListAdapter;
+    
+    public static TaskApplication get(Context context)
+    {
+    	TaskApplication app = null;    	
+    	if(context.getApplicationContext() instanceof TaskApplication)
+    	{
+    		app = (TaskApplication)context.getApplicationContext();
+    	}    	
+    	return app;
+    }
+    
+    public boolean isRelease()
+    {
+    	return RELEASE;
+    }
+    
+    public boolean isDebug()
+    {
+    	return !RELEASE;
+    }
+    
+    public boolean isTrial()
+    {
+    	return TRIAL;
+    }
+    
+    interface TaskListener {
+        void onTaskUpdated(String message, long id);
+    }
     
     @Override
     public void onCreate() {

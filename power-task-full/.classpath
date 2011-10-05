@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="src" path="power-task-library_src"/>
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/android-support-v4.jar"/>
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/google-api-client-1.4.1-beta.jar"/>
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/google-api-client-extensions-android2-1.4.1-beta.jar"/>
@@ -13,5 +12,6 @@
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/guava-r09.jar"/>
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/jackson-core-asl-1.6.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/libGoogleAnalytics.jar"/>
+	<classpathentry kind="src" path="power-task-library_src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

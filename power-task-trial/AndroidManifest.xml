@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.andorn.powertask.trial" 
-    android:versionCode="9" 
-    android:versionName="0.8.2.0">
+    android:versionCode="10" 
+    android:versionName="0.8.2.1">
     <!-- Add Account doesn't work in 7 or below at this point. -->
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8"  />
 	<uses-library android:name="com.andorn.powertask" />
@@ -28,7 +28,7 @@
 	    android:icon="@drawable/launcher" 
 	    android:label="@string/application_name"
         android:name="com.andorn.powertask.trial.PowerTaskTrialApplication" 
-        android:debuggable="true"
+        android:debuggable="false"
         android:theme="@style/Theme.IOSched">
 		
 		<service android:name="com.andorn.powertask.services.TasksAppService" />

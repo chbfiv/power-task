@@ -6,7 +6,9 @@ public class GooSyncBase extends GooBase {
 	public static final int SYNC_CREATE = 1;
 	public static final int SYNC_UPDATE = 2;
 	public static final int SYNC_DELETE = 4;
-	public static final int SYNC_REQUIRED = SYNC_CREATE | SYNC_UPDATE | SYNC_DELETE;
+	public static final int SYNC_HIDE = 8;
+	
+	public static final int SYNC_REQUIRED = SYNC_CREATE | SYNC_UPDATE | SYNC_DELETE | SYNC_HIDE;
 	
 	private int mSyncState = 0;
 	private String mETag = "";
@@ -33,6 +35,11 @@ public class GooSyncBase extends GooBase {
 	public boolean isSyncDelete()
 	{
 		return (mSyncState & SYNC_DELETE) == SYNC_DELETE;
+	}
+	
+	public boolean isSyncHide()
+	{
+		return (mSyncState & SYNC_HIDE) == SYNC_HIDE;
 	}
 	
 	public void setSyncState(int syncState)

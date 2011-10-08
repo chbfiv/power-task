@@ -83,7 +83,8 @@ public class ActivityHelper {
             MenuItem item = menu.getItem(i);
 
             if (item.getItemId() != R.id.menu_general_settings &&
-        		item.getItemId() != R.id.menu_add_account) 
+        		item.getItemId() != R.id.menu_add_account &&
+        		item.getItemId() != R.id.menu_clear_completed) 
             {
             	addActionButtonCompatFromMenuItem(item);
             }

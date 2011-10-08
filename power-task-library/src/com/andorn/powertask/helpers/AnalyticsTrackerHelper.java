@@ -61,12 +61,13 @@ public class AnalyticsTrackerHelper {
 	public static final String ACTION_DISAGREE_TERMS_OF_SERVICE = "disagree_terms_of_service";		
 	public static final String ACTION_CREATE_TASK_LIST = "create_task_list";	
 	public static final String ACTION_RENAME_TASK_LIST = "rename_task_list";	
-	public static final String ACTION_DELETE_TASK_LIST = "delete_task_list";	
+	public static final String ACTION_DELETE_TASK_LIST = "delete_task_list";
+	public static final String ACTION_CLEAR_COMPLETED_TASK_LIST = "clear_completed_task_list";		
 	public static final String ACTION_TRIAL_ENDED = "trial_ended";
 	public static final String ACTION_TRIAL_ENDED_PURCHASE_APP = "trial_ended_purchase_app";	
 	public static final String ACTION_TRIAL_ENDED_NO_THANKS = "trial_ended_no_thanks";	
-
-    private final static int TRIAL_END_DAYS_UNTIL_PROMPT = 0;
+	
+    private final static int TRIAL_END_DAYS_UNTIL_PROMPT = 10;
     private final static int TRIAL_END_DAYS_UNTIL_PROMPT_MS = (TRIAL_END_DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000);
     
     private final static int TRIAL_END_NUMBER_OF_DAYS_EXTENTION = 1;

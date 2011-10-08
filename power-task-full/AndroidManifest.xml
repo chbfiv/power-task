@@ -28,7 +28,7 @@
 	    android:icon="@drawable/launcher" 
 	    android:label="@string/application_name"
         android:name="com.andorn.powertask.PowerTaskApplication" 
-        android:debuggable="true"
+        android:debuggable="false"
         android:theme="@style/Theme.IOSched">
 		
 		<service android:name="com.andorn.powertask.services.TasksAppService" />

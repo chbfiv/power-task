@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.andorn.powertask.models.GooBase;
+import com.andorn.powertask.models.GooSyncBase;
 import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.services.TasksAppService;
 import com.google.api.services.tasks.v1.model.TaskList;
@@ -451,6 +452,14 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 				{
 					//dont need to create it, thus it was deleted remotely
 					delete(localList.getId());
+				}
+				else if (localList.isSyncHide()) 
+				{
+					if(service.clearRemoteTaskList(localList))
+					{
+						localList.unflagSyncState(GooSyncBase.SYNC_HIDE);
+						update(localList);
+					}
 				}
 				else if (localList.isSyncDelete()) 
 				{

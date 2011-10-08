@@ -293,11 +293,12 @@ public class GooTaskListsActivity extends BaseActivity implements
 		}		
 	}	
 	
-	public void helpAction(View v)
+	public void clearCompletedAction(View v)
 	{
 		if(mTaskListActionsDialog != null && mTaskListActionsDialog.isShowing())
 		{
 			mTaskListActionsDialog.dismiss();
+			clearCompletedTaskList(mTaskListActionsDialog.getTaskListId());
 		}		
 	}	
 	
@@ -401,6 +402,17 @@ public class GooTaskListsActivity extends BaseActivity implements
     	       });
     	builder.show();		
 	}
+		
+	public void clearCompletedTaskList(final long taskListId)
+	{    	
+		if(taskListId == GooBase.INVALID_ID)
+		{
+			Log.e(TAG, "invalid taskListId.");
+			return;
+		}        	
+
+ 	   new ClearCompletedTaskList().execute(taskListId);
+	}
 	
     private class RenameParam {
     	public RenameParam(long listId, String newTitle)
@@ -491,6 +503,34 @@ public class GooTaskListsActivity extends BaseActivity implements
 	
 	     protected void onPostExecute(Boolean result) {
 	         mAdapter.requery();
+	     }
+	}
+	
+	private class ClearCompletedTaskList extends AsyncTask<Long, Void, Boolean> {
+	     protected Boolean doInBackground(Long... ids) {
+	    	 Boolean ret = true;
+	    	 try
+	    	 {
+		    	 for (Long id : ids)
+		    	 {
+		    		 GooTaskList taskList = dbTLCHelper.read(id);
+		    		 taskList.setSyncState(GooSyncBase.SYNC_HIDE);
+		    		 dbTLCHelper.update(taskList);
+		    		 dbTLCHelper.getDbhTasks().clearCompleted(id);
+		    		 
+ 					 getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+								AnalyticsTrackerHelper.ACTION_CLEAR_COMPLETED_TASK_LIST, TAG, 0);
+		    	 }   		 
+	    	 }
+	    	 catch(Exception ex)
+	    	 {
+	    		 ret = false;
+	    	 }
+			return ret;	    	 
+	     }
+	
+	     protected void onPostExecute(Boolean result) {
+	         sync(true);
 	     }
 	}
 

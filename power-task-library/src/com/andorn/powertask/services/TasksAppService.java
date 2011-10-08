@@ -421,6 +421,22 @@ public class TasksAppService extends IntentService {
     	return ret;
 	}	
 	
+	public boolean clearRemoteTaskList(GooTaskList local) throws Exception
+	{
+		boolean ret = false;
+    	try
+    	{   		
+    		taskService.tasks.clear(local.remoteId).execute();
+    		ret = true;
+    	} 
+    	catch(Exception e)
+    	{
+    		handleException(e);
+            throw e;     
+    	}
+    	return ret;
+	}	
+	
 	// Tasks
 	
 	public Tasks queryRemoteTasks(String taskListRemoteId) throws Exception
@@ -432,6 +448,9 @@ public class TasksAppService extends IntentService {
 			com.google.api.services.tasks.v1.Tasks.TasksOperations.List request =
 					taskService.tasks.list(taskListRemoteId);
     		request.fields = "etag,items(completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated)";
+    		request.showCompleted = true;
+    		request.showDeleted = true;
+    		request.showHidden = true;
     		result = request.execute();
     	} 
     	catch(Exception e)

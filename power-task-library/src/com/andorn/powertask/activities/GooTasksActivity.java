@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.support.v4.view.ViewPager;
@@ -28,6 +29,8 @@ import com.andorn.powertask.interfaces.IGooTaskFrag;
 import com.andorn.powertask.interfaces.IGooTaskHost;
 import com.andorn.powertask.interfaces.IGooTasksHost;
 import com.andorn.powertask.models.GooBase;
+import com.andorn.powertask.models.GooSyncBase;
+import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.services.TasksAppService;
 import com.andorn.powertask.R;
 
@@ -102,6 +105,7 @@ public class GooTasksActivity extends BaseActivity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu_item_general_settings, menu);
+		getMenuInflater().inflate(R.menu.menu_item_clear_completed, menu);
 		getMenuInflater().inflate(R.menu.menu_item_sync, menu);
 		getMenuInflater().inflate(R.menu.menu_item_compose_task, menu);
 		return true;
@@ -123,6 +127,17 @@ public class GooTasksActivity extends BaseActivity
 			}
 			case R.id.menu_compose_task: {
 				GooTaskEditActivity.go(this, false, getActiveTaskListId(), GooBase.INVALID_ID);
+				return true;
+			}
+			case R.id.menu_clear_completed: {
+				long taskListId = getActiveTaskListId();
+				if(taskListId == GooBase.INVALID_ID)
+				{
+					Log.e(TAG, "invalid taskListId.");
+					return true;
+				}        	
+
+		 	    new ClearCompletedTaskList().execute(taskListId);				
 				return true;
 			}
 		}
@@ -187,6 +202,34 @@ public class GooTasksActivity extends BaseActivity
 			if(frag != null) frag.refresh();				
 		}
 		if(mTaskViewFragment != null) BaseFragment.<IGooTaskFrag>frag(mTaskViewFragment).refresh();
+	}
+	
+	private class ClearCompletedTaskList extends AsyncTask<Long, Void, Boolean> {
+	     protected Boolean doInBackground(Long... ids) {
+	    	 Boolean ret = true;
+	    	 try
+	    	 {
+		    	 for (Long id : ids)
+		    	 {
+		    		 GooTaskList taskList = dbhTaskLists.read(id);
+		    		 taskList.setSyncState(GooSyncBase.SYNC_HIDE);
+		    		 dbhTaskLists.update(taskList);
+		    		 dbhTaskLists.getDbhTasks().clearCompleted(id);
+		    		 
+					 getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+								AnalyticsTrackerHelper.ACTION_CLEAR_COMPLETED_TASK_LIST, TAG, 0);
+		    	 }   		 
+	    	 }
+	    	 catch(Exception ex)
+	    	 {
+	    		 ret = false;
+	    	 }
+			return ret;	    	 
+	     }
+	
+	     protected void onPostExecute(Boolean result) {
+	    	 refresh();
+	     }
 	}
 	
 	private OAuthReceiver mOAuthReceiver = new OAuthReceiver() {	

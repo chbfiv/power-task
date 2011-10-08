@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.andorn.powertask.models.GooBase;
+import com.andorn.powertask.models.GooSyncBase;
 import com.andorn.powertask.models.GooTask;
 import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.services.TasksAppService;
@@ -204,7 +205,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 			c = getDbReadOnly().query(
 					TABLE_NAME,            // The database to query
 					PROJECTION,    // The columns to return from the query
-					KEY_taskListId + " = ? AND (" + KEY_syncState + " & " + syncStateFilter + ") != " + syncStateFilter,     // The columns for the where clause
+					KEY_taskListId + " = ? AND " + KEY_deleted + " = 0 AND " + KEY_hidden + " = 0 AND " + 
+					"(" + KEY_syncState + " & " + syncStateFilter + ") != " + syncStateFilter,     // The columns for the where clause
 		           new String[] { String.valueOf(taskListId) }, // The values for the where clause
 		           null,          // don't group the rows
 		           null,          // don't filter by row groups
@@ -447,6 +449,27 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		 return ret;
      } 
 	 
+	 public boolean clearCompleted(long taskListId)
+	 {
+		boolean ret = false;
+		if(!initialize()) return ret;
+		 try
+		 {
+			 String sql = "UPDATE " + TABLE_NAME + 
+					 " SET " + KEY_hidden + " = 1 " +
+					 " WHERE " + KEY_taskListId + " = " + taskListId + " AND " +
+					 KEY_deleted + " = 0 AND " +
+					 KEY_status + " = '" + GooTask.Status.completed.toString() + "'";
+			 getDbReadWrite().execSQL(sql);	
+			 ret = true;
+		 }
+		 catch(SQLException sqle)
+		 {
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());	   			
+		 }
+		 return ret;
+	 }
+	 
 	public boolean sync(TasksAppService service, GooTaskList localList) throws Exception 
 	{
 		boolean ret = false;
@@ -506,7 +529,10 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 				{
 					if(service.deleteRemoteTask(localTask))
 					{
-						delete(localTask.getId());
+						localTask.deleted = true;
+						localTask.unflagSyncState(GooSyncBase.SYNC_DELETE);
+						localTask.setETag(remoteTasks.etag);
+						update(localTask);
 					}
 				}	
 				else if (localTask.isSyncUpdate()) 

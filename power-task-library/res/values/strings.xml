@@ -37,6 +37,7 @@
     <string name="description_task_list_open">Open Task List</string>
     <string name="description_task_list_rename">Rename Task List</string>
     <string name="description_task_list_delete">Delete Task List</string>
+    <string name="description_task_list_clear_completed">Clear Completed</string>
     <string name="task_list_title_hint">task list title</string>
     <string name="dialog_task_list_create_message">Create a new list named</string>
     <string name="dialog_task_list_rename_message_pre">Rename list</string>

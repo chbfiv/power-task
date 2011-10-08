@@ -4,7 +4,7 @@ import com.andorn.powertask.TaskApplication;
 
 public class PowerTaskTrialApplication extends TaskApplication {
 	
-	private static final boolean RELEASE = false;
+	private static final boolean RELEASE = true;
 	private static final boolean TRIAL = true;
     
     @Override

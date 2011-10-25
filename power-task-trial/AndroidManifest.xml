@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.andorn.powertask.trial" 
-    android:versionCode="10" 
-    android:versionName="0.8.2.1">
+    android:versionCode="11" 
+    android:versionName="0.8.3.0">
     <!-- Add Account doesn't work in 7 or below at this point. -->
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8"  />
 	<uses-library android:name="com.andorn.powertask" />

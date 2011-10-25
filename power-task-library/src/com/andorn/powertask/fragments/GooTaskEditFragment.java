@@ -83,19 +83,13 @@ public class GooTaskEditFragment extends BaseFragment
     
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-    	switch(item.getItemId())
-    	{
-    		case R.id.menu_discard: 
-    		{
-	        	discard();
-	            return true;
-	        }
-    		case R.id.menu_save: 
-    		{
-    			save();
-	            return true;
-	        }
-    	}
+    	if (item.getItemId() == R.id.menu_discard) {
+			discard();
+			return true;
+		} else if (item.getItemId() == R.id.menu_save) {
+			save();
+			return true;
+		}
 		return super.onOptionsItemSelected(item);
 	}
 

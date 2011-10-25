@@ -77,15 +77,12 @@ public class GooAccountsActivity extends BaseActivity
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.menu_general_settings: {
-				GeneralSettingsActivity.go(this, false);
-				return true;
-			}
-			case R.id.menu_add_account: {
-				GeneralSettingsActivity.addAccount(this);
-				return true;
-			}
+		if (item.getItemId() == R.id.menu_general_settings) {
+			GeneralSettingsActivity.go(this, false);
+			return true;
+		} else if (item.getItemId() == R.id.menu_add_account) {
+			GeneralSettingsActivity.addAccount(this);
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

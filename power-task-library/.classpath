@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/guava-r09.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-asl-1.6.7.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-client-1.4.1-beta.jar"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -99,16 +99,13 @@ public class GooTaskViewFragment extends BaseFragment
     
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-    	switch(item.getItemId())
-    	{
-			case R.id.menu_edit_mode: {
-				if(host().getActiveTaskId() != GooBase.INVALID_ID)
-					GooTaskEditActivity.go(mActivity, false, host().getActiveTaskId());
-				else
-				    Toast.makeText(mActivity, "Please select a task", Toast.LENGTH_SHORT).show();
-				return true;
-			}
-    	}
+    	if (item.getItemId() == R.id.menu_edit_mode) {
+			if(host().getActiveTaskId() != GooBase.INVALID_ID)
+				GooTaskEditActivity.go(mActivity, false, host().getActiveTaskId());
+			else
+			    Toast.makeText(mActivity, "Please select a task", Toast.LENGTH_SHORT).show();
+			return true;
+		}
         return super.onOptionsItemSelected(item);
 	}	
     

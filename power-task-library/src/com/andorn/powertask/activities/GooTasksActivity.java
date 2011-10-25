@@ -113,33 +113,27 @@ public class GooTasksActivity extends BaseActivity
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.menu_general_settings: {
-				GeneralSettingsActivity.go(this, false);
+		if (item.getItemId() == R.id.menu_general_settings) {
+			GeneralSettingsActivity.go(this, false);
+			return true;
+		} else if (item.getItemId() == R.id.menu_sync) {
+			getOAuthHelper().resetAuthAttempts();
+			sync();
+			getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+					AnalyticsTrackerHelper.ACTION_SYNC, TAG, 0);
+			return true;
+		} else if (item.getItemId() == R.id.menu_compose_task) {
+			GooTaskEditActivity.go(this, false, getActiveTaskListId(), GooBase.INVALID_ID);
+			return true;
+		} else if (item.getItemId() == R.id.menu_clear_completed) {
+			long taskListId = getActiveTaskListId();
+			if(taskListId == GooBase.INVALID_ID)
+			{
+				Log.e(TAG, "invalid taskListId.");
 				return true;
 			}
-			case R.id.menu_sync: {
-				getOAuthHelper().resetAuthAttempts();
-				sync();
-				getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
-						AnalyticsTrackerHelper.ACTION_SYNC, TAG, 0);
-				return true;
-			}
-			case R.id.menu_compose_task: {
-				GooTaskEditActivity.go(this, false, getActiveTaskListId(), GooBase.INVALID_ID);
-				return true;
-			}
-			case R.id.menu_clear_completed: {
-				long taskListId = getActiveTaskListId();
-				if(taskListId == GooBase.INVALID_ID)
-				{
-					Log.e(TAG, "invalid taskListId.");
-					return true;
-				}        	
-
-		 	    new ClearCompletedTaskList().execute(taskListId);				
-				return true;
-			}
+			new ClearCompletedTaskList().execute(taskListId);
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

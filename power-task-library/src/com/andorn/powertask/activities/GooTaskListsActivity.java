@@ -170,22 +170,18 @@ public class GooTaskListsActivity extends BaseActivity implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.menu_general_settings: {
-				GeneralSettingsActivity.go(this, false);
-				return true;
-			}
-			case R.id.menu_sync: {
-				getOAuthHelper().resetAuthAttempts();
-				sync();
-				getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
-						AnalyticsTrackerHelper.ACTION_SYNC, TAG, 0);
-				return true;
-			}
-			case R.id.menu_create_task_list: {
-				createTaskList();
-				return true;
-			}
+		if (item.getItemId() == R.id.menu_general_settings) {
+			GeneralSettingsActivity.go(this, false);
+			return true;
+		} else if (item.getItemId() == R.id.menu_sync) {
+			getOAuthHelper().resetAuthAttempts();
+			sync();
+			getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+					AnalyticsTrackerHelper.ACTION_SYNC, TAG, 0);
+			return true;
+		} else if (item.getItemId() == R.id.menu_create_task_list) {
+			createTaskList();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

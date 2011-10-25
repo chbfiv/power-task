@@ -13,5 +13,6 @@
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/guava-r09.jar"/>
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/jackson-core-asl-1.6.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/libGoogleAnalytics.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

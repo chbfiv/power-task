@@ -10,6 +10,7 @@ import android.util.TimeFormatException;
 
 import com.andorn.powertask.helpers.DateTimeHelper;
 import com.andorn.powertask.helpers.GeneralHelper;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.Tasks;
 
@@ -47,7 +48,7 @@ public class GooTask extends GooSyncBase {
 	public GooTask(long taskListId, String remoteId, String kind,
 			String title, String selfLink, String parent,
 			String position, String notes, String status,
-			String due, String completed, boolean deleted,
+			DateTime due, DateTime completed, boolean deleted,
 			boolean hidden)
 	{
 		super();
@@ -60,8 +61,8 @@ public class GooTask extends GooSyncBase {
 		this.position = position;
 		this.notes = notes;
 		this.status = status != null ? status : Status.needsAction.toString();
-		this.due = due;
-		this.completed = completed;
+		this.due = due != null ? due.toStringRfc3339() : null;
+		this.completed = completed != null ? completed.toStringRfc3339() : null;
 		this.deleted = deleted;
 		this.hidden = hidden;
 		
@@ -73,7 +74,7 @@ public class GooTask extends GooSyncBase {
 	public GooTask(long taskListId, String remoteId, String kind,
 			String title, String selfLink, String parent,
 			String position, String notes, String status,
-			String due, String completed, int deleted,
+			DateTime due, DateTime completed, int deleted,
 			int hidden)
 	{
 		super();		
@@ -86,8 +87,8 @@ public class GooTask extends GooSyncBase {
 		this.position = position;
 		this.notes = notes;
 		this.status = status != null ? status : Status.needsAction.toString();
-		this.due = due;
-		this.completed = completed;
+		this.due = due != null ? due.toStringRfc3339() : null;
+		this.completed = completed != null ? completed.toStringRfc3339() : null;
 		this.deleted = deleted != 0;
 		this.hidden = hidden != 0;
 		
@@ -203,8 +204,8 @@ public class GooTask extends GooSyncBase {
 		GooTask localTask = new GooTask(taskListId, remoteTask.getId(), remoteTask.getKind(),
 				remoteTask.getTitle(), remoteTask.getSelfLink(), remoteTask.getParent(),
 				remoteTask.getPosition(), remoteTask.getNotes(), remoteTask.getStatus(),
-				remoteTask.due, remoteTask.completed, remoteTask.getDeleted(),
-				remoteTask.getHidden());
+				remoteTask.getDue(), remoteTask.getCompleted(),
+				remoteTask.getDeleted(), remoteTask.getHidden());
 		localTask.completed = localTask.isCompleted() ? localTask.completed : null;
 		localTask.setETag(eTag);
 		return localTask;

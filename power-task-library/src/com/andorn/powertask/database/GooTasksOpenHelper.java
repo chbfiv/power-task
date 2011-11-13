@@ -8,6 +8,7 @@ import com.andorn.powertask.models.GooSyncBase;
 import com.andorn.powertask.models.GooTask;
 import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.services.TasksAppService;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.Tasks;
 
@@ -249,11 +250,14 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		{
 			if(c != null)
 			{
+				DateTime due = c.getString(INDEX_due) != null ? DateTime.parseRfc3339(c.getString(INDEX_due)) : null;
+				DateTime completed = c.getString(INDEX_completed) != null ? DateTime.parseRfc3339(c.getString(INDEX_completed)) : null;
+				
 				task = new GooTask(
 						c.getLong(INDEX_taskListId), c.getString(INDEX_remoteId), c.getString(INDEX_kind),
 						c.getString(INDEX_title), c.getString(INDEX_selfLink), c.getString(INDEX_parent),
 						c.getString(INDEX_position), c.getString(INDEX_notes), c.getString(INDEX_status),
-						c.getString(INDEX_due), c.getString(INDEX_completed), c.getInt(INDEX_deleted),
+						due, completed, c.getInt(INDEX_deleted),
 						c.getInt(INDEX_hidden));
 				task.setBase(c.getLong(INDEX_id), c.getLong(INDEX_created), c.getLong(INDEX_modified));
 				task.setSync(c.getInt(INDEX_syncState), c.getString(INDEX_eTag));

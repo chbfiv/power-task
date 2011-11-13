@@ -13,6 +13,7 @@ import com.andorn.powertask.models.GooTask;
 import com.andorn.powertask.models.GooTaskList;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
+import com.google.api.client.util.DateTime;
 
 import com.google.api.services.tasks.model.TaskList;
 import com.google.api.services.tasks.model.TaskLists;
@@ -401,9 +402,9 @@ public class TasksAppService extends IntentService {
 			com.google.api.services.tasks.Tasks.TasksOperations.List request =
 					taskService.tasks().list(taskListRemoteId);
     		request.setFields("etag,items(completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated)");
-    		request.showCompleted = true;
-    		request.showDeleted = true;
-    		request.showHidden = true;
+    		request.setShowCompleted(true);
+    		request.setShowDeleted(true);
+    		request.setShowHidden(true);
     		result = request.execute();
     	} 
     	catch(Exception e)
@@ -427,8 +428,8 @@ public class TasksAppService extends IntentService {
     		remote.setTitle(local.title);
     		remote.setNotes(local.notes);
     		remote.setStatus(local.status);
-    		remote.due = local.due;
-    		remote.completed = local.completed;
+    		remote.setDue(local.due != null ? DateTime.parseRfc3339(local.due) : null);
+    		remote.setCompleted(local.completed != null ? DateTime.parseRfc3339(local.completed) : null);
     		com.google.api.services.tasks.Tasks.TasksOperations.Insert request =
     				taskService.tasks().insert(taskListRemoteId, remote);    		
     		request.setFields("completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated");
@@ -462,8 +463,8 @@ public class TasksAppService extends IntentService {
     		remote.setTitle(local.title);
     		remote.setNotes(local.notes);
     		remote.setStatus(local.status);
-    		remote.due = local.due;
-    		remote.completed = local.completed;
+    		remote.setDue(local.due != null ? DateTime.parseRfc3339(local.due) : null);
+    		remote.setCompleted(local.completed != null ? DateTime.parseRfc3339(local.completed) : null);
 
     		com.google.api.services.tasks.Tasks.TasksOperations.Update requestUpdate =
     				taskService.tasks().update(taskListRemoteId, taskRemoteId, remote);

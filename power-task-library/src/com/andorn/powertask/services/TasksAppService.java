@@ -1,8 +1,6 @@
 package com.andorn.powertask.services;
 
 import java.io.IOException;
-import java.util.List;
-
 import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.database.GooAccountsOpenHelper;
 import com.andorn.powertask.database.GooTaskListsOpenHelper;
@@ -15,13 +13,12 @@ import com.andorn.powertask.models.GooTask;
 import com.andorn.powertask.models.GooTaskList;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
-import com.google.api.services.tasks.v1.model.TaskList;
-import com.google.api.services.tasks.v1.model.TaskLists;
-import com.google.api.services.tasks.v1.model.Task;
-import com.google.api.services.tasks.v1.model.Tasks;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
+import com.google.api.services.tasks.model.TaskList;
+import com.google.api.services.tasks.model.TaskLists;
+import com.google.api.services.tasks.model.Task;
+import com.google.api.services.tasks.model.Tasks;
+
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -60,7 +57,9 @@ public class TasksAppService extends IntentService {
     private final GooAccountsOpenHelper dbhAccounts = new GooAccountsOpenHelper(this);
     private final GooTaskListsOpenHelper dbhTaskLists = new GooTaskListsOpenHelper(this);
 	
-    private com.google.api.services.tasks.v1.Tasks taskService;
+    private com.google.api.services.tasks.Tasks taskService;
+    
+    // Service 
     
     public TasksAppService()
 	{
@@ -70,18 +69,62 @@ public class TasksAppService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
-		if (intent.getFlags() != REQUEST_SYNC_ACCOUNTS && ConnectivityHelper.isAirplaneMode(this))
+		if (processLocalRequest(intent)) return;
+		if (processRemoteRequests(intent)) return;	
+	}
+	
+	private boolean processLocalRequest(Intent intent)
+	{
+		boolean localRequest = false;
+    	boolean success = false;
+		
+	    final ResultReceiver receiver = (ResultReceiver)intent.getParcelableExtra(REQUEST_RECEIVER_EXTRA);
+	    final int requestType = intent.getFlags();
+
+	    if(requestType == REQUEST_SYNC_ACCOUNTS)
+	    {
+	    	localRequest = true;
+		    try
+		    {	    
+			    if(receiver != null) receiver.send(RESULT_SYNC_LOADING, Bundle.EMPTY);			    
+			    
+			    success = dbhAccounts.sync(this);
+			    
+			    if(receiver != null) 
+		    	{
+			    	if(!success) receiver.send(RESULT_SYNC_FAILED, Bundle.EMPTY);
+			    	else receiver.send(RESULT_SYNC_SUCCESS_ACCOUNTS, Bundle.EMPTY);    	
+		    	}
+		    }
+		    catch (Exception e)
+		    {
+	    		handleException(e, receiver);    	
+		    }
+		    if(receiver != null) receiver.send(RESULT_SYNC_LOADING_COMPLETE, Bundle.EMPTY);	
+	    }
+	    return localRequest;
+	}
+	
+	private boolean processRemoteRequests(Intent intent)
+	{
+		boolean remoteRequest = false;
+    	boolean success = false;
+    	
+	    final long taskListId = intent.getLongExtra(EXTRA_TASK_LIST_ID, GooBase.INVALID_ID);	    
+	    final ResultReceiver receiver = (ResultReceiver)intent.getParcelableExtra(REQUEST_RECEIVER_EXTRA);
+    	
+		if (ConnectivityHelper.isAirplaneMode(this))
 		{
 	    	TLog(TAG + " currently in airplane mode; no network connectivity.");	    
 		    //Toast.makeText(this, "currently in airplane mode; no network connectivity.", Toast.LENGTH_SHORT).show();		
-	    	return;
+	    	return remoteRequest;
 		}
 		
-		if (intent.getFlags() != REQUEST_SYNC_ACCOUNTS && !ConnectivityHelper.hasConnectivity(this))
+		if (!ConnectivityHelper.hasConnectivity(this))
 		{
 	    	TLog(TAG + " currently no network connectivity.");	    
 		    //Toast.makeText(this, "currently no network connectivity.", Toast.LENGTH_SHORT).show();	
-	    	return;
+	    	return remoteRequest;
 		}
 		
 	    long accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, GooBase.INVALID_ID);
@@ -92,32 +135,20 @@ public class TasksAppService extends IntentService {
 	    }
 	    
 	    //if still invalid exit cleanly
-	    if(intent.getFlags() != REQUEST_SYNC_ACCOUNTS && accountId == GooBase.INVALID_ID)
+	    if(accountId == GooBase.INVALID_ID)
 	    {
 	    	TLog(TAG + " accountId is invalid " + intent.getAction());	    	
-	    	return;
+	    	return remoteRequest;
 	    }
 	    
 	    GooAccount account = dbhAccounts.read(accountId);
 	    //if still null exit cleanly
-	    if(intent.getFlags() != REQUEST_SYNC_ACCOUNTS && account == null)
+	    if(account == null)
 	    {
 	    	TLog(TAG + " account is null " + intent.getAction());	    	
-	    	return;
-	    }
-	    
-	    if(intent.getFlags() != REQUEST_SYNC_ACCOUNTS && !account.getSync())
-	    {
-	    	return;
-	    }	    
-	    
-	    final long taskListId = intent.getLongExtra(EXTRA_TASK_LIST_ID, GooBase.INVALID_ID);
-//	    final long taskId = intent.getLongExtra(EXTRA_TASK_ID, GooBase.INVALID_ID);
-	    
-	    final ResultReceiver receiver = (ResultReceiver)intent.getParcelableExtra(REQUEST_RECEIVER_EXTRA);
-
-    	boolean success = false;
-	    //final long accountId = intent.getLongExtra(EXTRA_ACCOUNT_ID, -1);
+	    	return remoteRequest;
+	    }  	    
+    	
 	    try
 	    {	    
 		    if(receiver != null) receiver.send(RESULT_SYNC_LOADING, Bundle.EMPTY);
@@ -125,14 +156,16 @@ public class TasksAppService extends IntentService {
 		    int requestType = intent.getFlags();
 		    
 		    if (requestType == REQUEST_SYNC_TASK_LISTS) 
-		    	success = dbhTaskLists.sync(this, accountId);
+		    {
+		    	remoteRequest = true;
+		    	success = dbhTaskLists.sync(this, account);
+		    }
 		    else if (requestType == REQUEST_SYNC_TASKS) 
 		    {
+		    	remoteRequest = true;
 	    		GooTaskList localList = dbhTaskLists.read(taskListId);
 		    	success = dbhTaskLists.getDbhTasks().sync(this, localList);
 		    }
-		    else if (requestType == REQUEST_SYNC_ACCOUNTS) 
-		    	processAccountsRequest(receiver);    
 		    else success = true; //default
 		    
 		    if(receiver != null) 
@@ -147,91 +180,9 @@ public class TasksAppService extends IntentService {
     		handleException(e, receiver);    	
 	    }
 	    if(receiver != null) receiver.send(RESULT_SYNC_LOADING_COMPLETE, Bundle.EMPTY);
+	    return remoteRequest;	
 	}
-	
-	private void processAccountsRequest(ResultReceiver receiver)
-	{
-    	try
-    	{   					
-            Account[] localAccounts = AccountManager.get(this).getAccountsByType("com.google");
-
-            // add missing accounts
-            for (Account localAccount : localAccounts) {
-            	GooAccount gooAccount = dbhAccounts.findAccountByName(localAccount.name);
-            	if(gooAccount == null)
-            	{
-            		//create a new local cache account (currently unauthorized to sync)
-                	gooAccount = new GooAccount(localAccount.name, localAccount.type, true);  
-                	dbhAccounts.create(gooAccount);
-            	}
-            }  
-            
-            // purge missing accounts
-    		List<GooAccount> cacheAccounts = dbhAccounts.query();
-			for (GooAccount cacheAccount : cacheAccounts) {
-				boolean missing = true;
-				for (Account localAccount : localAccounts) {
-					if(localAccount.name != null && localAccount.name.equals(cacheAccount.getName()))
-					{
-						missing = false;
-						break;
-					}
-				}
-				
-				if(missing)
-				{
-					dbhAccounts.delete(cacheAccount.getId());
-				}
-			}
-    		
-	    	if(receiver != null) receiver.send(RESULT_SYNC_SUCCESS_ACCOUNTS, Bundle.EMPTY);
-    	} 
-    	catch(Exception e)
-    	{
-    		handleException(e, receiver);
-    	}
-	}
-	
-	public static void handleException(Exception e, ResultReceiver receiver) {
-	    if (e instanceof HttpResponseException) {
-	      HttpResponse response = ((HttpResponseException) e).response;
-	      int statusCode = response.statusCode;
-	      try {
-	        response.ignore();
-	      } catch (IOException ioe) {
-              Log.w(TAG, "Got IOException " + Log.getStackTraceString(ioe));
-              Log.w(TAG, Log.getStackTraceString(ioe));
-          } 
-          
-	      if (statusCode == 401) {
-	    	  if(receiver != null) receiver.send(RESULT_SYNC_FAILED_UNAUTHORIZED, Bundle.EMPTY);
-	    	  return;
-	      }
-	    }
-        Log.w(TAG, "Got Exception " + e);
-        Log.e(TAG, Log.getStackTraceString(e));
-    	if(receiver != null) receiver.send(RESULT_SYNC_FAILED, Bundle.EMPTY);	
-	}
-	
-	public static void handleException(Exception e) throws Exception {
-	    if (e instanceof HttpResponseException) {
-	      HttpResponse response = ((HttpResponseException) e).response;
-	      int statusCode = response.statusCode;
-	      try {
-	        response.ignore();
-	      } catch (IOException ioe) {
-              Log.w(TAG, "Got IOException " + Log.getStackTraceString(ioe));
-              Log.w(TAG, Log.getStackTraceString(ioe));
-          } 
-          
-	      if (statusCode == 401) {
-	    	  return;
-	      }
-	    }
-        Log.w(TAG, "Got Exception " + e);
-        Log.e(TAG, Log.getStackTraceString(e));   
-	}
-	
+		
 	@Override
 	public void onCreate() {
 		//TLog(TAG + " service onCreate.");
@@ -249,6 +200,8 @@ public class TasksAppService extends IntentService {
 		if (dbhAccounts != null) dbhAccounts.close();
 		if (dbhTaskLists != null) dbhTaskLists.close();
 	}
+	
+	// Static Sync Requests
 	
 	public static void syncAccounts(Context context, ResultReceiver receiver)
 	{
@@ -332,9 +285,9 @@ public class TasksAppService extends IntentService {
 		TaskLists result = null;
     	try    	
     	{  
-    		com.google.api.services.tasks.v1.Tasks.Tasklists.List request = 
-    				taskService.tasklists.list();
-    		request.fields = "etag,items(etag,id,title)"; 
+    		com.google.api.services.tasks.Tasks.Tasklists.List request = 
+    				taskService.tasklists().list();
+    		request.setFields("etag,items(etag,id,title)"); 
     		result = request.execute();		
     	} 
     	catch(Exception e)
@@ -351,9 +304,9 @@ public class TasksAppService extends IntentService {
     	try
     	{
 			if(GeneralHelper.isNullOrEmpty(taskListRemoteId)) return result;
-			com.google.api.services.tasks.v1.Tasks.Tasklists.Get request = 
-					taskService.tasklists.get(taskListRemoteId);
-			request.fields = "etag,id,title";
+			com.google.api.services.tasks.Tasks.Tasklists.Get request = 
+					taskService.tasklists().get(taskListRemoteId);
+			request.setFields("etag,id,title");
     		result = request.execute();		
     	} 
     	catch(Exception e)
@@ -370,10 +323,10 @@ public class TasksAppService extends IntentService {
 		TaskList result = null;
     	try
     	{   		
-    		remote.title = local.title;
-    		com.google.api.services.tasks.v1.Tasks.Tasklists.Insert request =
-    				taskService.tasklists.insert(remote);
-    		request.fields = "etag,id,title";
+    		remote.setTitle(local.title);
+    		com.google.api.services.tasks.Tasks.Tasklists.Insert request =
+    				taskService.tasklists().insert(remote);
+    		request.setFields("etag,id,title");
     		result = request.execute();			
     	} 
     	catch(Exception e)
@@ -390,11 +343,11 @@ public class TasksAppService extends IntentService {
 		TaskList result = null;
     	try
     	{   		
-    		remote = taskService.tasklists.get(local.remoteId).execute();
-    		remote.title = local.title;
-    		com.google.api.services.tasks.v1.Tasks.Tasklists.Update request =
-    				taskService.tasklists.update(remote.id, remote);
-    		request.fields = "etag,id,title";
+    		remote = taskService.tasklists().get(local.remoteId).execute();
+    		remote.setTitle(local.title);
+    		com.google.api.services.tasks.Tasks.Tasklists.Update request =
+    				taskService.tasklists().update(remote.getId(), remote);
+    		request.setFields("etag,id,title");
     		result = request.execute();
     	} 
     	catch(Exception e)
@@ -410,7 +363,7 @@ public class TasksAppService extends IntentService {
 		boolean ret = false;
     	try
     	{   		
-    		taskService.tasklists.delete(local.remoteId).execute();
+    		taskService.tasklists().delete(local.remoteId).execute();
     		ret = true;
     	} 
     	catch(Exception e)
@@ -426,7 +379,7 @@ public class TasksAppService extends IntentService {
 		boolean ret = false;
     	try
     	{   		
-    		taskService.tasks.clear(local.remoteId).execute();
+    		taskService.tasks().clear(local.remoteId).execute();
     		ret = true;
     	} 
     	catch(Exception e)
@@ -445,9 +398,9 @@ public class TasksAppService extends IntentService {
     	try
     	{   		
 			if(GeneralHelper.isNullOrEmpty(taskListRemoteId)) return result;
-			com.google.api.services.tasks.v1.Tasks.TasksOperations.List request =
-					taskService.tasks.list(taskListRemoteId);
-    		request.fields = "etag,items(completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated)";
+			com.google.api.services.tasks.Tasks.TasksOperations.List request =
+					taskService.tasks().list(taskListRemoteId);
+    		request.setFields("etag,items(completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated)");
     		request.showCompleted = true;
     		request.showDeleted = true;
     		request.showHidden = true;
@@ -471,14 +424,14 @@ public class TasksAppService extends IntentService {
 
 			if(taskListRemoteId ==  "") return result;
 			
-    		remote.title = local.title;
-    		remote.notes = local.notes;
-    		remote.status = local.status;
+    		remote.setTitle(local.title);
+    		remote.setNotes(local.notes);
+    		remote.setStatus(local.status);
     		remote.due = local.due;
     		remote.completed = local.completed;
-    		com.google.api.services.tasks.v1.Tasks.TasksOperations.Insert request =
-    				taskService.tasks.insert(taskListRemoteId, remote);
-    		request.fields = "completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated";
+    		com.google.api.services.tasks.Tasks.TasksOperations.Insert request =
+    				taskService.tasks().insert(taskListRemoteId, remote);    		
+    		request.setFields("completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated");
 			result = request.execute();	
     	} 
     	catch(Exception e)
@@ -501,23 +454,23 @@ public class TasksAppService extends IntentService {
 			if(GeneralHelper.isNullOrEmpty(taskListRemoteId) ||
 					GeneralHelper.isNullOrEmpty(taskRemoteId)) return result;
 
-    		com.google.api.services.tasks.v1.Tasks.TasksOperations.Get request =
-    				taskService.tasks.get(taskListRemoteId, taskRemoteId);
-    		request.fields = "completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated";
+    		com.google.api.services.tasks.Tasks.TasksOperations.Get request =
+    				taskService.tasks().get(taskListRemoteId, taskRemoteId);
+    		request.setFields("completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated");
     		remote = request.execute();
 
-    		remote.title = local.title;
-    		remote.notes = local.notes;
-    		remote.status = local.status;
+    		remote.setTitle(local.title);
+    		remote.setNotes(local.notes);
+    		remote.setStatus(local.status);
     		remote.due = local.due;
     		remote.completed = local.completed;
 
-    		com.google.api.services.tasks.v1.Tasks.TasksOperations.Update requestUpdate =
-    				taskService.tasks.update(taskListRemoteId, taskRemoteId, remote);
-    		requestUpdate.fields = "completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated";
+    		com.google.api.services.tasks.Tasks.TasksOperations.Update requestUpdate =
+    				taskService.tasks().update(taskListRemoteId, taskRemoteId, remote);
+    		requestUpdate.setFields("completed,deleted,due,etag,hidden,id,notes,parent,position,status,title,updated");
     		remote = requestUpdate.execute();
     		
-    		result = taskService.tasks.update(taskListRemoteId, taskRemoteId, remote).execute();
+    		result = taskService.tasks().update(taskListRemoteId, taskRemoteId, remote).execute();
     	} 
     	catch(Exception e)
     	{
@@ -538,7 +491,7 @@ public class TasksAppService extends IntentService {
 			if(GeneralHelper.isNullOrEmpty(taskListRemoteId) || 
 					GeneralHelper.isNullOrEmpty(taskRemoteId)) return ret;
 			
-    		taskService.tasks.delete(taskListRemoteId, taskRemoteId).execute();
+    		taskService.tasks().delete(taskListRemoteId, taskRemoteId).execute();
     		ret = true;
     	} 
     	catch(Exception e)
@@ -551,6 +504,46 @@ public class TasksAppService extends IntentService {
 	
 	
 	// Helpers
+
+	public static void handleException(Exception e, ResultReceiver receiver) {
+	    if (e instanceof HttpResponseException) {
+	      HttpResponse response = ((HttpResponseException) e).getResponse();
+	      int statusCode = response.getStatusCode();
+	      try {
+	        response.ignore();
+	      } catch (IOException ioe) {
+              Log.w(TAG, "Got IOException " + Log.getStackTraceString(ioe));
+              Log.w(TAG, Log.getStackTraceString(ioe));
+          } 
+          
+	      if (statusCode == 401) {
+	    	  if(receiver != null) receiver.send(RESULT_SYNC_FAILED_UNAUTHORIZED, Bundle.EMPTY);
+	    	  return;
+	      }
+	    }
+        Log.w(TAG, "Got Exception " + e);
+        Log.e(TAG, Log.getStackTraceString(e));
+    	if(receiver != null) receiver.send(RESULT_SYNC_FAILED, Bundle.EMPTY);	
+	}
+	
+	public static void handleException(Exception e) throws Exception {
+	    if (e instanceof HttpResponseException) {
+	      HttpResponse response = ((HttpResponseException) e).getResponse();
+	      int statusCode = response.getStatusCode();
+	      try {
+	        response.ignore();
+	      } catch (IOException ioe) {
+              Log.w(TAG, "Got IOException " + Log.getStackTraceString(ioe));
+              Log.w(TAG, Log.getStackTraceString(ioe));
+          } 
+          
+	      if (statusCode == 401) {
+	    	  return;
+	      }
+	    }
+        Log.w(TAG, "Got Exception " + e);
+        Log.e(TAG, Log.getStackTraceString(e));   
+	}
 	
 	private void TLog(String msg)
 	{

@@ -30,11 +30,4 @@
 		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>power-task-library_src</name>
-			<type>2</type>
-			<locationURI>_android_power_task_library_b2e1143b/src</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

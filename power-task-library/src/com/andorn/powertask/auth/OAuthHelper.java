@@ -201,8 +201,8 @@ public class OAuthHelper {
 	
 	public void handleException(Exception e) {
 	    if (e instanceof HttpResponseException) {
-	      HttpResponse response = ((HttpResponseException) e).response;
-	      int statusCode = response.statusCode;
+	      HttpResponse response = ((HttpResponseException) e).getResponse();
+	      int statusCode = response.getStatusCode();
 	      try {
 	        response.ignore();
 	      } catch (IOException ioe) {

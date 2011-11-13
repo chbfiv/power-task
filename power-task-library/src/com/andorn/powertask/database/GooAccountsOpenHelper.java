@@ -5,6 +5,10 @@ import java.util.List;
 
 import com.andorn.powertask.models.GooAccount;
 import com.andorn.powertask.models.GooBase;
+import com.andorn.powertask.services.TasksAppService;
+
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -339,4 +343,50 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 		}	
 		return ret;
      }
+	 
+	public boolean sync(TasksAppService service) throws Exception 
+	{		
+		boolean ret = false;
+		if(!initialize()) return ret;
+
+		try
+		{	
+	        Account[] localAccounts = AccountManager.get(service).getAccountsByType("com.google");
+	
+	        // add missing accounts
+	        for (Account localAccount : localAccounts) {
+	        	GooAccount gooAccount = findAccountByName(localAccount.name);
+	        	if(gooAccount == null)
+	        	{
+	        		//create a new local cache account (currently unauthorized to sync)
+	            	gooAccount = new GooAccount(localAccount.name, localAccount.type, true);  
+	            	create(gooAccount);
+	        	}
+	        }  
+	        
+	        // purge missing accounts
+			List<GooAccount> cacheAccounts = query();
+			for (GooAccount cacheAccount : cacheAccounts) {
+				boolean missing = true;
+				for (Account localAccount : localAccounts) {
+					if(localAccount.name != null && localAccount.name.equals(cacheAccount.getName()))
+					{
+						missing = false;
+						break;
+					}
+				}
+				
+				if(missing)
+				{
+					delete(cacheAccount.getId());
+				}
+			}
+	    	ret = true;
+		}
+		catch(SQLException sqle)
+		{
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+		}		
+		return ret;
+	}		
 }

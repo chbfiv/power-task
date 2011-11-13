@@ -8,7 +8,7 @@ import com.andorn.powertask.models.TCTagItem;
 import com.google.api.client.extensions.android2.AndroidHttp;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson.JacksonFactory;
-import com.google.api.services.tasks.v1.Tasks;
+import com.google.api.services.tasks.Tasks;
 import com.andorn.powertask.R;
 
 import android.app.Application;
@@ -24,7 +24,8 @@ public class TaskApplication extends Application {
 
     public final HttpTransport transport = AndroidHttp.newCompatibleTransport();
     public final JacksonFactory jsonFactory = new JacksonFactory();
-    public final Tasks service = new Tasks(APP_PNAME, transport, jsonFactory);
+    @SuppressWarnings("deprecation")
+	public final Tasks service = new Tasks(APP_PNAME, transport, jsonFactory);
     
     private TCTagListAdapter mTagListAdapter;
     
@@ -57,10 +58,11 @@ public class TaskApplication extends Application {
         void onTaskUpdated(String message, long id);
     }
     
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public void onCreate() {
     	super.onCreate();
-        service.accessKey = OAuthHelper.GOOGLE_API_KEY;  	
+        service.setKey(OAuthHelper.GOOGLE_API_KEY);
     }
 
     public Tasks getTasksService()
@@ -71,7 +73,7 @@ public class TaskApplication extends Application {
     @SuppressWarnings("deprecation")
 	public void setAccessToken(String authToken)
     {
-    	service.setAccessToken(authToken);  
+    	service.setOauthToken(authToken); 
     }
     
     public TCTagListAdapter getTagListAdapter() {

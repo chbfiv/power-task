@@ -10,8 +10,8 @@ import android.util.TimeFormatException;
 
 import com.andorn.powertask.helpers.DateTimeHelper;
 import com.andorn.powertask.helpers.GeneralHelper;
-import com.google.api.services.tasks.v1.model.Task;
-import com.google.api.services.tasks.v1.model.Tasks;
+import com.google.api.services.tasks.model.Task;
+import com.google.api.services.tasks.model.Tasks;
 
 public class GooTask extends GooSyncBase {
 	private static final String TAG = GooTask.class.getName();
@@ -199,15 +199,12 @@ public class GooTask extends GooSyncBase {
 	}
 	
 	public static GooTask Convert(long taskListId, Task remoteTask, String eTag)
-	{
-		boolean deleted = remoteTask.deleted != null ? remoteTask.deleted : false;
-		boolean hidden = remoteTask.hidden != null ? remoteTask.hidden : false;
-		
-		GooTask localTask = new GooTask(taskListId, remoteTask.id, remoteTask.kind,
-				remoteTask.title, remoteTask.selfLink, remoteTask.parent,
-				remoteTask.position, remoteTask.notes, remoteTask.status,
-				remoteTask.due, remoteTask.completed, deleted,
-				hidden);
+	{		
+		GooTask localTask = new GooTask(taskListId, remoteTask.getId(), remoteTask.getKind(),
+				remoteTask.getTitle(), remoteTask.getSelfLink(), remoteTask.getParent(),
+				remoteTask.getPosition(), remoteTask.getNotes(), remoteTask.getStatus(),
+				remoteTask.due, remoteTask.completed, remoteTask.getDeleted(),
+				remoteTask.getHidden());
 		localTask.completed = localTask.isCompleted() ? localTask.completed : null;
 		localTask.setETag(eTag);
 		return localTask;
@@ -216,12 +213,12 @@ public class GooTask extends GooSyncBase {
 	public static boolean find(String remoteId, Tasks remoteTasks)
 	{				
 		if(GeneralHelper.isNullOrEmpty(remoteId)) return false;
-		if(remoteTasks == null || remoteTasks.items == null) return false;
+		if(remoteTasks == null) return false;
 
 		boolean ret = false;
 		
-		for (Task remoteTask : remoteTasks.items) {
-			if(remoteTask.id.equals(remoteId))
+		for (Task remoteTask : remoteTasks.getItems()) {
+			if(remoteTask.getId().equals(remoteId))
 			{
 				ret = true;
 				break;
@@ -233,7 +230,7 @@ public class GooTask extends GooSyncBase {
 	public static boolean shouldDelete(String remoteId, Tasks remoteTasks)
 	{
 		if(GeneralHelper.isNullOrEmpty(remoteId)) return false;
-		if(remoteTasks == null || remoteTasks.items == null) return false;
+		if(remoteTasks == null || remoteTasks.getItems() == null) return false;
 		return !find(remoteId, remoteTasks);
 	}
 }

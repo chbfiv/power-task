@@ -4,15 +4,17 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/android-support-v4.jar"/>
-	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/google-api-client-1.4.1-beta.jar"/>
-	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/google-api-client-extensions-android2-1.4.1-beta.jar"/>
-	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/google-api-client-googleapis-1.4.1-beta.jar"/>
-	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/google-api-client-googleapis-extensions-android2-1.4.1-beta.jar"/>
-	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/google-api-services-tasks-v1-1.0.0-beta.jar"/>
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/guava-r09.jar"/>
-	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/jackson-core-asl-1.6.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="/power-task-library/lib/libGoogleAnalytics.jar"/>
-	<classpathentry kind="src" path="power-task-library_src"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="/power-task-library/lib/google-api-client-1.6.0-beta.jar"/>
+	<classpathentry kind="lib" path="/power-task-library/lib/google-api-client-extensions-android2-1.6.0-beta.jar"/>
+	<classpathentry kind="lib" path="/power-task-library/lib/google-api-services-tasks-v1-1.3.0-beta.jar"/>
+	<classpathentry kind="lib" path="/power-task-library/lib/jackson-core-asl-1.9.1.jar"/>
+	<classpathentry kind="lib" path="/power-task-library/lib/google-http-client-1.6.0-beta.jar"/>
+	<classpathentry kind="lib" path="/power-task-library/lib/google-http-client-extensions-1.6.0-beta.jar"/>
+	<classpathentry kind="lib" path="/power-task-library/lib/google-http-client-extensions-android2-1.6.0-beta.jar"/>
+	<classpathentry kind="lib" path="/power-task-library/lib/google-oauth-client-1.6.0-beta.jar"/>
+	<classpathentry kind="lib" path="/power-task-library/lib/google-oauth-client-extensions-1.6.0-beta.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

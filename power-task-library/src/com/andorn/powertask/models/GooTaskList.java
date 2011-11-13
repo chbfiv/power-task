@@ -1,8 +1,8 @@
 package com.andorn.powertask.models;
 
 import com.andorn.powertask.helpers.GeneralHelper;
-import com.google.api.services.tasks.v1.model.TaskList;
-import com.google.api.services.tasks.v1.model.TaskLists;
+import com.google.api.services.tasks.model.TaskList;
+import com.google.api.services.tasks.model.TaskLists;
 
 public class GooTaskList extends GooSyncBase {
 
@@ -32,7 +32,7 @@ public class GooTaskList extends GooSyncBase {
 	
 	public static GooTaskList Convert(long accountId, TaskList remoteList, String eTag)
 	{
-		GooTaskList localList = new GooTaskList(accountId, remoteList.id, remoteList.kind, remoteList.title, remoteList.selfLink);
+		GooTaskList localList = new GooTaskList(accountId, remoteList.getId(), remoteList.getKind(), remoteList.getTitle(), remoteList.getSelfLink());
 		localList.setETag(eTag);
 		return localList;
 	}
@@ -40,11 +40,11 @@ public class GooTaskList extends GooSyncBase {
 	public static boolean find(String remoteId, TaskLists remoteLists)
 	{				
 		if(GeneralHelper.isNullOrEmpty(remoteId)) return false;
-		if(remoteLists == null || remoteLists.items == null) return false;
+		if(remoteLists == null) return false;
 
 		boolean ret = false;
-		for (TaskList remoteList : remoteLists.items) {
-			if(remoteList.id.equals(remoteId))
+		for (TaskList remoteList : remoteLists.getItems()) {
+			if(remoteList.getId().equals(remoteId))
 			{
 				ret = true;
 				break;
@@ -56,7 +56,7 @@ public class GooTaskList extends GooSyncBase {
 	public static boolean shouldDelete(String remoteId, TaskLists remoteLists)
 	{
 		if(GeneralHelper.isNullOrEmpty(remoteId)) return false;
-		if(remoteLists == null || remoteLists.items == null) return false;
+		if(remoteLists == null || remoteLists.getItems() == null || remoteLists.getItems().size() == 0) return false;
 		return !find(remoteId, remoteLists);
 	}
 }

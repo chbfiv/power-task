@@ -3,12 +3,13 @@ package com.andorn.powertask.database;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.andorn.powertask.models.GooAccount;
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.models.GooSyncBase;
 import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.services.TasksAppService;
-import com.google.api.services.tasks.v1.model.TaskList;
-import com.google.api.services.tasks.v1.model.TaskLists;
+import com.google.api.services.tasks.model.TaskList;
+import com.google.api.services.tasks.model.TaskLists;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -378,7 +379,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 		return ret;
 	}	
 	
-	public boolean sync(TasksAppService service, long accountId) throws Exception 
+	public boolean sync(TasksAppService service, GooAccount account) throws Exception 
 	{
 		boolean ret = false;
 		if(!initialize()) return ret;
@@ -390,35 +391,35 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 			if(remoteLists == null) return false;
 			
 			boolean remoteTaskListChanges = 
-					service.shouldMergeTaskLists(remoteLists.etag, service.getGooAccountETag(accountId));
+					service.shouldMergeTaskLists(remoteLists.getEtag(), account.getETag());
 			
 			if (remoteTaskListChanges)
 			{
 				// merge - Task Lists						
-				int count = remoteLists.items != null ?  remoteLists.items.size() : 0;
+				int count = remoteLists.getItems() != null ?  remoteLists.getItems().size() : 0;
 				for(int i = 0; i < count; i++)
 				{
-					TaskList remoteList = remoteLists.items.get(i);
+					TaskList remoteList = remoteLists.getItems().get(i);
 					
 					// merge - Task List
 					// required to get etag per Task List
-					remoteList = service.readRemoteTaskList(remoteList.id);
-					GooTaskList localList = read(remoteList.id);
+					remoteList = service.readRemoteTaskList(remoteList.getId());
+					GooTaskList localList = read(remoteList.getId());
 					
 					if (localList == null)
 					{
 						//doesn't exist locally, create
-						GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);						
+						GooTaskList newList = GooTaskList.Convert(account.getId(), remoteList, remoteList.getEtag());						
 						long id = create(newList);
 						newList = read(id);
 						
 						// sync - Tasks
 						getDbhTasks().sync(service, newList);	
 					}
-					else if(localList.remoteSyncRequired(remoteList.etag))
+					else if(localList.remoteSyncRequired(remoteList.getEtag()))
 					{		
 						//if already cached etag; skip update	
-						GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);
+						GooTaskList newList = GooTaskList.Convert(account.getId(), remoteList, remoteList.getEtag());
 						newList.setId(localList.getId());
 						update(newList);	
 	
@@ -428,11 +429,11 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 				}	
 				
 				// merge complete
-				service.setGooAccountETag(accountId, remoteLists.etag);
+				service.setGooAccountETag(account.getId(), remoteLists.getEtag());
 			}
 			
 			// push - TaskLists
-			for (GooTaskList localList : query(accountId)) {
+			for (GooTaskList localList : query(account.getId())) {
 				TaskList remoteList = null;
 
 				if(localList.isSyncCreate())
@@ -440,7 +441,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 					remoteList = service.createRemoteTaskList(localList);
 					if(remoteList != null)
 					{
-						GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);
+						GooTaskList newList = GooTaskList.Convert(account.getId(), remoteList, remoteList.getEtag());
 						newList.setId(localList.getId());
 						update(newList);
 						
@@ -473,7 +474,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 					remoteList = service.updateRemoteTaskList(localList);							
 					if(remoteList != null)
 					{
-						GooTaskList newList = GooTaskList.Convert(accountId, remoteList, remoteList.etag);
+						GooTaskList newList = GooTaskList.Convert(account.getId(), remoteList, remoteList.getEtag());
 						newList.setId(localList.getId());
 						update(newList);
 					}					

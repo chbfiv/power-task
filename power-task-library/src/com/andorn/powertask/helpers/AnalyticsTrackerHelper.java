@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
 import com.andorn.powertask.R;
@@ -26,6 +28,7 @@ public class AnalyticsTrackerHelper {
     protected GoogleAnalyticsTracker mTracker;
     protected SharedPrefUtil mSharedPrefUtil;
     private boolean mGoogleAnalytics = false;
+    private LayoutInflater mInflater;
     
 	public static final boolean DEFAULT_GOOGLE_ANALYTICS = true;
     
@@ -80,6 +83,7 @@ public class AnalyticsTrackerHelper {
     protected AnalyticsTrackerHelper(Activity activity, Context context) {
     	mActivity = activity;
     	mContext = context;
+		mInflater = (LayoutInflater)mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);	
     }
     
     public void onCreate(Bundle savedInstanceState)
@@ -217,15 +221,20 @@ public class AnalyticsTrackerHelper {
     }    
     
     private void showTermsOfServiceDialog()
-    {
-    	String terms = mActivity.getString(R.string.terms_of_service_part_1);
+    {    	
+    	View termsOfService = mInflater.inflate(R.layout.terms_of_service, null);
     	
     	new AlertDialog.Builder(mActivity)
-    	.setTitle("Terms of Service - part 1")
-        .setMessage(terms)
-        .setPositiveButton("Accept - More",  new OnClickListener() {
+    	.setTitle("Terms of Service")
+        .setView(termsOfService)
+        .setPositiveButton("Accept",  new OnClickListener() {
            public void onClick(DialogInterface dialog, int id) {
-        	   showTermsOfServiceDialogPart2();	
+      	    	SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();
+	       	    editor.putBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, true);
+	       	    editor.commit();	
+	       	    
+         	    trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
+       				AnalyticsTrackerHelper.ACTION_AGREE_TERMS_OF_SERVICE, mActivity.getClass().getName(), 0);
            }
         })
         .setNegativeButton("Cancel",  new OnClickListener() {
@@ -247,42 +256,6 @@ public class AnalyticsTrackerHelper {
         .show();	
     }    
     
-    private void showTermsOfServiceDialogPart2()
-    {
-    	String terms = mActivity.getString(R.string.terms_of_service_part_2);
-    	
-    	new AlertDialog.Builder(mActivity)
-    	.setTitle("Terms of Service - part 2")
-        .setMessage(terms)
-        .setPositiveButton("Accept",  new OnClickListener() {
-           public void onClick(DialogInterface dialog, int id) {
-       	    	SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();
-	       	    editor.putBoolean(SharedPrefUtil.PREF_TERMS_OF_SERVICE, true);
-	       	    editor.commit();	
-	       	    
-          	    trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
-        				AnalyticsTrackerHelper.ACTION_AGREE_TERMS_OF_SERVICE, mActivity.getClass().getName(), 0);
-           }
-        })
-        .setNegativeButton("Cancel",  new OnClickListener() {
-           public void onClick(DialogInterface dialog, int id) {
-         	  mActivity.finish();
-         	  
-          	  trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
-      				AnalyticsTrackerHelper.ACTION_DISAGREE_TERMS_OF_SERVICE, mActivity.getClass().getName(), 0);
-           }
-        })
-        .setOnCancelListener(new OnCancelListener() {
-          public void onCancel(DialogInterface dialog) {
-        	  mActivity.finish();
-        	  
-          	  trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
-      				AnalyticsTrackerHelper.ACTION_DISAGREE_TERMS_OF_SERVICE, mActivity.getClass().getName(), 0);
-          }
-        })
-        .show();	
-    }    
-
     private void showTrialEndedDialog() {
     	
 	    final SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();

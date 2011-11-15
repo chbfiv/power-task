@@ -18,8 +18,6 @@ import com.andorn.powertask.adapters.GooTasksPagerAdapter;
 import com.andorn.powertask.auth.OAuthHelper;
 import com.andorn.powertask.auth.OAuthReceiver;
 import com.andorn.powertask.base.ActivityHelper;
-import com.andorn.powertask.database.GooTaskListsOpenHelper;
-import com.andorn.powertask.database.GooTasksOpenHelper;
 import com.andorn.powertask.fragments.BaseFragment;
 import com.andorn.powertask.fragments.GooTaskViewFragment;
 import com.andorn.powertask.fragments.GooTasksFragment;
@@ -42,8 +40,6 @@ public class GooTasksActivity extends BaseActivity
 	public static final String EXTRA_ACTIVE_TASK_LIST_ID = "active_task_list_id";		
 	private long mActiveTaskListId = GooBase.INVALID_ID;	
 	private long mActiveTaskId = GooBase.INVALID_ID;
-
-	private GooTaskListsOpenHelper dbhTaskLists = new GooTaskListsOpenHelper(this);
 
 	private GooTaskViewFragment mTaskViewFragment;
 	
@@ -98,8 +94,7 @@ public class GooTasksActivity extends BaseActivity
 	
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
-		if (dbhTaskLists != null) dbhTaskLists.close(); 		
+		super.onDestroy();		
 	}
 
 	@Override
@@ -156,14 +151,6 @@ public class GooTasksActivity extends BaseActivity
 		else GooTaskViewActivity.go(this, false, taskId);
 	}
 	
-	public GooTaskListsOpenHelper getDbhTaskLists() {
-		return dbhTaskLists;
-	}
-	
-	public GooTasksOpenHelper getDbhTasks() {
-		return dbhTaskLists.getDbhTasks();
-	}
-	
     public static void go(Activity activity, long taskListId) 
     {
     	go(activity, true, taskListId);
@@ -205,10 +192,10 @@ public class GooTasksActivity extends BaseActivity
 	    	 {
 		    	 for (Long id : ids)
 		    	 {
-		    		 GooTaskList taskList = dbhTaskLists.read(id);
+		    		 GooTaskList taskList = app().getDbhTaskLists().read(id);
 		    		 taskList.setSyncState(GooSyncBase.SYNC_HIDE);
-		    		 dbhTaskLists.update(taskList);
-		    		 dbhTaskLists.getDbhTasks().clearCompleted(id);
+		    		 app().getDbhTaskLists().update(taskList);
+		    		 app().getDbhTasks().clearCompleted(id);
 		    		 
 					 getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
 								AnalyticsTrackerHelper.ACTION_CLEAR_COMPLETED_TASK_LIST, TAG, 0);

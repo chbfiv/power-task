@@ -1,5 +1,6 @@
 package com.andorn.powertask.activities;
 
+import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.auth.OAuthHelper;
 import com.andorn.powertask.base.ActivityHelper;
 import com.andorn.powertask.helpers.AnalyticsTrackerHelper;
@@ -66,6 +67,11 @@ public abstract class BaseActivity extends FragmentActivity {
 		getOAuthHelper().onDestroy();
 		getTrackerHelper().onDestroy();
 	}	
+    
+    public TaskApplication app()
+    {    	
+    	return TaskApplication.app(this);
+    }
     
 	public AnalyticsTrackerHelper getTrackerHelper() {
         return mTrackerHelper;

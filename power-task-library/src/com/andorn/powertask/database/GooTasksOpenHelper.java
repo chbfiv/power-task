@@ -136,7 +136,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	public List<GooTask> query(long taskListId, int syncStateFilter, int taskSortType) {
 		List<GooTask> taskList = new ArrayList<GooTask>();
 		Cursor c = null;
-		if(!initialize()) return taskList;
 		
 		try
 		{
@@ -167,7 +166,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	public List<GooTask> query(long taskListId) {
 		List<GooTask> taskList = new ArrayList<GooTask>();
 		Cursor c = null;
-		if(!initialize()) return taskList;
 		
 		try
 		{
@@ -197,7 +195,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public Cursor queryCursor(long taskListId, int syncStateFilter, int taskSortType)  {
 		Cursor c = null;
-		if(!initialize()) return c;
 		
 		try
 		{
@@ -223,7 +220,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public Cursor queryCursor(long taskListId) {
 		Cursor c = null;
-		if(!initialize()) return c;
 		
 		try
 		{
@@ -273,7 +269,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	public GooTask read(long id) {
 		GooTask task = null;			
 		Cursor c = null;
-		if(!initialize()) return task;
 		
 		try
 		{
@@ -307,7 +302,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	public GooTask read(String remoteId) {
 		GooTask task = null;
 		Cursor c = null;
-		if(!initialize()) return task;
 		
 		try
 		{
@@ -341,7 +335,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	public long create(long taskListId) 
 	{
 		long ret = GooBase.INVALID_ID;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -359,7 +352,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	public long create(GooTask task) 
 	{
 		long ret = GooBase.INVALID_ID;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -391,7 +383,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	public boolean update(GooTask task) 
 	{
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -423,7 +414,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	public boolean update(long taskId, GooTask.Status status) 
 	{
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -440,7 +430,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	
 	 public boolean delete(long rowId) {
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		 try
 		 {
@@ -456,7 +445,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	 public boolean clearCompleted(long taskListId)
 	 {
 		boolean ret = false;
-		if(!initialize()) return ret;
 		 try
 		 {
 			 String sql = "UPDATE " + TABLE_NAME + 
@@ -477,7 +465,6 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 	public boolean sync(TasksAppService service, GooTaskList localList) throws Exception 
 	{
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		try
 		{

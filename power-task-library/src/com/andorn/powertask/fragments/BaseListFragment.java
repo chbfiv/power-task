@@ -1,5 +1,6 @@
 package com.andorn.powertask.fragments;
 
+import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.activities.BaseActivity;
 
 import android.os.Bundle;
@@ -17,7 +18,11 @@ public class BaseListFragment extends ListFragment {
     	super.onActivityCreated(savedInstanceState);
     	mActivity = (BaseActivity) getActivity();    	
     }
-    
+
+    public TaskApplication app()
+    {    	
+    	return TaskApplication.app(mActivity);
+    }
 //    
 //	public void sync() {	
 //		sync(true);

@@ -142,7 +142,7 @@ public class GooTaskViewFragment extends BaseFragment
     		return;
     	}
     	
-		GooTask task = host().getDbhTasks().read(host().getActiveTaskId());
+		GooTask task = app().getDbhTasks().read(host().getActiveTaskId());
     	if(task == null)
     	{
     		Log.e(TAG, "refreshTaskList - task null.");
@@ -170,16 +170,7 @@ public class GooTaskViewFragment extends BaseFragment
     	mDay.setVisibility(View.GONE);     
     	mDate.setVisibility(View.GONE);         
         
-        if(task.hasDueDate() && task.hasTags())
-        {
-	    	mDay.setText(DateTimeHelper.prettyDueDate(task.due));
-	    	mDate.setText(DateTimeHelper.prettyDueDate(task.due));
-        	mDay.setVisibility(View.VISIBLE);     
-        	mDate.setVisibility(View.VISIBLE);             	
-            mDetialsCollapsed.setVisibility(View.VISIBLE);   
-            mDetialsSeperator.setVisibility(View.VISIBLE);  
-        }        
-        else if(task.hasDueDate())
+    	if(task.hasDueDate())
         {
 	    	mDay.setText(DateTimeHelper.prettyDueDate(task.due));
 	    	mDate.setText(DateTimeHelper.prettyDueDate(task.due));
@@ -187,11 +178,7 @@ public class GooTaskViewFragment extends BaseFragment
         	mDate.setVisibility(View.VISIBLE);       
         	mDetialsCollapsed.setVisibility(View.VISIBLE);   
             mDetialsSeperator.setVisibility(View.VISIBLE);    
-        }      
-        else if(task.hasTags())
-        {
-        	
-        }  
+        }    
     }
     
     public class DetialsClick implements OnClickListener {
@@ -215,12 +202,12 @@ public class GooTaskViewFragment extends BaseFragment
 		public void onCheckedChanged(CompoundButton v, boolean isChecked) {
 			if(host().getActiveTaskId() != GooBase.INVALID_ID)
 			{
-				GooTask task = host().getDbhTasks().read(host().getActiveTaskId());					
+				GooTask task = app().getDbhTasks().read(host().getActiveTaskId());					
 
 				GooTask.Status status = isChecked ? GooTask.Status.completed : GooTask.Status.needsAction;
 				task.setStatus(status);
 				task.flagSyncState(GooSyncBase.SYNC_UPDATE);				
-				host().getDbhTasks().update(task);	
+				app().getDbhTasks().update(task);	
 				host().refresh();
 			}
 		}

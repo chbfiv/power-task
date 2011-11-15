@@ -5,7 +5,6 @@ import com.andorn.powertask.database.GooTasksOpenHelper;
 import com.andorn.powertask.fragments.GooTasksFragment;
 import com.andorn.powertask.helpers.DateTimeHelper;
 import com.andorn.powertask.models.GooTask;
-import com.andorn.powertask.models.TCTag;
 import com.andorn.powertask.R;
 
 import android.content.Context;
@@ -86,7 +85,6 @@ public class GooTasksCursorAdapter extends CursorAdapter {
         holder.title.setOnClickListener(null);
         holder.detials.setOnClickListener(null);
         holder.title.setOnLongClickListener(null);
-        holder.starCheckBox.setOnCheckedChangeListener(null);
 
     	GooTask task = GooTasksOpenHelper.read(cursor);
 
@@ -97,9 +95,6 @@ public class GooTasksCursorAdapter extends CursorAdapter {
         holder.starCheckBox.setTag(task.getId());
         holder.notes.setTag(task.getId());
         holder.dueDate.setTag(task.getId());
-        
-        holder.starCheckBox.setChecked(hasBlueStarTag(task));   
-        holder.starCheckBox.setOnCheckedChangeListener(mFragment.new TaskStarCheckedChanged());
         
         holder.statusCheckBox.setChecked(task.isCompleted());   
         holder.statusCheckBox.setOnCheckedChangeListener(mFragment.new TaskStatusCheckedChanged());
@@ -165,14 +160,4 @@ public class GooTasksCursorAdapter extends CursorAdapter {
         newView.setTag(holder);
 		return newView;
 	}
-    
-    private boolean hasBlueStarTag(GooTask task)
-    {
-    	boolean ret = false;
-    	for (TCTag tag : task.getTags()) {
-    		if(tag.getName().equalsIgnoreCase("blue-star"))
-    			return true;
-    	}
-    	return ret;
-    }  
 }

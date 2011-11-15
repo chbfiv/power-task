@@ -1,5 +1,6 @@
 package com.andorn.powertask.database;
 
+import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.helpers.SharedPrefUtil;
 
 import android.content.Context;
@@ -28,18 +29,17 @@ public abstract class GooBaseOpenHelper extends SQLiteOpenHelper {
     
     public abstract String getTableCreate();
     
+    private final Context mContext; 
+    
     public GooBaseOpenHelper(Context context) {
         super(context, GooDbUtil.DATABASE_NAME, null, GooDbUtil.DATABASE_VERSION);
+        mContext = context;
     }
 
 	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-    	if(!initialize())
-    	{
-    		Log.e(TAG, "onCreate - db failed to initialize.");
-    		return;    		
-    	}
+
 	}
 
 	@Override
@@ -54,9 +54,9 @@ public abstract class GooBaseOpenHelper extends SQLiteOpenHelper {
 	    	try
 	    	{
 	    		dbro = getReadableDatabase();
-	    		dbrw = getWritableDatabase();
-	    		dbrw.execSQL("PRAGMA foreign_keys=ON;");
-    			dbrw.execSQL(getTableCreate());
+				dbrw = getWritableDatabase();
+				dbrw.execSQL("PRAGMA foreign_keys=ON;");
+	    		dbrw.execSQL(getTableCreate());
 	    		initialized = true;
 			}
 			catch(SQLException sqle)
@@ -67,33 +67,56 @@ public abstract class GooBaseOpenHelper extends SQLiteOpenHelper {
 		}
 		return true;
 	}
-	
+
+    public TaskApplication app()
+    {    	
+    	return TaskApplication.app(mContext);
+    }
+    
 	public SQLiteDatabase getDbReadOnly()
 	{
 		SQLiteDatabase ret = null;
-		if(dbro != null)
+		
+		initialize();
+		
+		if(dbro != null && dbro.isOpen())
 		{
 			ret = dbro;
 		}
-		else
+		else			
 		{
-	    	  Log.e(TAG, "getDbReadOnly - null. should already be opened...");	
-	    	  throw new NullPointerException("getDbReadOnly - null. should already be opened...");
+			if (dbro != null) dbro.close();
+    		dbro = getReadableDatabase();
 		}
+		
+		if(dbro == null || !dbro.isOpen())
+		{
+			Log.e(TAG, "getDbReadOnly - null. should already be opened...");	
+			throw new NullPointerException("getDbReadOnly - null. should already be opened...");
+		}		
 		return ret;
 	}
 
 	public SQLiteDatabase getDbReadWrite()
 	{
 		SQLiteDatabase ret = null;
-		if(dbrw != null)
+		
+		initialize();
+		
+		if(dbrw != null && dbrw.isOpen())
 		{
 			ret = dbrw;
 		}
-		else
+		else			
 		{
-	    	  Log.e(TAG, "getDbReadWrite - null. should already be opened...");	
-	    	  throw new NullPointerException("getDbReadWrite - null. should already be opened..");
+			if (dbrw != null) dbrw.close();
+			dbrw = getWritableDatabase();
+		}
+		
+		if(dbrw == null || !dbrw.isOpen())
+		{
+			Log.e(TAG, "getDbReadWrite - null. should already be opened...");	
+			throw new NullPointerException("getDbReadWrite - null. should already be opened...");
 		}
 		return ret;
 	}

@@ -91,7 +91,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	public List<GooAccount> query() {
 		List<GooAccount> list = new ArrayList<GooAccount>();
 		Cursor c = null;
-		if(!initialize()) return list;
 		
 		try
 		{
@@ -119,7 +118,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public Cursor queryCursor() {
 		Cursor c = null;
-		if(!initialize()) return c;
 		
 		try
 		{
@@ -164,7 +162,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	public GooAccount read(long id) {
 		GooAccount acc = null;
 		Cursor c = null;
-		if(!initialize()) return acc;
 		
 		try
 		{
@@ -197,7 +194,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	{
 		GooAccount acc = null;
 		Cursor c = null;
-		if(!initialize()) return acc;
 		
 		try
 		{
@@ -234,7 +230,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	public long create(GooAccount account) 
 	{		
 		long rowId = GooBase.INVALID_ID;
-		if(!initialize()) return rowId;
 		
 		try
 		{
@@ -256,7 +251,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	public boolean update(GooAccount account) 
 	{
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -278,7 +272,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	public boolean updateAuthToken(long id, String authToken) 
 	{
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -296,7 +289,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	public boolean updateETag(long id, String eTag) 
 	{
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -314,7 +306,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	public boolean updateSync(long id, boolean sync) 
 	{
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -331,7 +322,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	 public boolean delete(long rowId) {
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -347,7 +337,6 @@ public class GooAccountsOpenHelper extends GooSyncBaseOpenHelper {
 	public boolean sync(TasksAppService service) throws Exception 
 	{		
 		boolean ret = false;
-		if(!initialize()) return ret;
 
 		try
 		{	

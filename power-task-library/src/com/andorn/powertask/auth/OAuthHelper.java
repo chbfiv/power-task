@@ -39,6 +39,8 @@ public class OAuthHelper {
     }
     
     private static final String TAG = OAuthHelper.class.getName();
+
+//    private static final Level LOGGING_LEVEL = Level.OFF;
     
 	//public static final String GOOGLE_API_KEY = "AIzaSyA_VcWSjcbbagRI8DW2jr1Iliy1D9P6IUg"; //chbfiv@gmail.com
     public static final String GOOGLE_API_KEY = "AIzaSyBK2Xe1teznQckJpZSGuFc51PIUGA0zZ_s"; //chbfiv@andornsoftware.com 

@@ -133,6 +133,11 @@ public class AnalyticsTrackerHelper {
     {		
     }  
     
+    public TaskApplication app()
+    {    	
+    	return TaskApplication.app(mActivity);
+    }
+    
     public void setSharedPrefUtil(SharedPrefUtil sharedPref)
     {
     	mSharedPrefUtil = sharedPref;
@@ -148,8 +153,8 @@ public class AnalyticsTrackerHelper {
 	    final SharedPreferences prefs = mSharedPrefUtil.getSharedPref();	  
 	    mGoogleAnalytics = prefs.getBoolean(SharedPrefUtil.PREF_GOOGLE_ANALYTICS, DEFAULT_GOOGLE_ANALYTICS); 
 	    
-    	mTracker.setDebug(TaskApplication.get(mContext).isDebug());
-    	mTracker.setDryRun(TaskApplication.get(mContext).isDebug());    	
+    	mTracker.setDebug(app().isDebug());
+    	mTracker.setDryRun(app().isDebug());    	
     }
     
     private void verifyTermsOfServiceAndTrial()
@@ -161,7 +166,7 @@ public class AnalyticsTrackerHelper {
     	if(!termsOfService) showTermsOfServiceDialog();    	
     	
     	// Trial Period
-    	if (TaskApplication.get(mContext).isTrial())
+    	if (app().isTrial())
 	    {
     	    final SharedPreferences.Editor editor = mSharedPrefUtil.getEditor();
     	    

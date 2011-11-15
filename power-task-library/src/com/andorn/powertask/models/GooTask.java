@@ -1,9 +1,6 @@
 package com.andorn.powertask.models;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
-
 import android.text.format.Time;
 import android.util.Log;
 import android.util.TimeFormatException;
@@ -36,8 +33,6 @@ public class GooTask extends GooSyncBase {
 	public boolean deleted;
 	public boolean hidden;
 	
-	private List<TCTag> mTags;
-	
 	public GooTask(long taskListId)
 	{
 		this.taskListId = taskListId;	
@@ -66,8 +61,6 @@ public class GooTask extends GooSyncBase {
 		this.deleted = deleted;
 		this.hidden = hidden;
 		
-		mTags = new ArrayList<TCTag>();
-		
 		this.completed = isCompleted() ? this.completed : null;
 	}	
 	
@@ -92,21 +85,8 @@ public class GooTask extends GooSyncBase {
 		this.deleted = deleted != 0;
 		this.hidden = hidden != 0;
 		
-		mTags = new ArrayList<TCTag>();
-		
 		this.completed = isCompleted() ? this.completed : null;
-	}	
-	
-	public void setTags(List<TCTag> tags)
-	{
-		mTags.clear();
-		mTags = tags;
-	}
-	
-	public List<TCTag> getTags()
-	{
-		return mTags;
-	}	
+	}		
 	
 	public Status getStatus()
 	{
@@ -192,11 +172,6 @@ public class GooTask extends GooSyncBase {
 	public boolean hasNotes()
 	{
 		return notes != null && notes.length() > 0;
-	}
-	
-	public boolean hasTags()
-	{
-		return mTags != null && mTags.size() > 0;
 	}
 	
 	public static GooTask Convert(long taskListId, Task remoteTask, String eTag)

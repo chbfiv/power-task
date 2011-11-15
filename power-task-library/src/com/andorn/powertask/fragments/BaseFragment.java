@@ -1,5 +1,6 @@
 package com.andorn.powertask.fragments;
 
+import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.activities.BaseActivity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,7 +18,12 @@ public class BaseFragment extends Fragment {
     	super.onActivityCreated(savedInstanceState);
     	mActivity = (BaseActivity) getActivity();    	
     }
-
+    
+    public TaskApplication app()
+    {    	
+    	return TaskApplication.app(mActivity);
+    }
+    
     @SuppressWarnings("unchecked")
 	public static <T> T host(FragmentActivity activity)
     {    	

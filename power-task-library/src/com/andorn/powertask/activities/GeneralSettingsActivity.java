@@ -55,7 +55,7 @@ public class GeneralSettingsActivity extends BaseActivity {
 
 	    View debug = findViewById(R.id.generalSettings_debug);
 	    
-	    if(TaskApplication.get(this).isDebug()) debug.setVisibility(View.VISIBLE);
+	    if(app().isDebug()) debug.setVisibility(View.VISIBLE);
 	    else debug.setVisibility(View.GONE);
     }
 

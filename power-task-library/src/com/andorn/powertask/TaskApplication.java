@@ -1,16 +1,13 @@
 package com.andorn.powertask;
 
-import java.util.ArrayList;
-
-import com.andorn.powertask.adapters.TCTagListAdapter;
 import com.andorn.powertask.auth.OAuthHelper;
-import com.andorn.powertask.models.TCTagItem;
+import com.andorn.powertask.database.GooAccountsOpenHelper;
+import com.andorn.powertask.database.GooTaskListsOpenHelper;
+import com.andorn.powertask.database.GooTasksOpenHelper;
 import com.google.api.client.extensions.android2.AndroidHttp;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.services.tasks.Tasks;
-import com.andorn.powertask.R;
-
 import android.app.Application;
 import android.content.Context;
 
@@ -27,16 +24,24 @@ public class TaskApplication extends Application {
     @SuppressWarnings("deprecation")
 	public final Tasks service = new Tasks(APP_PNAME, transport, jsonFactory);
     
-    private TCTagListAdapter mTagListAdapter;
+	private final GooAccountsOpenHelper dbhAccounts = new GooAccountsOpenHelper(this);
+	private final GooTaskListsOpenHelper dbhTaskLists = new GooTaskListsOpenHelper(this);
+    private final GooTasksOpenHelper dbhTasks = new GooTasksOpenHelper(this);
+
+    private static TaskApplication mInstance = null; 
     
-    public static TaskApplication get(Context context)
-    {
-    	TaskApplication app = null;    	
-    	if(context.getApplicationContext() instanceof TaskApplication)
+    public static TaskApplication app(Context context)
+    {  	
+    	if(mInstance == null && context.getApplicationContext() instanceof TaskApplication)
     	{
-    		app = (TaskApplication)context.getApplicationContext();
+    		mInstance = (TaskApplication)context.getApplicationContext();
     	}    	
-    	return app;
+    	return mInstance;
+    }
+    
+    public static TaskApplication app()
+    {    	
+    	return mInstance;
     }
     
     public boolean isRelease()
@@ -76,14 +81,18 @@ public class TaskApplication extends Application {
     	service.setOauthToken(authToken); 
     }
     
-    public TCTagListAdapter getTagListAdapter() {
-        return mTagListAdapter;
-    }   
-    
-    public TCTagListAdapter getTagListAdapter(Context context) {
-        if (mTagListAdapter == null) {
-        	mTagListAdapter = new TCTagListAdapter(context,  R.layout.tag_item, new ArrayList<TCTagItem>());
-        }
-        return mTagListAdapter;
-    }  
+	public GooAccountsOpenHelper getDbhAccounts() {
+		dbhAccounts.initialize();
+		return dbhAccounts;
+	}
+	
+	public GooTaskListsOpenHelper getDbhTaskLists() {
+		dbhTaskLists.initialize();
+		return dbhTaskLists;
+	}
+	
+	public GooTasksOpenHelper getDbhTasks() {
+		dbhTasks.initialize();
+		return dbhTasks;
+	}
 }

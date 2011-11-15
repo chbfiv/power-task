@@ -11,7 +11,7 @@ public class GooBase {
 	private Date mCreated;
 	private Date mModified;
 
-	public static final int INVALID_ID = -1;
+	public static final long INVALID_ID = -1;
 	
 	public GooBase()
 	{

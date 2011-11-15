@@ -163,7 +163,7 @@ public class GooTaskEditFragment extends BaseFragment
     	}    	
     	else 
     	{
-    		editTask = host().getDbhTasks().read(taskId);    		
+    		editTask = app().getDbhTasks().read(taskId);    		
     	}    	
     	
     	if(editTask == null)
@@ -222,9 +222,9 @@ public class GooTaskEditFragment extends BaseFragment
         
         if (mCreate) 
         {			
-			host().getDbhTasks().create(editTask);	
+			app().getDbhTasks().create(editTask);	
         } else {
-			host().getDbhTasks().update(editTask);		
+        	app().getDbhTasks().update(editTask);		
         }
 
         mActivity.finish();

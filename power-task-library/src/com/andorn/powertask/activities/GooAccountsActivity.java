@@ -2,7 +2,6 @@ package com.andorn.powertask.activities;
 
 import com.andorn.powertask.adapters.GooAccountsCursorAdapter;
 import com.andorn.powertask.base.ActivityHelper;
-import com.andorn.powertask.database.GooAccountsOpenHelper;
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.services.TasksAppService;
 import com.andorn.powertask.R;
@@ -22,8 +21,6 @@ public class GooAccountsActivity extends BaseActivity
 	implements OnClickListener {
 
 	private static final String TAG = GooAccountsActivity.class.getName();
-
-	private final GooAccountsOpenHelper dbACCHelper = new GooAccountsOpenHelper(this);
 
     private ListView mListView;    
     private GooAccountsCursorAdapter mAdapter;
@@ -51,7 +48,7 @@ public class GooAccountsActivity extends BaseActivity
 
 		if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();
 		mListView.setAdapter(null);	
-		Cursor c = dbACCHelper.queryCursor();
+		Cursor c = app().getDbhAccounts().queryCursor();
 		mAdapter = new GooAccountsCursorAdapter(this, c, true);
 		mListView.setAdapter(mAdapter);	   
 		
@@ -65,7 +62,6 @@ public class GooAccountsActivity extends BaseActivity
 		super.onDestroy();
 
 		if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();
-		if (dbACCHelper != null) dbACCHelper.close(); 
 	}
 	
 	@Override

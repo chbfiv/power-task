@@ -26,7 +26,7 @@ public abstract class GooSyncBaseOpenHelper extends GooBaseOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		
+		super.onCreate(db);
 	}
 	
 	@Override

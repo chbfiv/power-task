@@ -8,6 +8,7 @@ import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.models.GooSyncBase;
 import com.andorn.powertask.models.GooTask;
 import com.andorn.powertask.R;
+import com.andorn.powertask.TaskApplication;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -69,6 +70,11 @@ public class TaskActionsDialogFragment extends DialogFragment {
     	mEditTextView.setOnClickListener(new EditClick());
     	mDeleteTextView.setOnClickListener(new DeleteClick());
         return v;
+    }
+    
+    public TaskApplication app()
+    {    	
+    	return TaskApplication.app(mActivity);
     }
     
     public IGooTasksHost host()
@@ -140,9 +146,9 @@ public class TaskActionsDialogFragment extends DialogFragment {
 	    	 {
 		    	 for (Long id : ids)
 		    	 {
-		    		 GooTask task = host().getDbhTasks().read(id);
+		    		 GooTask task = app().getDbhTasks().read(id);
 		    		 task.setSyncState(GooSyncBase.SYNC_DELETE);
-		    		 host().getDbhTasks().update(task);
+		    		 app().getDbhTasks().update(task);
 		    	 }   		 
 	    	 }
 	    	 catch(Exception ex)

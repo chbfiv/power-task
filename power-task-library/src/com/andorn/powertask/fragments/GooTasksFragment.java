@@ -12,7 +12,6 @@ import com.andorn.powertask.models.GooSyncBase;
 import com.andorn.powertask.models.GooTask;
 import com.andorn.powertask.models.GooTaskList;
 import com.andorn.powertask.R;
-
 import android.content.Context;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -74,7 +73,7 @@ public class GooTasksFragment extends BaseListFragment
 		mRoot = getView();
         mList = getListView();
         
-    	GooTaskList list = host().getDbhTaskLists().read(host().getActiveTaskListId());
+    	GooTaskList list = app().getDbhTaskLists().read(host().getActiveTaskListId());
     	String listTitle = "default list title";
     	if(list != null) listTitle = list.title;
 
@@ -221,11 +220,11 @@ public class GooTasksFragment extends BaseListFragment
 			long taskId = (Long)v.getTag();
 			if(taskId != GooBase.INVALID_ID)
 			{
-				GooTask task = host().getDbhTasks().read(taskId);
+				GooTask task = app().getDbhTasks().read(taskId);
 				GooTask.Status status = isChecked ? GooTask.Status.completed : GooTask.Status.needsAction;
 				task.setStatus(status);			
 				task.flagSyncState(GooSyncBase.SYNC_UPDATE);				
-				host().getDbhTasks().update(task);
+				app().getDbhTasks().update(task);
 				host().refresh();
 			}
 		}

@@ -1,5 +1,6 @@
 package com.andorn.powertask.loaders;
 
+import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.fragments.BaseFragment;
 import com.andorn.powertask.interfaces.IGooTasksFrag;
 import com.andorn.powertask.interfaces.IGooTasksHost;
@@ -18,6 +19,11 @@ public class GooTasksLoader extends BaseCursorLoader {
 		super(context, fragment);		
 	}
 	
+    public TaskApplication app()
+    {    	
+    	return TaskApplication.app(mActivity);
+    }
+    
     public IGooTasksHost host()
     {    	
     	return BaseFragment.<IGooTasksHost>host(mActivity);
@@ -30,7 +36,7 @@ public class GooTasksLoader extends BaseCursorLoader {
     
 	@Override
 	public Cursor loadInBackground() {
-		return host().getDbhTasks().queryCursor(host().getActiveTaskListId(), 
+		return app().getDbhTasks().queryCursor(host().getActiveTaskListId(), 
 				GooSyncBase.SYNC_DELETE, frag().getTaskSortType());  		
 	}
 }

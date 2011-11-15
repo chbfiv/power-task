@@ -28,8 +28,6 @@ import com.andorn.powertask.adapters.GooTaskListsCursorAdapter;
 import com.andorn.powertask.auth.OAuthHelper;
 import com.andorn.powertask.auth.OAuthReceiver;
 import com.andorn.powertask.base.ActivityHelper;
-import com.andorn.powertask.database.GooAccountsOpenHelper;
-import com.andorn.powertask.database.GooTaskListsOpenHelper;
 import com.andorn.powertask.dialogs.TaskListActionsDialog;
 import com.andorn.powertask.helpers.AnalyticsTrackerHelper;
 import com.andorn.powertask.helpers.AppRaterHelper;
@@ -45,9 +43,6 @@ public class GooTaskListsActivity extends BaseActivity implements
 	OnClickListener, OnLongClickListener {
 	
 	private static final String TAG = GooTaskListsActivity.class.getName();
-	
-	private final GooAccountsOpenHelper dbACCHelper = new GooAccountsOpenHelper(this);
-	private final GooTaskListsOpenHelper dbTLCHelper = new GooTaskListsOpenHelper(this);
 	
 	private ListView listView;
 	private GooTaskListsCursorAdapter mAdapter;
@@ -85,7 +80,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 	    editor.putLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, mActiveAccountId);
 	    editor.commit();		
     	
-    	GooAccount account = dbACCHelper.read(mActiveAccountId);
+    	GooAccount account = app().getDbhAccounts().read(mActiveAccountId);
     	if(account == null)
     	{
     		Log.e(TAG, "onCreate - account is null");
@@ -121,7 +116,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 		{
 			if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();
 			listView.setAdapter(null);	 
-			Cursor c = dbTLCHelper.queryCursor(mActiveAccountId, GooSyncBase.SYNC_DELETE);
+			Cursor c = app().getDbhTaskLists().queryCursor(mActiveAccountId, GooSyncBase.SYNC_DELETE);
 			mAdapter = new GooTaskListsCursorAdapter(this, c, true);		
 			listView.setAdapter(mAdapter);	  			
 			mAdapter.requery();			
@@ -145,13 +140,8 @@ public class GooTaskListsActivity extends BaseActivity implements
     
 	@Override
 	protected void onDestroy() {		
-		super.onDestroy();		
-		synchronized(this)
-		{
-			if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();
-			if (dbACCHelper != null) dbACCHelper.close(); 
-			if (dbTLCHelper != null) dbTLCHelper.close(); 
-		}
+		super.onDestroy();	
+		if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();
 	}
 	
 	@Override
@@ -311,7 +301,7 @@ public class GooTaskListsActivity extends BaseActivity implements
         String ok = getString(R.string.description_ok);
         String cancel = getString(R.string.description_cancel);
         
-		GooTaskList taskList = dbTLCHelper.read(taskListId);
+		GooTaskList taskList = app().getDbhTaskLists().read(taskListId);
 		
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	builder.setMessage(messagePre + ": \"" + taskList.title + "\"?\n" + messagePost + ".")
@@ -345,7 +335,7 @@ public class GooTaskListsActivity extends BaseActivity implements
         String ok = getString(R.string.description_ok);
         String cancel = getString(R.string.description_cancel);
         
-		GooTaskList taskList = dbTLCHelper.read(taskListId);
+		GooTaskList taskList = app().getDbhTaskLists().read(taskListId);
 		 
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
     	final EditText input = new EditText(this); 
@@ -427,10 +417,10 @@ public class GooTaskListsActivity extends BaseActivity implements
 	    	 {
 		    	 for (RenameParam param : params)
 		    	 {
-		    		 GooTaskList taskList = dbTLCHelper.read(param.taskListId);
+		    		 GooTaskList taskList = app().getDbhTaskLists().read(param.taskListId);
 		    		 taskList.title = param.title;
 		    		 taskList.flagSyncState(GooSyncBase.SYNC_UPDATE);	
-	        		 dbTLCHelper.update(taskList);  	   
+		    		 app().getDbhTaskLists().update(taskList);  	   
 
  					 getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
  								AnalyticsTrackerHelper.ACTION_RENAME_TASK_LIST, TAG, 0);
@@ -457,7 +447,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 		    	 {
 		    		 GooTaskList taskList = new GooTaskList(mActiveAccountId, title);
 		    		 taskList.flagSyncState(GooSyncBase.SYNC_CREATE);
-		    		 dbTLCHelper.create(taskList);
+		    		 app().getDbhTaskLists().create(taskList);
 		    		 
  					 getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
 								AnalyticsTrackerHelper.ACTION_CREATE_TASK_LIST, TAG, 0);
@@ -482,9 +472,9 @@ public class GooTaskListsActivity extends BaseActivity implements
 	    	 {
 		    	 for (Long id : ids)
 		    	 {
-		    		 GooTaskList taskList = dbTLCHelper.read(id);
+		    		 GooTaskList taskList = app().getDbhTaskLists().read(id);
 		    		 taskList.setSyncState(GooSyncBase.SYNC_DELETE);
-		    		 dbTLCHelper.update(taskList);
+		    		 app().getDbhTaskLists().update(taskList);
 		    		 
  					 getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
 								AnalyticsTrackerHelper.ACTION_DELETE_TASK_LIST, TAG, 0);
@@ -509,10 +499,10 @@ public class GooTaskListsActivity extends BaseActivity implements
 	    	 {
 		    	 for (Long id : ids)
 		    	 {
-		    		 GooTaskList taskList = dbTLCHelper.read(id);
+		    		 GooTaskList taskList = app().getDbhTaskLists().read(id);
 		    		 taskList.setSyncState(GooSyncBase.SYNC_HIDE);
-		    		 dbTLCHelper.update(taskList);
-		    		 dbTLCHelper.getDbhTasks().clearCompleted(id);
+		    		 app().getDbhTaskLists().update(taskList);
+		    		 app().getDbhTasks().clearCompleted(id);
 		    		 
  					 getTrackerHelper().trackEvent(AnalyticsTrackerHelper.CATEGORY_UI_INTERACTION, 
 								AnalyticsTrackerHelper.ACTION_CLEAR_COMPLETED_TASK_LIST, TAG, 0);

@@ -21,8 +21,6 @@ import android.util.Log;
 public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	
     private static final String TAG = GooTaskListsOpenHelper.class.getName();
-
-    private final GooTasksOpenHelper dbhTasks;
     
     protected static final String TABLE_NAME = "goo_tasklists";
     protected static final String KEY_accountId = "accountId";
@@ -73,7 +71,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
     
     public GooTaskListsOpenHelper(Context context) {
         super(context);
-        dbhTasks = new GooTasksOpenHelper(context);
     }
 
     @Override
@@ -101,21 +98,10 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	public void onOpen(SQLiteDatabase db) {
 		super.onOpen(db);
 	}
-	
-	@Override
-	public synchronized void close() {
-		if(dbhTasks != null) dbhTasks.close();
-		super.close();
-	}
-	
-	public GooTasksOpenHelper getDbhTasks() {
-		return dbhTasks;
-	}
-	
+
 	public List<GooTaskList> query(long accountId, int syncStateFilter) {
 		List<GooTaskList> list = new ArrayList<GooTaskList>();
 		Cursor c = null;
-		if(!initialize()) return list;
 		
 		try
 		{
@@ -144,7 +130,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	public List<GooTaskList> query(long accountId) {
 		List<GooTaskList> list = new ArrayList<GooTaskList>();
 		Cursor c = null;
-		if(!initialize()) return list;
 		
 		try
 		{
@@ -172,7 +157,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public Cursor queryCursor(long accountId, int syncStateFilter)  {
 		Cursor c = null;
-		if(!initialize()) return c;
 		
 		try
 		{
@@ -195,7 +179,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	public Cursor queryCursor(long accountId) {
 		Cursor c = null;
-		if(!initialize()) return c;
 		
 		try
 		{
@@ -238,7 +221,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	public GooTaskList read(long id) {
 		GooTaskList tl = null;
 		Cursor c = null;
-		if(!initialize()) return tl;
 		
 		try
 		{
@@ -270,7 +252,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	public GooTaskList read(String remoteId) {
 		GooTaskList tl = null;
 		Cursor c = null;
-		if(!initialize()) return tl;
 		
 		try
 		{
@@ -302,7 +283,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	public long create(GooTaskList item) 
 	{
 		long ret = GooBase.INVALID_ID;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -326,7 +306,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	public boolean update(GooTaskList item) 
 	{
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -348,7 +327,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	
 	 public boolean delete(long rowId) {
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		 try
 		 {
@@ -365,7 +343,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	{
 		String ret = "";
 		GooTaskList list;
-		if(!initialize()) return ret;
 		
 		try
 		{
@@ -382,7 +359,6 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 	public boolean sync(TasksAppService service, GooAccount account) throws Exception 
 	{
 		boolean ret = false;
-		if(!initialize()) return ret;
 		
 		try
 		{		
@@ -414,7 +390,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 						newList = read(id);
 						
 						// sync - Tasks
-						getDbhTasks().sync(service, newList);	
+						app().getDbhTasks().sync(service, newList);	
 					}
 					else if(localList.remoteSyncRequired(remoteList.getEtag()))
 					{		
@@ -424,7 +400,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 						update(newList);	
 	
 						// sync - Tasks
-						getDbhTasks().sync(service, newList);	
+						app().getDbhTasks().sync(service, newList);	
 					}
 				}	
 				
@@ -446,7 +422,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 						update(newList);
 						
 						// sync - Tasks
-						getDbhTasks().sync(service,  newList);	
+						app().getDbhTasks().sync(service,  newList);	
 					}
 				}
 				else if (remoteTaskListChanges && GooTaskList.shouldDelete(localList.remoteId, remoteLists)) 

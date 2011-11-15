@@ -67,6 +67,11 @@ public class TasksAppService extends IntentService {
 		super(TAG);
 	}
 
+    public TaskApplication app()
+    {    	
+    	return TaskApplication.app(this);
+    }
+    
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
@@ -165,7 +170,7 @@ public class TasksAppService extends IntentService {
 		    {
 		    	remoteRequest = true;
 	    		GooTaskList localList = dbhTaskLists.read(taskListId);
-		    	success = dbhTaskLists.getDbhTasks().sync(this, localList);
+		    	success = app().getDbhTasks().sync(this, localList);
 		    }
 		    else success = true; //default
 		    

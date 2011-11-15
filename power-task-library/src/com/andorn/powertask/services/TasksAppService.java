@@ -514,6 +514,7 @@ public class TasksAppService extends IntentService {
           } 
           
 	      if (statusCode == 401) {
+	    	  Log.e(TAG, "401 Http Response Exception - " + response.getStatusMessage());	 
 	    	  if(receiver != null) receiver.send(RESULT_SYNC_FAILED_UNAUTHORIZED, Bundle.EMPTY);
 	    	  return;
 	      }

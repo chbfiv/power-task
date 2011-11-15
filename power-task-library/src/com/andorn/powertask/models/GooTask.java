@@ -43,8 +43,8 @@ public class GooTask extends GooSyncBase {
 	public GooTask(long taskListId, String remoteId, String kind,
 			String title, String selfLink, String parent,
 			String position, String notes, String status,
-			DateTime due, DateTime completed, boolean deleted,
-			boolean hidden)
+			DateTime due, DateTime completed, Boolean deleted,
+			Boolean hidden)
 	{
 		super();
 		this.taskListId = taskListId;
@@ -58,8 +58,8 @@ public class GooTask extends GooSyncBase {
 		this.status = status != null ? status : Status.needsAction.toString();
 		this.due = due != null ? due.toStringRfc3339() : null;
 		this.completed = completed != null ? completed.toStringRfc3339() : null;
-		this.deleted = deleted;
-		this.hidden = hidden;
+		this.deleted = deleted != null ? deleted : false;
+		this.hidden = hidden != null ? hidden : false;
 		
 		this.completed = isCompleted() ? this.completed : null;
 	}	

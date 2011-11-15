@@ -113,7 +113,6 @@ public class OAuthHelper {
 	      {
 		      authorizeAccount(gooAccount);	    	  
 	      }
-	      return;
 	    }
 	    //otherwise take them to the accounts page
 //		final Intent intent = new Intent(mActivity, GooAccountsActivity.class);
@@ -146,7 +145,7 @@ public class OAuthHelper {
 	                intent.setFlags(intent.getFlags() & ~Intent.FLAG_ACTIVITY_NEW_TASK);
 	                mActivity.startActivityForResult(intent, REQUEST_AUTHENTICATE);
 	              } else if (bundle.containsKey(AccountManager.KEY_AUTHTOKEN)) {   
-	            	  String authToken = bundle.get(AccountManager.KEY_AUTHTOKEN).toString();
+	            	  String authToken = bundle.getString(AccountManager.KEY_AUTHTOKEN);
 	                  onAuthToken(authToken);
 	              }
 	            } catch (Exception e) {

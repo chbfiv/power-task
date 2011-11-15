@@ -518,6 +518,10 @@ public class TasksAppService extends IntentService {
 	    	  if(receiver != null) receiver.send(RESULT_SYNC_FAILED_UNAUTHORIZED, Bundle.EMPTY);
 	    	  return;
 	      }
+	      
+	      if (statusCode == 404) {
+	    	  Log.e(TAG, "404 Not Found - " + response.getStatusMessage());	 
+	      }
 	    }
         Log.w(TAG, "Got Exception " + e);
         Log.e(TAG, Log.getStackTraceString(e));
@@ -536,7 +540,12 @@ public class TasksAppService extends IntentService {
           } 
           
 	      if (statusCode == 401) {
+	    	  Log.e(TAG, "401 Http Response Exception - " + response.getStatusMessage());	
 	    	  return;
+	      }
+	      
+	      if (statusCode == 404) {
+	    	  Log.e(TAG, "404 Not Found - " + response.getStatusMessage());	 
 	      }
 	    }
         Log.w(TAG, "Got Exception " + e);

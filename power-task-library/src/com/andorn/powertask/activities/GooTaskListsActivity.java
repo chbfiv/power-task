@@ -23,7 +23,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.adapters.GooTaskListsCursorAdapter;
 import com.andorn.powertask.auth.OAuthHelper;
 import com.andorn.powertask.auth.OAuthReceiver;
@@ -524,8 +523,7 @@ public class GooTaskListsActivity extends BaseActivity implements
 	    
 	    @Override
 	    public void onAuthToken(Context context, String authToken) {	
-		    TaskApplication app = (TaskApplication)getApplication();
-	    	app.setAccessToken(authToken);  	    	
+	    	app().setAccessToken(authToken);  	    	
 	    	sync();
 	    }
 	};

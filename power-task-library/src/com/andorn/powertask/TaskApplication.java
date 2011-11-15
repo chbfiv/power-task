@@ -39,9 +39,12 @@ public class TaskApplication extends Application {
     	return mInstance;
     }
     
-    public static TaskApplication app()
-    {    	
-    	return mInstance;
+    @Override
+    public void onTerminate() {
+    	super.onTerminate();
+    	if (dbhAccounts != null) dbhAccounts.close();
+    	if (dbhTaskLists != null) dbhTaskLists.close();
+    	if (dbhTasks != null) dbhTasks.close();    	
     }
     
     public boolean isRelease()
@@ -82,17 +85,14 @@ public class TaskApplication extends Application {
     }
     
 	public GooAccountsOpenHelper getDbhAccounts() {
-		dbhAccounts.initialize();
 		return dbhAccounts;
 	}
 	
 	public GooTaskListsOpenHelper getDbhTaskLists() {
-		dbhTaskLists.initialize();
 		return dbhTaskLists;
 	}
 	
 	public GooTasksOpenHelper getDbhTasks() {
-		dbhTasks.initialize();
 		return dbhTasks;
 	}
 }

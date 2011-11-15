@@ -3,14 +3,11 @@ package com.andorn.powertask.activities;
 import java.util.List;
 
 import com.andorn.powertask.adapters.GooAccountsCursorAdapter;
-import com.andorn.powertask.database.GooAccountsOpenHelper;
 import com.andorn.powertask.helpers.AnalyticsTrackerHelper;
 import com.andorn.powertask.helpers.SharedPrefUtil;
 import com.andorn.powertask.models.GooAccount;
 import com.andorn.powertask.models.GooBase;
 import com.andorn.powertask.R;
-import com.andorn.powertask.TaskApplication;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -28,8 +25,6 @@ import android.widget.LinearLayout;
 public class GeneralSettingsActivity extends BaseActivity {
 	
 	private static final String TAG = GeneralSettingsActivity.class.getName();
-
-	private final GooAccountsOpenHelper dbACCHelper = new GooAccountsOpenHelper(this);
 
     private GooAccountsCursorAdapter mAdapter;
 
@@ -91,7 +86,7 @@ public class GeneralSettingsActivity extends BaseActivity {
 	    
 	    accountsLayout.removeAllViews();
 	    
-	    List<GooAccount> accounts = dbACCHelper.query();
+	    List<GooAccount> accounts = app().getDbhAccounts().query();
 	    for (GooAccount account : accounts)
 	    {
 	    	View accountView = mInflater.inflate(R.layout.account, null);
@@ -110,9 +105,9 @@ public class GeneralSettingsActivity extends BaseActivity {
 					long accountId = (Long)v.getTag();
 					if(accountId != GooBase.INVALID_ID)
 					{
-						GooAccount tmpAccount = dbACCHelper.read(accountId);
+						GooAccount tmpAccount = app().getDbhAccounts().read(accountId);
 						tmpAccount.setSync(isChecked);
-						dbACCHelper.update(tmpAccount);
+						app().getDbhAccounts().update(tmpAccount);
 					}
 				}
 			});
@@ -128,7 +123,6 @@ public class GeneralSettingsActivity extends BaseActivity {
 		super.onDestroy();
 		
 		if(mAdapter != null && mAdapter.getCursor() != null) mAdapter.getCursor().close();
-		if (dbACCHelper != null) dbACCHelper.close(); 
 	}
     
     public static void go(Activity activity) 

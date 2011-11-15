@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.andorn.powertask.database.GooAccountsOpenHelper;
+import com.andorn.powertask.TaskApplication;
 import com.andorn.powertask.helpers.SharedPrefUtil;
 import com.andorn.powertask.models.GooAccount;
 import com.google.api.client.googleapis.auth.oauth2.draft10.GoogleAccessProtectedResource;
@@ -26,16 +26,13 @@ import android.widget.Toast;
 public class OAuthHelper {
 
     protected Activity mActivity;
-    
-	private final GooAccountsOpenHelper dbACCHelper;
-    
+        
     public static OAuthHelper create(Activity activity) {
         return new OAuthHelper(activity);                
     }
 
     public OAuthHelper(Activity activity) {
         mActivity = activity;
-        dbACCHelper = new GooAccountsOpenHelper(activity);
     }
     
     private static final String TAG = OAuthHelper.class.getName();
@@ -87,20 +84,24 @@ public class OAuthHelper {
 	
 	public void onDestroy() {
         resetAuthAttempts();        
-		if (dbACCHelper != null) dbACCHelper.close();
+    }
+
+    public TaskApplication app()
+    {    	
+    	return TaskApplication.app(mActivity);
     }
     
 	public void updateTokenExpiration(boolean tokenExpired) {
 	    SharedPreferences prefs = SharedPrefUtil.getSharedPref(mActivity);
 	    long accountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, -1);
 	    int authAttempts = prefs.getInt(SharedPrefUtil.PREF_AUTH_ATTEMPTS, 0);
-	    GooAccount gooAccount = dbACCHelper.read(accountId);	    
+	    GooAccount gooAccount = app().getDbhAccounts().read(accountId);	    
 	    
 	    if (gooAccount != null) {
 	      if (tokenExpired) {
 	        accountManager.invalidateAuthToken(gooAccount.getAuthToken());	       
 	        gooAccount.setAuthToken(null);
-	        dbACCHelper.update(gooAccount);
+	        app().getDbhAccounts().update(gooAccount);
 	      }
 	      
 	      if(authAttempts >= MAX_AUTH_ATTEMPTS)	      
@@ -165,7 +166,7 @@ public class OAuthHelper {
 	      
 		final SharedPreferences prefs = SharedPrefUtil.getSharedPref(mActivity);	   
 		long accountId = prefs.getLong(SharedPrefUtil.PREF_ACTIVE_ACCOUNT_ID, -1);
-		if(dbACCHelper.updateAuthToken(accountId, authToken))
+		if(app().getDbhAccounts().updateAuthToken(accountId, authToken))
 		{	    
 			final Intent intent = new Intent(INTENT_ON_AUTH);
 			intent.putExtra(INTENT_EXTRA_AUTH_TOKEN, authToken);

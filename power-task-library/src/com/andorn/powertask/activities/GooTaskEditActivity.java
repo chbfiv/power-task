@@ -26,8 +26,6 @@ public class GooTaskEditActivity extends BaseActivity
 	private long mActiveTaskId = GooBase.INVALID_ID;
 	private long mActiveTaskListId = GooBase.INVALID_ID;
 
-	private final GooTasksOpenHelper dbhTasks = new GooTasksOpenHelper(this);
-
 	private GooTaskEditFragment mTaskEditFragment;
 	
     @Override
@@ -63,7 +61,6 @@ public class GooTaskEditActivity extends BaseActivity
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();		
-		if (dbhTasks != null) dbhTasks.close(); 
 	}
 
 	@Override
@@ -84,7 +81,7 @@ public class GooTaskEditActivity extends BaseActivity
 	}
 	
 	public GooTasksOpenHelper getDbhTasks() {
-		return dbhTasks;
+		return app().getDbhTasks();
 	}
 
 	public void refresh()

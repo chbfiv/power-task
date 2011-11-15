@@ -2,8 +2,6 @@ package com.andorn.powertask.services;
 
 import java.io.IOException;
 import com.andorn.powertask.TaskApplication;
-import com.andorn.powertask.database.GooAccountsOpenHelper;
-import com.andorn.powertask.database.GooTaskListsOpenHelper;
 import com.andorn.powertask.helpers.ConnectivityHelper;
 import com.andorn.powertask.helpers.GeneralHelper;
 import com.andorn.powertask.helpers.SharedPrefUtil;
@@ -54,9 +52,6 @@ public class TasksAppService extends IntentService {
     public static final int RESULT_SYNC_FAILED_UNAUTHORIZED = 49996;
     
     public static final String RESULT_TASK_LISTS = "result_task_lists";
-
-    private final GooAccountsOpenHelper dbhAccounts = new GooAccountsOpenHelper(this);
-    private final GooTaskListsOpenHelper dbhTaskLists = new GooTaskListsOpenHelper(this);
 	
     private com.google.api.services.tasks.Tasks taskService;
     
@@ -94,7 +89,7 @@ public class TasksAppService extends IntentService {
 		    {	    
 			    if(receiver != null) receiver.send(RESULT_SYNC_LOADING, Bundle.EMPTY);			    
 			    
-			    success = dbhAccounts.sync(this);
+			    success = app().getDbhAccounts().sync(this);
 			    
 			    if(receiver != null) 
 		    	{
@@ -147,7 +142,7 @@ public class TasksAppService extends IntentService {
 	    	return remoteRequest;
 	    }
 	    
-	    GooAccount account = dbhAccounts.read(accountId);
+	    GooAccount account = app().getDbhAccounts().read(accountId);
 	    //if still null exit cleanly
 	    if(account == null)
 	    {
@@ -164,12 +159,12 @@ public class TasksAppService extends IntentService {
 		    if (requestType == REQUEST_SYNC_TASK_LISTS) 
 		    {
 		    	remoteRequest = true;
-		    	success = dbhTaskLists.sync(this, account);
+		    	success = app().getDbhTaskLists().sync(this, account);
 		    }
 		    else if (requestType == REQUEST_SYNC_TASKS) 
 		    {
 		    	remoteRequest = true;
-	    		GooTaskList localList = dbhTaskLists.read(taskListId);
+	    		GooTaskList localList = app().getDbhTaskLists().read(taskListId);
 		    	success = app().getDbhTasks().sync(this, localList);
 		    }
 		    else success = true; //default
@@ -194,17 +189,13 @@ public class TasksAppService extends IntentService {
 		//TLog(TAG + " service onCreate.");
 		super.onCreate();
 		
-		TaskApplication app = (TaskApplication)getApplication();
-		taskService = app.getTasksService();
+		taskService = app().getTasksService();
 	}	
 	
 	@Override
 	public void onDestroy() {
 		//TLog(TAG + " service onDestroy.");
 		super.onDestroy();
-		
-		if (dbhAccounts != null) dbhAccounts.close();
-		if (dbhTaskLists != null) dbhTaskLists.close();
 	}
 	
 	// Static Sync Requests
@@ -253,7 +244,7 @@ public class TasksAppService extends IntentService {
 		String result = null;
     	try
     	{   		
-    		GooAccount account = dbhAccounts.read(accountId);
+    		GooAccount account = app().getDbhAccounts().read(accountId);
     		if(account != null) result = account.getETag();
     	} 
     	catch(Exception e)
@@ -268,7 +259,7 @@ public class TasksAppService extends IntentService {
 		String result = null;
     	try
     	{  
-    		dbhAccounts.updateETag(accountId, eTag);
+    		app().getDbhAccounts().updateETag(accountId, eTag);
     	} 
     	catch(Exception e)
     	{  		
@@ -426,7 +417,7 @@ public class TasksAppService extends IntentService {
 		Task result = null;
     	try
     	{
-			String taskListRemoteId = dbhTaskLists.getTaskListRemoteId(local.taskListId);
+			String taskListRemoteId = app().getDbhTaskLists().getTaskListRemoteId(local.taskListId);
 
 			if(taskListRemoteId ==  "") return result;
 			
@@ -454,7 +445,7 @@ public class TasksAppService extends IntentService {
 		Task result = null;
     	try
     	{   
-			String taskListRemoteId = dbhTaskLists.getTaskListRemoteId(local.taskListId);
+			String taskListRemoteId = app().getDbhTaskLists().getTaskListRemoteId(local.taskListId);
 			String taskRemoteId = local.remoteId;
 
 			if(GeneralHelper.isNullOrEmpty(taskListRemoteId) ||
@@ -491,7 +482,7 @@ public class TasksAppService extends IntentService {
 		boolean ret = false;
     	try
     	{   		
-			String taskListRemoteId = dbhTaskLists.getTaskListRemoteId(local.taskListId);
+			String taskListRemoteId = app().getDbhTaskLists().getTaskListRemoteId(local.taskListId);
 			String taskRemoteId = local.remoteId;
 
 			if(GeneralHelper.isNullOrEmpty(taskListRemoteId) || 

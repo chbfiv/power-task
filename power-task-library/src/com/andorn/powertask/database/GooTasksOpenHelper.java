@@ -261,7 +261,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		}
 		catch(SQLException sqle)
 		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());		
+	    	  throw sqle;		
 		}
 		return task;
 	}
@@ -290,7 +291,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		}
 		catch(SQLException sqle)
 		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());		
+	    	  throw sqle;		
 		}
 		finally
 		{
@@ -323,7 +325,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		}
 		catch(SQLException sqle)
 		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());	
+	    	  throw sqle;
 		}
 		finally
 		{
@@ -344,7 +347,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		}
 		catch(SQLException sqle)
 		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());		
+	    	  throw sqle;		
 		}
 		return ret;
 	}
@@ -375,7 +379,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		}
 		catch(SQLException sqle)
 		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());			
+	    	  throw sqle;	
 		}
 		return ret;
 	}
@@ -406,7 +411,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		}
 		catch(SQLException sqle)
 		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());	
+	    	  throw sqle;			
 		}
 		return ret;
 	}
@@ -423,7 +429,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		}
 		catch(SQLException sqle)
 		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());		
+	    	  throw sqle;		
 		}
 		return ret;
 	}
@@ -437,7 +444,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		 }
 		 catch(SQLException sqle)
 		 {
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());	   			
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());	 
+	    	  throw sqle;  			
 		 }
 		 return ret;
      } 
@@ -457,19 +465,22 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		 }
 		 catch(SQLException sqle)
 		 {
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());	   			
+	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());	
+	    	  throw sqle;   			
 		 }
 		 return ret;
 	 }
 	 
-	public boolean sync(TasksAppService service, GooTaskList localList) throws Exception 
+	public boolean sync(TasksAppService service, long taskListId) throws Exception 
 	{
 		boolean ret = false;
 		
 		try
 		{
 			// pull - Tasks
-			if(localList == null) return false;    		
+    		GooTaskList localList = app().getDbhTaskLists().read(taskListId);    		
+			if(localList == null) return false;    	
+			
 			Tasks remoteTasks = service.queryRemoteTasks(localList.remoteId);
 			if(remoteTasks == null) return false;
 			
@@ -541,7 +552,8 @@ public class GooTasksOpenHelper extends GooSyncBaseOpenHelper {
 		}
 		catch(SQLException sqle)
 		{
-	    	  Log.e(TAG, "SQL exception - " + sqle.getMessage());				
+	    	  Log.e(TAG, "SYNC - SQL exception - " + sqle.getMessage());	
+	    	  throw sqle;			
 		}
 		return ret;
 	}		

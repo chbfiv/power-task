@@ -164,8 +164,7 @@ public class TasksAppService extends IntentService {
 		    else if (requestType == REQUEST_SYNC_TASKS) 
 		    {
 		    	remoteRequest = true;
-	    		GooTaskList localList = app().getDbhTaskLists().read(taskListId);
-		    	success = app().getDbhTasks().sync(this, localList);
+		    	success = app().getDbhTasks().sync(this, taskListId);
 		    }
 		    else success = true; //default
 		    

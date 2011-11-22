@@ -24,7 +24,7 @@
 	
 	<!-- Account(s) -->
     <string name="description_accounts">Accounts</string>
-    <string name="description_add_account">Add Google Gmail account</string>
+    <string name="description_add_account">Add Gmail account</string>
     <string name="description_debug">Debug</string>
     <string name="description_offline_mode">Offline mode</string>
     <string name="description_accounts_authorized_to_sync">Accounts authorized to sync</string>
@@ -51,7 +51,7 @@
     <string name="description_task_compose">Compose Task</string>   
     <string name="description_task_edit">Edit Task</string>  
     <string name="description_task_read">Open Task</string>
-    <string name="description_task_discard">Discard</string>   
+    <string name="description_task_discard">Discard Changes</string>   
     <string name="description_task_delete">Delete Task</string>
 
     <string name="task_title_hint">title:</string>

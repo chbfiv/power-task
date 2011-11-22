@@ -14,7 +14,7 @@
 	
 	<!-- Account(s) -->
     <string name="description_accounts">账户</string>
-    <string name="description_add_account">添加 Google Gmail 账户</string>
+    <string name="description_add_account">添加 Gmail 账户</string>
     <string name="description_debug">寻找错误</string>
     <string name="description_offline_mode">脱机操作</string>
     <string name="description_accounts_authorized_to_sync">用于同步的账户</string>

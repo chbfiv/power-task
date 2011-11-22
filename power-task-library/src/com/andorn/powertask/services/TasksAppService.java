@@ -41,6 +41,7 @@ public class TasksAppService extends IntentService {
 	public static final int REQUEST_SYNC_TASK_LISTS = 30000;
 	public static final int REQUEST_SYNC_TASKS = 30001;
 	public static final int REQUEST_SYNC_ACCOUNTS = 30002;
+	public static final int REQUEST_SYNC_ACCOUNT = 30003;
 	
 	public static final int RESULT_SYNC_SUCCESS_TASK_LISTS = 40000;
 	public static final int RESULT_SYNC_SUCCESS_TASKS = 40001;
@@ -156,10 +157,15 @@ public class TasksAppService extends IntentService {
 		    
 		    int requestType = intent.getFlags();
 		    
+		    if (requestType == REQUEST_SYNC_ACCOUNT) 
+		    {
+		    	remoteRequest = true;
+		    	success = app().getDbhTaskLists().sync(this, account, true);
+		    }
 		    if (requestType == REQUEST_SYNC_TASK_LISTS) 
 		    {
 		    	remoteRequest = true;
-		    	success = app().getDbhTaskLists().sync(this, account);
+		    	success = app().getDbhTaskLists().sync(this, account, false);
 		    }
 		    else if (requestType == REQUEST_SYNC_TASKS) 
 		    {
@@ -206,6 +212,20 @@ public class TasksAppService extends IntentService {
 		intent.putExtra(REQUEST_RECEIVER_EXTRA, receiver);
 		context.startService(intent);
 	}	
+	
+	public static void syncAccount(Context context, ResultReceiver receiver)
+	{
+		final SharedPrefUtil sharedPref = SharedPrefUtil.create(context);
+	    boolean offlineMode = sharedPref.getSharedPref().getBoolean(SharedPrefUtil.PREF_OFFLINE_MODE, false);	
+	    
+	    if(!offlineMode)
+	    {
+			Intent intent = new Intent(context, TasksAppService.class);
+			intent.setFlags(REQUEST_SYNC_ACCOUNT);
+			intent.putExtra(REQUEST_RECEIVER_EXTRA, receiver);
+			context.startService(intent);
+	    }
+	}
 	
 	public static void syncTaskLists(Context context, ResultReceiver receiver)
 	{

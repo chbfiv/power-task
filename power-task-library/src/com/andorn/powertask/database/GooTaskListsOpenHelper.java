@@ -363,7 +363,7 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 		return ret;
 	}	
 	
-	public boolean sync(TasksAppService service, GooAccount account) throws Exception 
+	public boolean sync(TasksAppService service, GooAccount account, boolean all) throws Exception 
 	{
 		boolean ret = false;
 		
@@ -384,8 +384,12 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 				{
 					TaskList remoteList = remoteLists.getItems().get(i);
 					
+					// sync all Tasks, or 
 					//no etag provided w/ request. Use accoutn ETag for now
-					remoteList.setEtag(remoteLists.getEtag());
+					if (all)
+						remoteList = service.readRemoteTaskList(remoteList.getId());
+					else
+						remoteList.setEtag(remoteLists.getEtag()); 
 					
 					// merge - Task List
 					GooTaskList localList = read(remoteList.getId());
@@ -394,14 +398,20 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 					{
 						//doesn't exist locally, create
 						GooTaskList newList = GooTaskList.Convert(account.getId(), remoteList, remoteList.getEtag());						
-						create(newList);
+						long id = create(newList);
+	  	
+						// sync all Tasks
+						if (all) app().getDbhTasks().sync(service, id);  
 					}
 					else if(localList.remoteSyncRequired(remoteList.getEtag()))
 					{		
 						//if already cached etag; skip update	
 						GooTaskList newList = GooTaskList.Convert(account.getId(), remoteList, remoteList.getEtag());
 						newList.setId(localList.getId());
-						update(newList);	
+						update(newList);
+						
+						// sync all Tasks
+						if (all) app().getDbhTasks().sync(service, newList.getId());  
 					}
 				}	
 				
@@ -421,6 +431,9 @@ public class GooTaskListsOpenHelper extends GooSyncBaseOpenHelper {
 						GooTaskList newList = GooTaskList.Convert(account.getId(), remoteList, remoteList.getEtag());
 						newList.setId(localList.getId());
 						update(newList);
+						
+						// sync all Tasks
+						if (all) app().getDbhTasks().sync(service, newList.getId());  
 					}
 				}
 				else if (remoteTaskListChanges && GooTaskList.shouldDelete(localList.remoteId, remoteLists)) 
